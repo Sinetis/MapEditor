@@ -422,6 +422,7 @@ namespace MapEditor.XferGui
         }
         private void EquipmentEdit_Load(object sender, EventArgs e)
         {
+            ammoMin_ValueChanged(sender, e);
             SetPreviews();
         }
         private void EquipmentEdit_FormClosing(object sender, FormClosingEventArgs e)
@@ -431,6 +432,13 @@ namespace MapEditor.XferGui
                 e.Cancel = true;
                 randClicked = false;
             }
+        }
+        private void ammoMin_ValueChanged(object sender, EventArgs e)
+        {
+            if (ammoMin.Value > ammoMax.Value)
+                lblCharges.ForeColor = Color.Red;
+            else
+                lblCharges.ForeColor = Color.Black;
         }
         private void enchantment1_SelectedIndexChanged(object sender, EventArgs e)
         {

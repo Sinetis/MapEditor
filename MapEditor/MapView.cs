@@ -22,6 +22,8 @@ namespace MapEditor
         public WallProperties secprops = new WallProperties();
         public bool TileTabLoaded = false;
         public bool mouseMove = false;
+        private bool wheeled = false;
+        private bool makesuggest = false;
         private bool renderingOk = true;
         private int WidthMod = 0;
         private int winX = 0;
@@ -93,7 +95,9 @@ namespace MapEditor
                 contexMenu.Items.Add("Properties");
                 contexMenu.Items.Add("Copy X,Y");
                 contexMenu.Items.Add("Copy Extents");
+                contexMenu.Items.Add("Copy Waypoints");
                 contexMenu.Items[6].Visible = false;
+                contexMenu.Items[7].Visible = false;
                 contexMenu.ItemClicked += new ToolStripItemClickedEventHandler(contexMenu_ItemClicked);
                 contexMenu.Opened += new EventHandler(contextMenu_Popup);
 
@@ -130,6 +134,9 @@ namespace MapEditor
             // initialize buttons
             cmdQuickPreview.Checked = EditorSettings.Default.Edit_PreviewMode;
             radioExtentsShowAll.Checked = EditorSettings.Default.Draw_Extents_3D;
+            radFullSnap.Checked = EditorSettings.Default.Edit_SnapHalfGrid;
+            radCenterSnap.Checked = EditorSettings.Default.Edit_SnapGrid;
+            radCustom.Checked = EditorSettings.Default.Edit_SnapCustom;
             // alter initial mode
             tabMapTools.SelectedTab = tabObjectWps;
             MapInterface.CurrentMode = Mode.OBJECT_SELECT;
@@ -137,101 +144,13 @@ namespace MapEditor
             SelectObjectBtn.Checked = true;
         }
 
-        public void TabsShortcuts(object sender, KeyEventArgs e)
-        {
-            int page = MainWindow.Instance.panelTabs.SelectedIndex;
-            int mode = tabMapTools.SelectedIndex;
-
-            var activeControl = WallMakeNewCtrl.ActiveControl;
-            if (mode == 1)
-                activeControl = TileMakeNewCtrl.ActiveControl;
-            else if (mode == 2)
-                activeControl = EdgeMakeNewCtrl.ActiveControl;
-            else if (mode == 3)
-                activeControl = ActiveControl;
-
-
-            if (activeControl is TextBox || activeControl is NumericUpDown)
-                return;
-
-            if (page != 0)
-                return;
-
-            if (e.KeyCode == Keys.D1 || e.KeyCode == Keys.NumPad1)
-            {
-                tabMapTools.SelectedTab = tabWalls;
-                TabMapToolsSelectedIndexChanged(sender, e);
-                return;
-            }
-            else if (e.KeyCode == Keys.D2 || e.KeyCode == Keys.NumPad2)
-            {
-
-                tabMapTools.SelectedTab = tabTiles;
-                TabMapToolsSelectedIndexChanged(sender, e);
-                return;
-            }
-            else if (e.KeyCode == Keys.D3 || e.KeyCode == Keys.NumPad3)
-            {
-
-                tabMapTools.SelectedTab = tabEdges;
-                TabMapToolsSelectedIndexChanged(sender, e);
-                return;
-            }
-            else if (e.KeyCode == Keys.D4 || e.KeyCode == Keys.NumPad4)
-            {
-                tabMapTools.SelectedTab = tabObjectWps;
-                TabMapToolsSelectedIndexChanged(sender, e);
-                return;
-            }
-            else if (e.KeyCode == Keys.Oemtilde || e.KeyCode == Keys.OemSemicolon || e.KeyCode == Keys.NumPad0)
-            {
-                ModeSwitcher();
-                return;
-            }
-        }
-        public void TabMapToolsSelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (PolygonEditDlg.Visible)
-                return;
-
-            var page = tabMapTools.SelectedTab;
-
-            if (tileBucket && (page != tabTiles))
-                TileMakeNewCtrl.Bucket.Checked = false;
-            if (wallBucket && (page != tabWalls))
-                WallMakeNewCtrl.Bucket.Checked = false;
-
-            // Alter current mode depending on the tab testudo
-            if (page == tabTiles)
-                MapInterface.CurrentMode = (Mode)GetSelectedMode(TileMakeNewCtrl.buttons).Tag;
-            else if (page == tabWalls)
-            {
-                if (WallMakeNewCtrl.WallProp.Visible)
-                {
-                    MapInterface.CurrentMode = Mode.WALL_CHANGE;
-                    return;
-                }
-
-                MapInterface.CurrentMode = (Mode)GetSelectedMode(WallMakeNewCtrl.buttons).Tag;
-            }
-            else if (page == tabEdges)
-                MapInterface.CurrentMode = Mode.EDGE_PLACE;
-            else
-                MapInterface.CurrentMode = (Mode)GetSelectedMode(buttons).Tag;
-        }
-        private void tabEdges_Enter(object sender, EventArgs e)
-        {
-            int selectedIndex = MainWindow.Instance.mapView.TileMakeNewCtrl.comboTileType.SelectedIndex;
-            string tileName = MainWindow.Instance.mapView.TileMakeNewCtrl.comboTileType.Items[selectedIndex].ToString();
-            EdgeMakeNewCtrl.ignoreAllBox.Text = "Ignore all but " + tileName;
-            EdgeMakeNewCtrl.preserveBox.Text = "Preserve " + tileName;
-            EdgeMakeNewCtrl.UpdateListView(sender, e);
-        }
-
         private void mapPanel_MouseDown(object sender, MouseEventArgs e)
         {
             if (!done) return;
             BlockTime = true;
+            if (!MapInterface.KeyHelper.ShiftKey)
+                MainWindow.Instance.suggestBox.Visible = false;
+            MainWindow.Instance.suggestBlocked = false;
             var page = tabMapTools.SelectedTab;
             var mouseCoords = new Point(e.X, e.Y);
 
@@ -244,22 +163,28 @@ namespace MapEditor
                 {
                     Map.Tile tile = Map.Tiles.ContainsKey(GetNearestTilePoint(mouseCoords)) ? Map.Tiles[MapView.GetNearestTilePoint(mouseCoords)] : null;
                     if (tile == null) return;
-                    TileMakeNewCtrl.findTileInList(tile.Graphic);
+                    TileMakeNewCtrl.findTileInList(tile.Graphic, tile.Variation);
                     if (page == tabEdges) tabEdges_Enter(sender, e);
                 }
                 else if (page == tabWalls)
                 {
                     Map.Wall wall = Map.Walls.ContainsKey(GetNearestWallPoint(mouseCoords)) ? Map.Walls[MapView.GetNearestWallPoint(mouseCoords)] : null;
                     if (wall == null) return;
-                    if (MapInterface.KeyHelper.ShiftKey)
+
+                    if (MapInterface.CurrentMode == Mode.WALL_CHANGE)
+                        WallMakeNewCtrl.SetWall(wall, true);
+                    else
                     {
-                        Button o = WallMakeNewCtrl.WallSelectButtons[(int)wall.Facing + (wall.Window ? 11 : 0)];
-                        o.PerformClick();
-                        o.Focus();
+                        if (MapInterface.KeyHelper.ShiftKey)
+                        {
+                            Button o = WallMakeNewCtrl.WallSelectButtons[(int)wall.Facing + (wall.Window ? 11 : 0)];
+                            o.PerformClick();
+                            o.Focus();
+                        }
+                        WallMakeNewCtrl.FindWallInList(wall.Material);
+                        if (MapInterface.KeyHelper.ShiftKey)
+                            WallMakeNewCtrl.numWallVari.Value = wall.Variation;
                     }
-                    WallMakeNewCtrl.FindWallInList(wall.Material);
-                    if (MapInterface.KeyHelper.ShiftKey)
-                        WallMakeNewCtrl.numWallVari.Value = wall.Variation;
                 }
                 else if (page == tabEdges)
                 {
@@ -301,13 +226,10 @@ namespace MapEditor
                 mapPanel.Invalidate();
             }
             // Open properties if shift is hold, show context menu otherwise
-            if (MapInterface.CurrentMode == Mode.OBJECT_SELECT && e.Button.Equals(MouseButtons.Right))
-            {
-                // TODO: ShowObjectProperties(MapInterface.ObjectSelect(pt));
+            if ((MapInterface.CurrentMode == Mode.OBJECT_SELECT || MapInterface.CurrentMode == Mode.WAYPOINT_SELECT) && e.Button.Equals(MouseButtons.Right))
                 contexMenu.Show(mapPanel, pt);
-            }
 
-            if (MapInterface.CurrentMode == Mode.OBJECT_SELECT || MapInterface.CurrentMode == Mode.OBJECT_PLACE || MapInterface.CurrentMode == Mode.POLYGON_RESHAPE || MapInterface.CurrentMode == Mode.WAYPOINT_PLACE)
+            if (MapInterface.CurrentMode == Mode.OBJECT_SELECT || MapInterface.CurrentMode == Mode.OBJECT_PLACE || MapInterface.CurrentMode == Mode.POLYGON_RESHAPE || MapInterface.CurrentMode == Mode.WAYPOINT_PLACE || MapInterface.CurrentMode == Mode.WAYPOINT_SELECT)
             {
                 string objName = cboObjCreate.Text;
                 if (ThingDb.Things.ContainsKey(objName))
@@ -461,7 +383,6 @@ namespace MapEditor
                     if (!WallMakeNewCtrl.WallSelectButtons[0].Focused && !WallMakeNewCtrl.WallSelectButtons[11].Focused && !WallMakeNewCtrl.WallSelectButtons[12].Focused)
                     {
                         Button o = WallMakeNewCtrl.WallSelectButtons[0];
-
                     }
                 }
                 if (WallMakeNewCtrl.RecWall.Checked)
@@ -541,38 +462,35 @@ namespace MapEditor
                     MapInterface.HandleLMouseClick(pt);
 
                 // Snap to grid
-                if (EditorSettings.Default.Edit_SnapGrid)
-                    ptAligned = new Point((int)Math.Round((decimal)(pt.X / squareSize)) * squareSize, (int)Math.Round((decimal)(pt.Y / squareSize)) * squareSize);
-                if (EditorSettings.Default.Edit_SnapHalfGrid)
-                    ptAligned = new Point((int)Math.Round((decimal)((pt.X / (squareSize)) * squareSize) + squareSize / 2), (int)Math.Round((decimal)((pt.Y / (squareSize)) * squareSize) + squareSize / 2));
-                if (EditorSettings.Default.Edit_SnapCustom)
-                {
-                    int snap = (int)customSnapValue.Value;
-                    ptAligned = new Point((int)Math.Round((decimal)(pt.X / snap)) * snap, (int)Math.Round((decimal)(pt.Y / snap)) * snap);
-                }
+                bool snapGrid = EditorSettings.Default.Edit_SnapGrid || EditorSettings.Default.Edit_SnapHalfGrid || EditorSettings.Default.Edit_SnapCustom;
+                ptAligned = GetGridPoint(pt, relXX, relYY);
 
                 // moving waypoints
-                if (MapInterface.CurrentMode == Mode.WAYPOINT_SELECT)
+                if (MapInterface.CurrentMode == Mode.WAYPOINT_SELECT && MapInterface.SelectedWaypoint != null)
                 {
-                    // multi-move
+                    float x = MapInterface.SelectedWaypoint.Point.X;
+                    float y = MapInterface.SelectedWaypoint.Point.Y;
+
+                    if (relXX == 0 && relYY == 0)
+                    {
+                        relXX = x - pt.X;
+                        relYY = y - pt.Y;
+                    }
+                    ptAligned = GetGridPoint(pt, relXX, relYY);
+
                     if (MapInterface.SelectedWaypoints.Count > 0)
                     {
-                        foreach (var wp in MapInterface.SelectedWaypoints)
+                        foreach (Map.Waypoint selectedWaypoint in MapInterface.SelectedWaypoints)
                         {
-                            wp.Point.X += e.X - mouseKeep.X;
-                            wp.Point.Y += e.Y - mouseKeep.Y;
+                            float relX = ((x - selectedWaypoint.Point.X) - (!snapGrid ? relXX : 0f));
+                            float relY = ((y - selectedWaypoint.Point.Y) - (!snapGrid ? relYY : 0f));
+                            var ResultLoc = new PointF(ptAligned.X - relX, ptAligned.Y - relY);
+                            if (ResultLoc.Y < 5870.0 && ResultLoc.X < 5885.0 && ResultLoc.X > 10.0 && ResultLoc.Y > 10.0)
+                                selectedWaypoint.Point = ResultLoc;
                         }
-                        mouseKeep = new Point(e.X, e.Y);
-                        mapPanel.Invalidate();
                     }
-                    // single-move
-                    else if (MapInterface.SelectedWaypoint != null)
-                    {
-                        MapInterface.SelectedWaypoint.Point.X = ptAligned.X; // Move the waypoint
-                        MapInterface.SelectedWaypoint.Point.Y = ptAligned.Y;
 
-                        mapPanel.Invalidate(); // Repaint the screen
-                    }
+                    MapRenderer.UpdateCanvas(true, false, false);
                 }
                 // moving polypoints tudo
                 if (MapInterface.CurrentMode == Mode.POLYGON_RESHAPE)
@@ -610,8 +528,6 @@ namespace MapEditor
                     }
                 }
                 // moving objects
-                bool aligned = false;
-
                 if (!SelectedObjects.IsEmpty && Get45RecSize() < 5 && e.Y < 5870 && e.X < 5885 && e.X > 10 && e.Y > 10)
                 {
                     if (MapInterface.CurrentMode == Mode.OBJECT_SELECT)
@@ -627,27 +543,12 @@ namespace MapEditor
                                 relXX = closestX - pt.X;
                                 relYY = closestY - pt.Y;
                             }
+                            ptAligned = GetGridPoint(pt, relXX, relYY);
 
-                            if (EditorSettings.Default.Edit_SnapGrid)
-                            {
-                                aligned = true;
-                                ptAligned = new Point((int)Math.Round((decimal)((pt.X + (int)relXX) / squareSize)) * squareSize, (int)Math.Round((decimal)((pt.Y + (int)relYY) / squareSize)) * squareSize);
-                            }
-                            if (EditorSettings.Default.Edit_SnapHalfGrid)
-                            {
-                                aligned = true;
-                                ptAligned = new Point((int)Math.Round((decimal)(((pt.X + (int)relXX) / squareSize) * squareSize) + squareSize / 2), (int)Math.Round((decimal)(((pt.Y + (int)relYY) / squareSize) * squareSize) + squareSize / 2));
-                            }
-                            if (EditorSettings.Default.Edit_SnapCustom)
-                            {
-                                aligned = true;
-                                int snap = (int)customSnapValue.Value;
-                                ptAligned = new Point((int)Math.Round((decimal)((pt.X + relXX) / snap)) * snap, (int)Math.Round((decimal)((pt.Y + relYY) / snap)) * snap);
-                            }
                             foreach (Map.Object co in SelectedObjects)
                             {
-                                float relX = (closestX - co.Location.X) - (!aligned ? (float)relXX : 0);
-                                float relY = (closestY - co.Location.Y) - (!aligned ? (float)relYY : 0);
+                                float relX = (closestX - co.Location.X) - (!snapGrid ? relXX : 0);
+                                float relY = (closestY - co.Location.Y) - (!snapGrid ? relYY : 0);
                                 PointF ResultLoc = new PointF(ptAligned.X - relX, ptAligned.Y - relY);
                                 if (!(ResultLoc.Y < 5870 && ResultLoc.X < 5885 && ResultLoc.X > 10 && ResultLoc.Y > 10)) continue;
                                 co.Location = ResultLoc;
@@ -701,6 +602,15 @@ namespace MapEditor
             MapInterface.RecSelected.Clear();
             MapInterface.selected45Area = new Point[4];
 
+            if (MapInterface.CurrentMode == Mode.OBJECT_PLACE)
+            {
+                if (chkRandomize.Checked)
+                {
+                    var rand = new Random();
+                    cboObjCreate.SelectedIndex = rand.Next(0, cboObjCreate.Items.Count);
+                }
+            }
+
             //////////////delete rnpty time///////////////////////úú
 
             if (!MapInterface.OpUpdatedTiles && !MapInterface.OpUpdatedWalls && !MapInterface.OpUpdatedObjects && !MapInterface.OpUpdatedPolygons && !MapInterface.OpUpdatedWaypoints && !moved && added)
@@ -723,8 +633,9 @@ namespace MapEditor
                     cmdUndo.Enabled = false;
                 }
             }
-            BlockTime = false;
+
             noPre:
+            BlockTime = false;
 
             //////////////////////////////////////////////////
 
@@ -803,6 +714,9 @@ namespace MapEditor
 
             if (MapInterface.CurrentMode == Mode.OBJECT_SELECT)
                 ShowObjectProperties(MapInterface.ObjectSelect(new Point(e.X, e.Y)));
+
+            if ((MapInterface.CurrentMode == Mode.WAYPOINT_SELECT || MapInterface.CurrentMode == Mode.WAYPOINT_CONNECT) && MapInterface.SelectedWaypoint != null)
+                new WaypointProperties() { wplist = Map.Waypoints, wpPub = MapInterface.SelectedWaypoint, StartPosition = FormStartPosition.CenterParent }.ShowDialog(this);
         }
         private void mapPanel_Paint(object sender, PaintEventArgs e)
         {
@@ -846,6 +760,108 @@ namespace MapEditor
             mapPanel.Invalidate();
         }
 
+        #region Tabs
+        public void TabsShortcuts(object sender, KeyEventArgs e)
+        {
+            if (cboObjCreate.Focused)
+                return;
+
+            int page = MainWindow.Instance.panelTabs.SelectedIndex;
+            int mode = tabMapTools.SelectedIndex;
+
+            var activeControl = WallMakeNewCtrl.ActiveControl;
+            if (mode == 1)
+                activeControl = TileMakeNewCtrl.ActiveControl;
+            else if (mode == 2)
+                activeControl = EdgeMakeNewCtrl.ActiveControl;
+            else if (mode == 3)
+                activeControl = ActiveControl;
+
+
+            if (activeControl is TextBox || activeControl is NumericUpDown)
+                return;
+
+            if (page != 0)
+                return;
+
+            if (e.KeyCode == Keys.D1 || e.KeyCode == Keys.NumPad1)
+            {
+                tabMapTools.SelectedTab = tabWalls;
+                TabMapToolsSelectedIndexChanged(sender, e);
+                return;
+            }
+            else if (e.KeyCode == Keys.D2 || e.KeyCode == Keys.NumPad2)
+            {
+
+                tabMapTools.SelectedTab = tabTiles;
+                TabMapToolsSelectedIndexChanged(sender, e);
+                return;
+            }
+            else if (e.KeyCode == Keys.D3 || e.KeyCode == Keys.NumPad3)
+            {
+
+                tabMapTools.SelectedTab = tabEdges;
+                TabMapToolsSelectedIndexChanged(sender, e);
+                return;
+            }
+            else if (e.KeyCode == Keys.D4 || e.KeyCode == Keys.NumPad4)
+            {
+                tabMapTools.SelectedTab = tabObjectWps;
+                TabMapToolsSelectedIndexChanged(sender, e);
+                return;
+            }
+            else if (e.KeyCode == Keys.Oemtilde || e.KeyCode == Keys.OemSemicolon || e.KeyCode == Keys.NumPad0)
+            {
+                ModeSwitcher();
+                return;
+            }
+        }
+        public void TabMapToolsSelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (PolygonEditDlg.Visible)
+                return;
+            if (MainWindow.Instance != null)
+                MainWindow.Instance.suggestBox.Visible = false;
+
+            var page = tabMapTools.SelectedTab;
+
+            if (tileBucket && (page != tabTiles))
+                TileMakeNewCtrl.Bucket.Checked = false;
+            if (wallBucket && (page != tabWalls))
+                WallMakeNewCtrl.Bucket.Checked = false;
+
+            // Alter current mode depending on the tab testudo
+            if (page == tabTiles)
+                MapInterface.CurrentMode = (Mode)GetSelectedMode(TileMakeNewCtrl.buttons).Tag;
+            else if (page == tabWalls)
+            {
+                if (WallMakeNewCtrl.WallProp.Visible)
+                {
+                    MapInterface.CurrentMode = Mode.WALL_CHANGE;
+                    return;
+                }
+
+                MapInterface.CurrentMode = (Mode)GetSelectedMode(WallMakeNewCtrl.buttons).Tag;
+            }
+            else if (page == tabEdges)
+                MapInterface.CurrentMode = Mode.EDGE_PLACE;
+            else
+                MapInterface.CurrentMode = (Mode)GetSelectedMode(buttons).Tag;
+        }
+        private void tabEdges_Enter(object sender, EventArgs e)
+        {
+            int selectedIndex = MainWindow.Instance.mapView.TileMakeNewCtrl.comboTileType.SelectedIndex;
+            string tileName = MainWindow.Instance.mapView.TileMakeNewCtrl.comboTileType.Items[selectedIndex].ToString();
+            EdgeMakeNewCtrl.ignoreAllBox.Text = "Ignore all but " + tileName;
+            EdgeMakeNewCtrl.preserveBox.Text = "Preserve " + tileName;
+            EdgeMakeNewCtrl.UpdateListView(sender, e);
+        }
+        public int GetCurrentTab()
+        {
+            return tabMapTools.SelectedIndex;
+        }
+        #endregion
+        #region Key Handlers
         private void MapView_KeyPressed(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Delete)
@@ -1027,53 +1043,129 @@ namespace MapEditor
                 mapPanel.Invalidate();
             }
         }
+        #endregion
+        #region Object/Waypoint Events
         private void cboObjMouseWheel(object sender, MouseEventArgs e)
         {
             ComboBox combo = sender as ComboBox;
             Point mousePt = new Point(e.X, e.Y);
             mousePt = combo.PointToScreen(mousePt);
             mousePt = MainWindow.Instance.PointToClient(mousePt);
+            wheeled = false;
 
             if (groupAdv.ClientRectangle.Contains(mousePt)) return;
-            object thingName = cboObjCreate.SelectedItem;
-            if (ThingDb.Things[(string)thingName].Xfer == "DoorXfer" ||
-                ThingDb.Things[(string)thingName].Xfer == "NPCXfer" ||
-                ThingDb.Things[(string)thingName].Xfer == "MonsterXfer" ||
-                ThingDb.Things[(string)thingName].Xfer == "SentryXfer")
+            ThingDb.Thing thing = ThingDb.GetThing(cboObjCreate.Text);
+            if (thing == null)
+                return;
+            if (thing.Xfer == "DoorXfer" || thing.Xfer == "NPCXfer" || thing.Xfer == "MonsterXfer" || thing.Xfer == "SentryXfer")
             {
                 ((HandledMouseEventArgs)e).Handled = true;
                 MouseWheelEventHandler(sender, e);
             }
             else
             {
-                MapRenderer.UpdateCanvas(true, false);
+                MapRenderer.UpdateCanvas(true, false, true);
                 mapPanel.Invalidate();
             }
         }
         private void CboObjCreateSelectedIndexChanged(object sender, EventArgs e)
         {
-            object thingName = cboObjCreate.SelectedItem;
-            // Update object image
-            delta = 0;
-            if (thingName != null)
+            string text = cboObjCreate.Text;
+            if (string.IsNullOrEmpty(text))
+                return;
+            string lower = text.ToLower();
+            delta = 0.0f;
+            string index = "";
+            bool match = false;
+            bool match2 = false;
+            foreach (string obj in cboObjCreate.Items)
+            {
+                if (obj.ToLower().StartsWith(lower))
+                {
+                    match = true;
+                    index = obj;
+                    break;
+                }
+            }
+            if (!match || makesuggest && wheeled)
+            {
+                wheeled = false;
+                if (makesuggest)
+                {
+                    cboObjCreate.Text = cboObjCreate.Text.Substring(0, cboObjCreate.SelectionStart);
+                    cboObjCreate.SelectionStart = cboObjCreate.Text.Length;
+                    cboObjCreate.SelectionLength = 0;
+                    lower = cboObjCreate.Text.ToLower();
+                }
+                makesuggest = false;
+                if (MainWindow.Instance != null)
+                    MainWindow.Instance.suggestBox.Items.Clear();
+                foreach (string str1 in cboObjCreate.Items)
+                {
+                    if (str1.ToLower().Contains(lower))
+                    {
+                        match2 = true;
+                        string str2 = str1;
+                        if (MainWindow.Instance != null && !MainWindow.Instance.suggestBox.Items.Contains(str2))
+                            MainWindow.Instance.suggestBox.Items.Add(str2);
+                    }
+                }
+                if (match2 && MainWindow.Instance != null && MainWindow.Instance.suggestBox.Items.Count > 0)
+                    MainWindow.Instance.suggestBox.Visible = true;
+            }
+            if (!match)
+                return;
+            if (wheeled && !makesuggest)
+            {
+                wheeled = false;
+                cboObjCreate.Text = index;
+                cboObjCreate.SelectionStart = lower.Length;
+                cboObjCreate.SelectionLength = index.Length - lower.Length;
+            }
+            else
             {
                 PlaceObjectBtn.Checked = true;
-
-                ThingDb.Thing tt = ThingDb.Things[(string)thingName];
-                Bitmap icon = null;
-                if (tt.SpritePrettyImage > 0 && (tt.Class & ThingDb.Thing.ClassFlags.MONSTER) == 0)
+                ThingDb.Thing thing = ThingDb.Things[index];
+                Bitmap bitmap = (Bitmap)null;
+                if (thing.SpritePrettyImage > 0 && (thing.Class & ThingDb.Thing.ClassFlags.MONSTER) == ThingDb.Thing.ClassFlags.NULL)
+                    bitmap = MapRenderer.VideoBag.GetBitmap(thing.SpritePrettyImage);
+                else if (thing.SpriteMenuIcon > 0)
                 {
-                    icon = MapRenderer.VideoBag.GetBitmap(tt.SpritePrettyImage);
+                    bitmap = MapRenderer.VideoBag.GetBitmap(thing.SpriteMenuIcon);
+                    if (thing.Xfer != "InvisibleLightXfer" && !thing.Name.StartsWith("Amb") && thing.SpriteAnimFrames.Count > 0)
+                        bitmap = MapRenderer.VideoBag.GetBitmap(thing.SpriteAnimFrames[thing.SpriteAnimFrames.Count - 1]);
                 }
-                else if (tt.SpriteMenuIcon > 0)
-                {
-                    icon = MapRenderer.VideoBag.GetBitmap(tt.SpriteMenuIcon);
-
-                    if (tt.Xfer != "InvisibleLightXfer" && !tt.Name.StartsWith("Amb"))
-                        if (tt.SpriteAnimFrames.Count > 0) icon = MapRenderer.VideoBag.GetBitmap(tt.SpriteAnimFrames[tt.SpriteAnimFrames.Count-1]);
-                }
-                objectPreview.BackgroundImage = icon;
+                objectPreview.BackgroundImage = (Image)bitmap;
+                MapRenderer.UpdateCanvas(true, false, true);
+                mapPanel.Invalidate();
+                makesuggest = false;
             }
+        }
+        private void cboObjCreate_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode >= Keys.A && e.KeyCode <= Keys.Z || e.KeyCode >= Keys.D0 && e.KeyCode <= Keys.D9 || e.KeyCode >= Keys.NumPad0 && e.KeyCode <= Keys.NumPad9)
+            {
+                MainWindow.Instance.suggestBox.Visible = false;
+                wheeled = true;
+            }
+            else if (e.KeyCode == Keys.Space)
+            {
+                e.SuppressKeyPress = true;
+                makesuggest = true;
+                e.Handled = true;
+                wheeled = true;
+                CboObjCreateSelectedIndexChanged(sender, e);
+            }
+            else
+                wheeled = false;
+        }
+        private void cboObjCreate_MouseClick(object sender, MouseEventArgs e)
+        {
+            MainWindow.Instance.suggestBox.Visible = false;
+        }
+        private void objectCategoriesBox_MouseClick(object sender, MouseEventArgs e)
+        {
+            MainWindow.Instance.suggestBox.Visible = false;
         }
         internal void LoadObjectCategories()
         {
@@ -1127,6 +1219,8 @@ namespace MapEditor
         }
         public void ObjectModesChanged(object sender, EventArgs e)
         {
+            if (MainWindow.Instance != null)
+                MainWindow.Instance.suggestBox.Visible = false;
             RadioButton radioButton = sender as RadioButton;
             radioButton.Font = new Font(radioButton.Font.Name, radioButton.Font.Size, FontStyle.Regular);
             if (!radioButton.Checked) return;
@@ -1149,6 +1243,25 @@ namespace MapEditor
             MapRenderer.UpdateCanvas(true, false);
             mapPanel.Invalidate();
         }
+
+        private void WaypointName_TextChanged(object sender, EventArgs e)
+        {
+            if (MapInterface.SelectedWaypoint != null)
+            {
+                MapInterface.SelectedWaypoint.Name = waypointName.Text;
+            }
+        }
+        private void WaypointEnabled_CheckedChanged(object sender, EventArgs e)
+        {
+            foreach (Map.Waypoint selectedWaypoint in MapInterface.SelectedWaypoints)
+                selectedWaypoint.Flags = selectedWaypoint.Flags > 0 ? 0 : 1;
+        }
+        private void WaypointSelectAll_Click(object sender, EventArgs e)
+        {
+            selectWPBtn.PerformClick();
+            MapInterface.WaypointSelectAll();
+        }
+        #endregion
 
         #region Quick Menu
         private void cmdQuickSave_Click(object sender, EventArgs e)
@@ -1194,6 +1307,16 @@ namespace MapEditor
             else
                 cmdRedo.BackgroundImage = Properties.Resources.redoDisabled;
         }
+        private void chkRandomize_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chkRandomize.Checked)
+            {
+                if (!PlaceObjectBtn.Checked)
+                    PlaceObjectBtn.Checked = true;
+                var rand = new Random();
+                cboObjCreate.SelectedIndex = rand.Next(0, cboObjCreate.Items.Count);
+            }
+        }
 
         private double colorFadePercentage = 0.05;
         public void ShowMapStatus(string message)
@@ -1227,23 +1350,38 @@ namespace MapEditor
             contextMenuOpen = true;
             bool enable = true;
 
-            if (SelectedObjects.IsEmpty)
+            if ((SelectedObjects.IsEmpty) || (MapInterface.CurrentMode != Mode.OBJECT_SELECT))
                 enable = false;
 
             // These are inaccessible if there are no selected objects
             contexMenu.Items[0].Enabled = enable;
+            contexMenu.Items[1].Enabled = Clipboard.GetDataObject().GetDataPresent(typeof(MapObjectCollection));
             contexMenu.Items[2].Enabled = enable;
             contexMenu.Items[3].Enabled = enable;
+            for (int i = 0; i < 7; i++)
+                contexMenu.Items[i].Visible = true;
+            contexMenu.Items[7].Visible = false;
 
             if (SelectedObjects.Items.Count > 1)
                 contexMenu.Items[6].Visible = true;
             else
                 contexMenu.Items[6].Visible = false;
+
+            if (MapInterface.CurrentMode != Mode.WAYPOINT_SELECT)
+                return;
+
+            // Show Copy Waypoints only
+            for (int i = 0; i < 7; i++)
+                contexMenu.Items[i].Visible = false;
+            contexMenu.Items[7].Visible = true;
         }
         private void contextMenuCopy_Click(object sender, EventArgs e)
         {
             if (!SelectedObjects.IsEmpty)
+            {
                 Clipboard.SetDataObject(SelectedObjects.Clone(), false);
+                ShowMapStatus("COPIED");
+            }
         }
         private void contextMenuStrip_Open(object sender, EventArgs e)
         {
@@ -1313,9 +1451,11 @@ namespace MapEditor
             else if (item.Text == "Properties")
                 contextMenuProperties_Click(sender, e);
             else if (item.Text == "Copy X,Y")
-                Copy_Coords(sender, e);
+                contextMenuCopyCoords_Click(sender, e);
             else if (item.Text == "Copy Extents")
-                menuItem1_Click(sender, e);
+                contextMenuCopyExtents_Click(sender, e);
+            else if (item.Text == "Copy Waypoints")
+                contextMenuCopyWaypoints_Click(sender, e);
         }
         private void contextMenuDelete_Click(object sender, EventArgs e)
         {
@@ -1326,25 +1466,49 @@ namespace MapEditor
         {
             mapPanel.Cursor = Cursors.Default;
         }
-        private void menuItem1_Click(object sender, EventArgs e)
+        private void contextMenuCopyExtents_Click(object sender, EventArgs e)
         {
             string content = "";
             foreach (Map.Object obj in SelectedObjects.Items)
-            {
-                content = content + obj.Extent.ToString() + Environment.NewLine;
+                content += obj.Extent.ToString() + Environment.NewLine;
 
-            }
             Clipboard.SetDataObject(content, false);
-
+            ShowMapStatus("COPIED");
         }
-        private void Copy_Coords(object sender, EventArgs e)
+        private void contextMenuCopyWaypoints_Click(object sender, EventArgs e)
+        {
+            string content = "";
+            foreach (Map.Waypoint wp in MapInterface.SelectedWaypoints)
+                content += wp.Number.ToString() + Environment.NewLine;
+
+            Clipboard.SetDataObject(content, false);
+            ShowMapStatus("COPIED");
+        }
+        private void contextMenuCopyCoords_Click(object sender, EventArgs e)
         {
             copyPoint = mouseLocation;
             string content = copyPoint.X.ToString() + ", " + copyPoint.Y.ToString();
             Clipboard.SetDataObject(content, true);
+            ShowMapStatus("COPIED");
         }
         #endregion
         #region 3D Extents/Grid Snap Settings
+        private Point GetGridPoint(Point start, float xOffset = 0, float yOffset = 0)
+        {
+            var ptAligned = start;
+            if (EditorSettings.Default.Edit_SnapGrid)
+                ptAligned = new Point((int)Math.Round((decimal)((start.X + (int)xOffset) / squareSize)) * squareSize, (int)Math.Round((decimal)((start.Y + (int)yOffset) / squareSize)) * squareSize);
+
+            if (EditorSettings.Default.Edit_SnapHalfGrid)
+                ptAligned = new Point((int)Math.Round((decimal)(((start.X + (int)xOffset) / squareSize) * squareSize) + squareSize / 2), (int)Math.Round((decimal)(((start.Y + (int)yOffset) / squareSize) * squareSize) + squareSize / 2));
+            if (EditorSettings.Default.Edit_SnapCustom)
+            {
+                int snap = (int)customSnapValue.Value;
+                ptAligned = new Point((int)Math.Round((decimal)((start.X + xOffset) / snap)) * snap, (int)Math.Round((decimal)((start.Y + yOffset) / snap)) * snap);
+            }
+            return ptAligned;
+        }
+
         private void radHideExtents_CheckedChanged(object sender, EventArgs e)
         {
             EditorSettings.Default.Draw_Extents = false;
@@ -1360,6 +1524,13 @@ namespace MapEditor
             EditorSettings.Default.Draw_Extents = true;
             EditorSettings.Default.Draw_AllExtents = true;
         }
+        private void radNoSnap_CheckedChanged(object sender, EventArgs e)
+        {
+            customSnapValue.Enabled = false;
+            EditorSettings.Default.Edit_SnapCustom = false;
+            EditorSettings.Default.Edit_SnapGrid = false;
+            EditorSettings.Default.Edit_SnapHalfGrid = false;
+        }
         private void radFullSnap_CheckedChanged(object sender, EventArgs e)
         {
             customSnapValue.Enabled = false;
@@ -1372,13 +1543,6 @@ namespace MapEditor
             customSnapValue.Enabled = false;
             EditorSettings.Default.Edit_SnapCustom = false;
             EditorSettings.Default.Edit_SnapGrid = radCenterSnap.Checked;
-            EditorSettings.Default.Edit_SnapHalfGrid = false;
-        }
-        private void radNoSnap_CheckedChanged(object sender, EventArgs e)
-        {
-            customSnapValue.Enabled = false;
-            EditorSettings.Default.Edit_SnapCustom = false;
-            EditorSettings.Default.Edit_SnapGrid = false;
             EditorSettings.Default.Edit_SnapHalfGrid = false;
         }
         private void radCustom_CheckedChanged(object sender, EventArgs e)
@@ -1414,10 +1578,16 @@ namespace MapEditor
         }
         public void OpenScripts()
         {
+            if (strSd.Visible)
+                return;
+
             strSd = new ScriptFunctionDialog();
             strSd.Scripts = Map.Scripts;
-            strSd.ShowDialog(this);
-            Map.Scripts = strSd.Scripts;
+            strSd.Show(this);
+        }
+        public void SaveScripts(Map.ScriptObject newScripts)
+        {
+            Map.Scripts = newScripts;
         }
         public void PlayerStartSelect()
         {
@@ -1517,15 +1687,21 @@ namespace MapEditor
             if (obj == null) return;
 
             // working on the object clone (we should be able to rollback changes)
-            int ndx = Map.Objects.IndexOf(obj);
+            int index = Map.Objects.IndexOf(obj);
+            // store Undo pointer
+            var timeObj = TimeObjects.Find(o => o.Object == obj);
+            int cloneIndex = TimeObjects.IndexOf(timeObj);
             //MessageBox.Show(ndx.ToString());
             var propDlg = new ObjectPropertiesDialog();
-            propDlg.Object = (Map.Object)Map.Objects[ndx];
+            propDlg.Object = (Map.Object)Map.Objects[index];
 
             if (propDlg.ShowDialog() == DialogResult.OK)
             {
                 // update object reference to updated version
-                Map.Objects[ndx] = propDlg.Object;
+                Map.Objects[index] = propDlg.Object;
+                // update Undo stored object
+                if (cloneIndex != -1)
+                    TimeObjects[cloneIndex].Object = propDlg.Object;
                 if (SelectedObjects.Items.Count > 0) SelectedObjects.Items[0] = propDlg.Object;
 
                 // hint renderer
@@ -1539,6 +1715,13 @@ namespace MapEditor
             if (indx >= 0)
                 SelectedObjects.Items.RemoveAt(indx);
 
+        }
+        public void DeletefromSelected(Map.Waypoint item)
+        {
+            int index = Array.IndexOf(MapInterface.SelectedWaypoints.ToArray(), item);
+            if (index < 0)
+                return;
+            MapInterface.SelectedWaypoints.RemoveAt(index);
         }
         public void DeleteSelectedObjects()
         {
@@ -1580,39 +1763,26 @@ namespace MapEditor
             if (MapInterface.CurrentMode == Mode.WAYPOINT_SELECT && MapInterface.SelectedWaypoint != null)
             {
                 ApplyStore();
-                MapInterface.WaypointRemove(MapInterface.SelectedWaypoint);
+                var newList = new List<Map.Waypoint>();
+                newList.AddRange(MapInterface.SelectedWaypoints);
+                foreach (Map.Waypoint wp in newList)
+                    MapInterface.WaypointRemove(wp);
+                
                 Store(MapInterface.CurrentMode, TimeEvent.POST);
             }
 
             MapRenderer.UpdateCanvas(true, false);
         }
 
-        private void WaypointName_TextChanged(object sender, EventArgs e)
-        {
-            if (MapInterface.SelectedWaypoint != null)
-            {
-                MapInterface.SelectedWaypoint.Name = waypointName.Text;
-            }
-        }
-        private void WaypointEnabled_CheckedChanged(object sender, EventArgs e)
-        {
-            if (MapInterface.SelectedWaypoint != null)
-            {
-                MapInterface.SelectedWaypoint.Flags = waypointEnabled.Checked ? 1 : 0;
-            }
-        }
-        private void WaypointSelectAll_Click(object sender, EventArgs e)
-        {
-            selectWPBtn.PerformClick();
-            MapInterface.WaypointSelectAll();
-        }
-
         private void Picker_CheckedChanged(object sender, EventArgs e)
         {
+            if (MainWindow.Instance != null)
+                MainWindow.Instance.suggestBox.Visible = false;
             if (Picker.Checked)
             {
                 TileMakeNewCtrl.Picker.Checked = true;
                 WallMakeNewCtrl.Picker.Checked = true;
+                WallMakeNewCtrl.PickerProp.Checked = true;
                 EdgeMakeNewCtrl.Picker.Checked = true;
                 picking = true;
                 Cursor myCursor = Cursors.Cross;
@@ -1627,6 +1797,7 @@ namespace MapEditor
                 TileMakeNewCtrl.Picker.Checked = false;
                 EdgeMakeNewCtrl.Picker.Checked = false;
                 WallMakeNewCtrl.Picker.Checked = false;
+                WallMakeNewCtrl.PickerProp.Checked = false;
                 mapPanel.Cursor = Cursors.Default;
             }
         }
@@ -1653,11 +1824,6 @@ namespace MapEditor
             MapInterface.ObjectSelect45Rectangle(mouseLocation);
 
             mapPanel.Invalidate();
-        }
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-            MapRenderer.FakeWalls.Clear();
-            MapRenderer.UpdateCanvas(false, true);
         }
 
         #region Wall/Tile Position Functions
@@ -2567,8 +2733,6 @@ namespace MapEditor
                 StopUndo = true;
                 cmdUndo.Enabled = false;
                 MainWindow.Instance.miniUndo.Enabled = false;
-                //TimeManager.Clear();
-                //currentStep = 0;
                 return;
             }
 
@@ -3424,6 +3588,10 @@ namespace MapEditor
         public ComboBox cboObjCreate;
         public PictureBox objectPreview;
         private Label label6;
+        public CheckBox chkRandomize;
+        private MenuItem contextMenuCopyWaypoints;
+        public NumericUpDown wpConnFlag;
+        private Label label4;
         private ContextMenuStrip contexMenu = new ContextMenuStrip();
 
         private void InitializeComponent()
@@ -3459,6 +3627,7 @@ namespace MapEditor
             this.radCenterSnap = new System.Windows.Forms.RadioButton();
             this.radCustom = new System.Windows.Forms.RadioButton();
             this.waypointGroup = new System.Windows.Forms.GroupBox();
+            this.wpConnFlag = new System.Windows.Forms.NumericUpDown();
             this.label3 = new System.Windows.Forms.Label();
             this.waypointSelectAll = new System.Windows.Forms.Button();
             this.waypointName = new System.Windows.Forms.TextBox();
@@ -3467,12 +3636,14 @@ namespace MapEditor
             this.selectWPBtn = new System.Windows.Forms.RadioButton();
             this.waypointEnabled = new System.Windows.Forms.CheckBox();
             this.pathWPBtn = new System.Windows.Forms.RadioButton();
+            this.label4 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.extentsGroup = new System.Windows.Forms.GroupBox();
             this.radioExtentsShowAll = new System.Windows.Forms.RadioButton();
             this.radioExtentsHide = new System.Windows.Forms.RadioButton();
             this.radioExtentShowColl = new System.Windows.Forms.RadioButton();
             this.objectGroup = new System.Windows.Forms.GroupBox();
+            this.chkRandomize = new System.Windows.Forms.CheckBox();
             this.SelectObjectBtn = new System.Windows.Forms.RadioButton();
             this.objectPreview = new System.Windows.Forms.PictureBox();
             this.select45Box = new System.Windows.Forms.CheckBox();
@@ -3499,6 +3670,7 @@ namespace MapEditor
             this.contextMenuCopy = new System.Windows.Forms.MenuItem();
             this.contextMenuPaste = new System.Windows.Forms.MenuItem();
             this.contextcopyContent = new System.Windows.Forms.MenuItem();
+            this.contextMenuCopyWaypoints = new System.Windows.Forms.MenuItem();
             this.tmrInvalidate = new System.Windows.Forms.Timer(this.components);
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.UndoTimer = new System.Windows.Forms.Timer(this.components);
@@ -3519,6 +3691,7 @@ namespace MapEditor
             this.groupGridSnap.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.customSnapValue)).BeginInit();
             this.waypointGroup.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.wpConnFlag)).BeginInit();
             this.extentsGroup.SuspendLayout();
             this.objectGroup.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.objectPreview)).BeginInit();
@@ -3708,7 +3881,7 @@ namespace MapEditor
             this.tabTiles.Controls.Add(this.TileMakeNewCtrl);
             this.tabTiles.Location = new System.Drawing.Point(4, 22);
             this.tabTiles.Name = "tabTiles";
-            this.tabTiles.Size = new System.Drawing.Size(192, 74);
+            this.tabTiles.Size = new System.Drawing.Size(228, 615);
             this.tabTiles.TabIndex = 5;
             this.tabTiles.Text = "Tiles";
             // 
@@ -3725,7 +3898,7 @@ namespace MapEditor
             this.tabEdges.Controls.Add(this.EdgeMakeNewCtrl);
             this.tabEdges.Location = new System.Drawing.Point(4, 22);
             this.tabEdges.Name = "tabEdges";
-            this.tabEdges.Size = new System.Drawing.Size(192, 74);
+            this.tabEdges.Size = new System.Drawing.Size(228, 615);
             this.tabEdges.TabIndex = 6;
             this.tabEdges.Text = "Edges";
             this.tabEdges.Enter += new System.EventHandler(this.tabEdges_Enter);
@@ -3761,9 +3934,9 @@ namespace MapEditor
             this.groupGridSnap.Controls.Add(this.radNoSnap);
             this.groupGridSnap.Controls.Add(this.radCenterSnap);
             this.groupGridSnap.Controls.Add(this.radCustom);
-            this.groupGridSnap.Location = new System.Drawing.Point(113, 406);
+            this.groupGridSnap.Location = new System.Drawing.Point(113, 400);
             this.groupGridSnap.Name = "groupGridSnap";
-            this.groupGridSnap.Size = new System.Drawing.Size(110, 100);
+            this.groupGridSnap.Size = new System.Drawing.Size(110, 80);
             this.groupGridSnap.TabIndex = 32;
             this.groupGridSnap.TabStop = false;
             this.groupGridSnap.Text = "Grid Snap";
@@ -3771,14 +3944,14 @@ namespace MapEditor
             // customSnapValue
             // 
             this.customSnapValue.Enabled = false;
-            this.customSnapValue.Location = new System.Drawing.Point(65, 72);
+            this.customSnapValue.Location = new System.Drawing.Point(39, 51);
             this.customSnapValue.Minimum = new decimal(new int[] {
             2,
             0,
             0,
             0});
             this.customSnapValue.Name = "customSnapValue";
-            this.customSnapValue.Size = new System.Drawing.Size(39, 20);
+            this.customSnapValue.Size = new System.Drawing.Size(43, 20);
             this.customSnapValue.TabIndex = 29;
             this.customSnapValue.Value = new decimal(new int[] {
             2,
@@ -3788,57 +3961,76 @@ namespace MapEditor
             // 
             // radFullSnap
             // 
-            this.radFullSnap.AutoSize = true;
+            this.radFullSnap.Appearance = System.Windows.Forms.Appearance.Button;
+            this.radFullSnap.BackColor = System.Drawing.Color.Transparent;
+            this.radFullSnap.BackgroundImage = global::MapEditor.Properties.Resources.fullSnap;
+            this.radFullSnap.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.radFullSnap.FlatAppearance.CheckedBackColor = System.Drawing.Color.LightBlue;
+            this.radFullSnap.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.radFullSnap.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.radFullSnap.Location = new System.Drawing.Point(6, 55);
+            this.radFullSnap.Location = new System.Drawing.Point(39, 15);
             this.radFullSnap.Name = "radFullSnap";
-            this.radFullSnap.Size = new System.Drawing.Size(69, 17);
+            this.radFullSnap.Size = new System.Drawing.Size(30, 30);
             this.radFullSnap.TabIndex = 28;
-            this.radFullSnap.Text = "Full Snap";
-            this.radFullSnap.UseVisualStyleBackColor = true;
+            this.toolTip1.SetToolTip(this.radFullSnap, "Full Snap");
+            this.radFullSnap.UseVisualStyleBackColor = false;
             this.radFullSnap.CheckedChanged += new System.EventHandler(this.radFullSnap_CheckedChanged);
             // 
             // radNoSnap
             // 
-            this.radNoSnap.AutoSize = true;
+            this.radNoSnap.Appearance = System.Windows.Forms.Appearance.Button;
+            this.radNoSnap.BackColor = System.Drawing.Color.Transparent;
+            this.radNoSnap.BackgroundImage = global::MapEditor.Properties.Resources.noSnap;
+            this.radNoSnap.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.radNoSnap.Checked = true;
-            this.radNoSnap.Location = new System.Drawing.Point(6, 19);
+            this.radNoSnap.FlatAppearance.CheckedBackColor = System.Drawing.Color.LightBlue;
+            this.radNoSnap.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.radNoSnap.Location = new System.Drawing.Point(6, 15);
             this.radNoSnap.Name = "radNoSnap";
-            this.radNoSnap.Size = new System.Drawing.Size(51, 17);
+            this.radNoSnap.Size = new System.Drawing.Size(30, 30);
             this.radNoSnap.TabIndex = 26;
             this.radNoSnap.TabStop = true;
-            this.radNoSnap.Text = "None";
-            this.radNoSnap.UseVisualStyleBackColor = true;
+            this.toolTip1.SetToolTip(this.radNoSnap, "No Snap");
+            this.radNoSnap.UseVisualStyleBackColor = false;
             this.radNoSnap.CheckedChanged += new System.EventHandler(this.radNoSnap_CheckedChanged);
             // 
             // radCenterSnap
             // 
-            this.radCenterSnap.AutoSize = true;
+            this.radCenterSnap.Appearance = System.Windows.Forms.Appearance.Button;
             this.radCenterSnap.BackColor = System.Drawing.Color.Transparent;
+            this.radCenterSnap.BackgroundImage = global::MapEditor.Properties.Resources.sideSnap;
+            this.radCenterSnap.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.radCenterSnap.FlatAppearance.CheckedBackColor = System.Drawing.Color.LightBlue;
+            this.radCenterSnap.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.radCenterSnap.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.radCenterSnap.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.radCenterSnap.Location = new System.Drawing.Point(6, 37);
+            this.radCenterSnap.Location = new System.Drawing.Point(73, 15);
             this.radCenterSnap.Name = "radCenterSnap";
-            this.radCenterSnap.Size = new System.Drawing.Size(84, 17);
+            this.radCenterSnap.Size = new System.Drawing.Size(30, 30);
             this.radCenterSnap.TabIndex = 27;
-            this.radCenterSnap.Text = "Center/Door";
+            this.toolTip1.SetToolTip(this.radCenterSnap, "Side Snap");
             this.radCenterSnap.UseVisualStyleBackColor = false;
             this.radCenterSnap.CheckedChanged += new System.EventHandler(this.radCenterSnap_CheckedChanged);
             // 
             // radCustom
             // 
-            this.radCustom.AutoSize = true;
-            this.radCustom.Location = new System.Drawing.Point(6, 73);
+            this.radCustom.Appearance = System.Windows.Forms.Appearance.Button;
+            this.radCustom.BackColor = System.Drawing.Color.Transparent;
+            this.radCustom.BackgroundImage = global::MapEditor.Properties.Resources.customSnap;
+            this.radCustom.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.radCustom.FlatAppearance.CheckedBackColor = System.Drawing.Color.LightBlue;
+            this.radCustom.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.radCustom.Location = new System.Drawing.Point(6, 45);
             this.radCustom.Name = "radCustom";
-            this.radCustom.Size = new System.Drawing.Size(63, 17);
+            this.radCustom.Size = new System.Drawing.Size(30, 30);
             this.radCustom.TabIndex = 30;
-            this.radCustom.TabStop = true;
-            this.radCustom.Text = "Custom:";
-            this.radCustom.UseVisualStyleBackColor = true;
+            this.toolTip1.SetToolTip(this.radCustom, "Custom Snap");
+            this.radCustom.UseVisualStyleBackColor = false;
             this.radCustom.CheckedChanged += new System.EventHandler(this.radCustom_CheckedChanged);
             // 
             // waypointGroup
             // 
+            this.waypointGroup.Controls.Add(this.wpConnFlag);
             this.waypointGroup.Controls.Add(this.label3);
             this.waypointGroup.Controls.Add(this.waypointSelectAll);
             this.waypointGroup.Controls.Add(this.waypointName);
@@ -3847,14 +4039,34 @@ namespace MapEditor
             this.waypointGroup.Controls.Add(this.selectWPBtn);
             this.waypointGroup.Controls.Add(this.waypointEnabled);
             this.waypointGroup.Controls.Add(this.pathWPBtn);
+            this.waypointGroup.Controls.Add(this.label4);
             this.waypointGroup.Controls.Add(this.label1);
             this.waypointGroup.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.waypointGroup.Location = new System.Drawing.Point(7, 265);
             this.waypointGroup.Name = "waypointGroup";
-            this.waypointGroup.Size = new System.Drawing.Size(215, 138);
+            this.waypointGroup.Size = new System.Drawing.Size(215, 130);
             this.waypointGroup.TabIndex = 30;
             this.waypointGroup.TabStop = false;
             this.waypointGroup.Text = " Waypoints";
+            // 
+            // wpConnFlag
+            // 
+            this.wpConnFlag.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.wpConnFlag.Location = new System.Drawing.Point(92, 46);
+            this.wpConnFlag.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            this.wpConnFlag.Name = "wpConnFlag";
+            this.wpConnFlag.Size = new System.Drawing.Size(47, 20);
+            this.wpConnFlag.TabIndex = 32;
+            this.toolTip1.SetToolTip(this.wpConnFlag, "Connection Flag (0-255)");
+            this.wpConnFlag.Value = new decimal(new int[] {
+            128,
+            0,
+            0,
+            0});
             // 
             // label3
             // 
@@ -3868,7 +4080,7 @@ namespace MapEditor
             // waypointSelectAll
             // 
             this.waypointSelectAll.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.waypointSelectAll.Location = new System.Drawing.Point(56, 46);
+            this.waypointSelectAll.Location = new System.Drawing.Point(143, 44);
             this.waypointSelectAll.Name = "waypointSelectAll";
             this.waypointSelectAll.Size = new System.Drawing.Size(63, 21);
             this.waypointSelectAll.TabIndex = 21;
@@ -3881,9 +4093,9 @@ namespace MapEditor
             // waypointName
             // 
             this.waypointName.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.waypointName.Location = new System.Drawing.Point(58, 22);
+            this.waypointName.Location = new System.Drawing.Point(42, 21);
             this.waypointName.Name = "waypointName";
-            this.waypointName.Size = new System.Drawing.Size(136, 20);
+            this.waypointName.Size = new System.Drawing.Size(97, 20);
             this.waypointName.TabIndex = 0;
             this.waypointName.TextChanged += new System.EventHandler(this.WaypointName_TextChanged);
             // 
@@ -3907,7 +4119,7 @@ namespace MapEditor
             // 
             this.doubleWp.AutoSize = true;
             this.doubleWp.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.doubleWp.Location = new System.Drawing.Point(113, 109);
+            this.doubleWp.Location = new System.Drawing.Point(113, 105);
             this.doubleWp.Name = "doubleWp";
             this.doubleWp.Size = new System.Drawing.Size(85, 17);
             this.doubleWp.TabIndex = 25;
@@ -3937,7 +4149,7 @@ namespace MapEditor
             this.waypointEnabled.Checked = true;
             this.waypointEnabled.CheckState = System.Windows.Forms.CheckState.Checked;
             this.waypointEnabled.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.waypointEnabled.Location = new System.Drawing.Point(126, 48);
+            this.waypointEnabled.Location = new System.Drawing.Point(145, 22);
             this.waypointEnabled.Name = "waypointEnabled";
             this.waypointEnabled.Size = new System.Drawing.Size(65, 17);
             this.waypointEnabled.TabIndex = 2;
@@ -3951,7 +4163,7 @@ namespace MapEditor
             this.pathWPBtn.Appearance = System.Windows.Forms.Appearance.Button;
             this.pathWPBtn.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.pathWPBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.pathWPBtn.Location = new System.Drawing.Point(12, 105);
+            this.pathWPBtn.Location = new System.Drawing.Point(12, 101);
             this.pathWPBtn.Name = "pathWPBtn";
             this.pathWPBtn.Size = new System.Drawing.Size(95, 23);
             this.pathWPBtn.TabIndex = 24;
@@ -3962,10 +4174,19 @@ namespace MapEditor
             this.pathWPBtn.UseVisualStyleBackColor = true;
             this.pathWPBtn.CheckedChanged += new System.EventHandler(this.ObjectModesChanged);
             // 
+            // label4
+            // 
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.label4.Location = new System.Drawing.Point(6, 49);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(92, 23);
+            this.label4.TabIndex = 31;
+            this.label4.Text = "Connection Flag:";
+            // 
             // label1
             // 
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.label1.Location = new System.Drawing.Point(15, 24);
+            this.label1.Location = new System.Drawing.Point(6, 24);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(48, 23);
             this.label1.TabIndex = 1;
@@ -3976,7 +4197,7 @@ namespace MapEditor
             this.extentsGroup.Controls.Add(this.radioExtentsShowAll);
             this.extentsGroup.Controls.Add(this.radioExtentsHide);
             this.extentsGroup.Controls.Add(this.radioExtentShowColl);
-            this.extentsGroup.Location = new System.Drawing.Point(8, 406);
+            this.extentsGroup.Location = new System.Drawing.Point(8, 400);
             this.extentsGroup.Name = "extentsGroup";
             this.extentsGroup.Size = new System.Drawing.Size(104, 80);
             this.extentsGroup.TabIndex = 29;
@@ -4023,6 +4244,7 @@ namespace MapEditor
             // 
             // objectGroup
             // 
+            this.objectGroup.Controls.Add(this.chkRandomize);
             this.objectGroup.Controls.Add(this.SelectObjectBtn);
             this.objectGroup.Controls.Add(this.objectPreview);
             this.objectGroup.Controls.Add(this.select45Box);
@@ -4038,6 +4260,21 @@ namespace MapEditor
             this.objectGroup.TabIndex = 24;
             this.objectGroup.TabStop = false;
             this.objectGroup.Text = " Objects";
+            // 
+            // chkRandomize
+            // 
+            this.chkRandomize.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkRandomize.BackgroundImage = global::MapEditor.Properties.Resources.random1;
+            this.chkRandomize.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.chkRandomize.FlatAppearance.CheckedBackColor = System.Drawing.Color.Lime;
+            this.chkRandomize.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.chkRandomize.Location = new System.Drawing.Point(189, 192);
+            this.chkRandomize.Name = "chkRandomize";
+            this.chkRandomize.Size = new System.Drawing.Size(20, 20);
+            this.chkRandomize.TabIndex = 37;
+            this.toolTip1.SetToolTip(this.chkRandomize, "Randomize Object");
+            this.chkRandomize.UseVisualStyleBackColor = true;
+            this.chkRandomize.CheckedChanged += new System.EventHandler(this.chkRandomize_CheckedChanged);
             // 
             // SelectObjectBtn
             // 
@@ -4073,6 +4310,8 @@ namespace MapEditor
             this.select45Box.Appearance = System.Windows.Forms.Appearance.Button;
             this.select45Box.BackgroundImage = global::MapEditor.Properties.Resources._0deg;
             this.select45Box.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.select45Box.FlatAppearance.CheckedBackColor = System.Drawing.Color.Lime;
+            this.select45Box.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.select45Box.Location = new System.Drawing.Point(174, 52);
             this.select45Box.Name = "select45Box";
             this.select45Box.Size = new System.Drawing.Size(30, 30);
@@ -4085,7 +4324,9 @@ namespace MapEditor
             // 
             this.Picker.Appearance = System.Windows.Forms.Appearance.Button;
             this.Picker.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("Picker.BackgroundImage")));
-            this.Picker.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.Picker.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.Picker.FlatAppearance.CheckedBackColor = System.Drawing.Color.Lime;
+            this.Picker.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Picker.Location = new System.Drawing.Point(174, 23);
             this.Picker.Name = "Picker";
             this.Picker.Size = new System.Drawing.Size(30, 30);
@@ -4104,11 +4345,12 @@ namespace MapEditor
             this.objectCategoriesBox.Size = new System.Drawing.Size(104, 21);
             this.objectCategoriesBox.TabIndex = 30;
             this.objectCategoriesBox.SelectedIndexChanged += new System.EventHandler(this.ObjectCategoriesBoxSelectedIndexChanged);
+            this.objectCategoriesBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.objectCategoriesBox_MouseClick);
             // 
             // label6
             // 
             this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.label6.Location = new System.Drawing.Point(28, 195);
+            this.label6.Location = new System.Drawing.Point(29, 195);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(66, 23);
             this.label6.TabIndex = 31;
@@ -4124,6 +4366,8 @@ namespace MapEditor
             this.cboObjCreate.Size = new System.Drawing.Size(160, 21);
             this.cboObjCreate.TabIndex = 23;
             this.cboObjCreate.SelectedIndexChanged += new System.EventHandler(this.CboObjCreateSelectedIndexChanged);
+            this.cboObjCreate.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cboObjCreate_KeyDown);
+            this.cboObjCreate.MouseClick += new System.Windows.Forms.MouseEventHandler(this.cboObjCreate_MouseClick);
             // 
             // PlaceObjectBtn
             // 
@@ -4151,7 +4395,7 @@ namespace MapEditor
             this.groupMapCopy.Controls.Add(this.chkCopyTiles);
             this.groupMapCopy.Controls.Add(this.chkCopyWaypoints);
             this.groupMapCopy.Controls.Add(this.chkCopyPolygons);
-            this.groupMapCopy.Location = new System.Drawing.Point(7, 503);
+            this.groupMapCopy.Location = new System.Drawing.Point(7, 482);
             this.groupMapCopy.Name = "groupMapCopy";
             this.groupMapCopy.Size = new System.Drawing.Size(215, 99);
             this.groupMapCopy.TabIndex = 38;
@@ -4332,7 +4576,8 @@ namespace MapEditor
             this.contextMenuDelete,
             this.menuItem3,
             this.contextMenuProperties,
-            this.contextcopyContent});
+            this.contextcopyContent,
+            this.contextMenuCopyWaypoints});
             this.contextMenu.Popup += new System.EventHandler(this.contextMenu_Popup);
             // 
             // contextMenuCopy
@@ -4352,7 +4597,14 @@ namespace MapEditor
             this.contextcopyContent.Index = 5;
             this.contextcopyContent.Text = "Copy Extents";
             this.contextcopyContent.Visible = false;
-            this.contextcopyContent.Click += new System.EventHandler(this.menuItem1_Click);
+            this.contextcopyContent.Click += new System.EventHandler(this.contextMenuCopyExtents_Click);
+            // 
+            // contextMenuCopyWaypoints
+            // 
+            this.contextMenuCopyWaypoints.Index = 6;
+            this.contextMenuCopyWaypoints.Text = "Copy Waypoints";
+            this.contextMenuCopyWaypoints.Visible = false;
+            this.contextMenuCopyWaypoints.Click += new System.EventHandler(this.contextMenuCopyWaypoints_Click);
             // 
             // tmrInvalidate
             // 
@@ -4410,10 +4662,10 @@ namespace MapEditor
             this.tabEdges.ResumeLayout(false);
             this.tabObjectWps.ResumeLayout(false);
             this.groupGridSnap.ResumeLayout(false);
-            this.groupGridSnap.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.customSnapValue)).EndInit();
             this.waypointGroup.ResumeLayout(false);
             this.waypointGroup.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.wpConnFlag)).EndInit();
             this.extentsGroup.ResumeLayout(false);
             this.extentsGroup.PerformLayout();
             this.objectGroup.ResumeLayout(false);

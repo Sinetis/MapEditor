@@ -24,7 +24,7 @@ namespace MapEditor.newgui
         private List<string> sortedTileNames;
         private MapView mapView;
         private VideoBagCachedProvider videoBag = null;
-        private int tileVariation;
+        public int tileVariation;
         private int tileTypeID;
         public bool AutoVari
         {
@@ -95,10 +95,11 @@ namespace MapEditor.newgui
             // если не создан
             if (listTileImages.LargeImageList == null)
                 listTileImages.LargeImageList = new ImageList();
+
             // обновляем ImageList
             ImageList imglist = listTileImages.LargeImageList;
             imglist.Images.Clear();
-            imglist.ImageSize = new Size(46, 46);
+            imglist.ImageSize = new Size(46,46);
             List<uint> variations = GetVariationsForType(tileTypeID);
             // грузим только первые 90 картинок
             int varns = variations.Count;
@@ -121,13 +122,14 @@ namespace MapEditor.newgui
             else
                 return spaceChar;
         }
-        public void findTileInList(string data)
+        public void findTileInList(string data, int variation)
         {
             for (int i = 0; i <= comboTileType.Items.Count; i++)
             {
                 if (removeSpace(comboTileType.Items[i].ToString()) == data)
                 {
                     comboTileType.SelectedIndex = i;
+                    tileVariation = variation;
                     break;
                 }
             }

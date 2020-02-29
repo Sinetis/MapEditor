@@ -113,7 +113,7 @@ namespace MapEditor.render
                 Selection = Color.Green;
                 Removing = Color.Red;
                 WaypointDis = Pens.Olive;
-                WaypointNorm = new Pen(Color.FromArgb(255, 215, 215, 0));
+                WaypointNorm = new Pen(Color.FromArgb(255, 170, 170, 0));
                 WaypointSel = Pens.Aqua;
                 WaypointTwoPath = new Pen(Color.FromArgb(255, 255, 103, 38));
             }
@@ -804,28 +804,41 @@ namespace MapEditor.render
                     // Highlight selected waypoint
                     pen = wp.Flags == 1 ? ColorLayout.WaypointNorm : ColorLayout.WaypointDis;
                     pen = ((MapInterface.SelectedWaypoint == wp) || (MapInterface.SelectedWaypoints.Contains(wp))) ? ColorLayout.WaypointSel : pen;
+
+                    foreach (Map.Waypoint selectedWaypoint in MapInterface.SelectedWaypoints)
+                    {
+                        if (selectedWaypoint == wp)
+                            pen = ColorLayout.WaypointSel;
+                    }
+
                     // Draw waypoint and related pathes
                     center = new PointF(wp.Point.X - MapView.objectSelectionRadius, wp.Point.Y - MapView.objectSelectionRadius);
                     g.DrawEllipse(pen, new RectangleF(center, new Size(2 * MapView.objectSelectionRadius, 2 * MapView.objectSelectionRadius)));
                     pen = ColorLayout.WaypointDis;
-                    // Draw paths (code/idea from UndeadZeus)
+                    // Draw paths (code/idea from UndeadZeus)  TODO: Could use optimization, drawing multiple lines for 1 connection
                     foreach (Map.Waypoint.WaypointConnection wpc in wp.connections)
                     {
-                        g.DrawLine(pen, wp.Point.X, wp.Point.Y, wpc.wp.Point.X, wpc.wp.Point.Y);
-                        foreach (Map.Waypoint.WaypointConnection wpwp in wpc.wp.connections)//Checks if the waypoint connection is connecting to wp
+                        if (MapInterface.SelectedWaypoint != null && wp == MapInterface.SelectedWaypoint)
+                            g.DrawLine(ColorLayout.WaypointSel, wp.Point.X, wp.Point.Y, wpc.wp.Point.X, wpc.wp.Point.Y);
+                        else
                         {
-                            if (wpwp.wp.Equals(wp))
+                            g.DrawLine(ColorLayout.WaypointNorm, wp.Point.X, wp.Point.Y, wpc.wp.Point.X, wpc.wp.Point.Y);
+
+                            foreach (Map.Waypoint.WaypointConnection wpwp in wpc.wp.connections)//Checks if the waypoint connection is connecting to wp
                             {
-                                // Draw connections
-                                if ((MapInterface.SelectedWaypoint != null) && (wp == MapInterface.SelectedWaypoint))
-                                    g.DrawLine(ColorLayout.WaypointSel, wp.Point.X, wp.Point.Y, wpc.wp.Point.X, wpc.wp.Point.Y);
-                                else
-                                    g.DrawLine(ColorLayout.WaypointTwoPath, wp.Point.X, wp.Point.Y, wpc.wp.Point.X, wpc.wp.Point.Y);
-                                break;
+                                if (wpwp.wp.Equals(wp))
+                                {
+                                    // Draw connections
+                                    if ((MapInterface.SelectedWaypoint != null) && (wp == MapInterface.SelectedWaypoint) || (wpc.wp == MapInterface.SelectedWaypoint))
+                                        g.DrawLine(ColorLayout.WaypointSel, wp.Point.X, wp.Point.Y, wpc.wp.Point.X, wpc.wp.Point.Y);
+                                    else
+                                        g.DrawLine(ColorLayout.WaypointTwoPath, wp.Point.X, wp.Point.Y, wpc.wp.Point.X, wpc.wp.Point.Y);
+                                    break;
+                                }
                             }
                         }
                     }
-                    
+
                     // Draw text
                     if (DrawText && clip.Contains(center.ToPoint()))
                     {

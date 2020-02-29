@@ -92,23 +92,21 @@ namespace MapEditor.XferGui
 			poisonPower.Value = Xfer.PoisonLevel;
 			npcUnknown.Text = Xfer.NPCSpeed.ToString(numberFormat);
 			npcStrength.Value = Xfer.NPCStrength;
-            //npcSoundSet.Text = Xfer.NPCVoiceSet;
 
-            var extraVoices = new string[] { "AirshipCaptain", "AlbinoSpider", "Archer", "Bat", "Bear", "Bear2", "Beholder", "BlackBear", "BlackWidow", "BlackWolf", "Bomber", "BomberBlue", "BomberGreen", "BomberYellow", "CarnivorousPlant", "Demon", "EmberDemon", "EvilCherub", "FireSprite", "FishBig", "FishSmall", "FlyingGolem", "Ghost", "GiantLeech", "Goon", "GreenFrog", "GruntAxe", "Hecubah", "HecubahWithOrb", "Horrendous", "Imp", "Lich", "LichLord", "MechanicalGolem", "MeleeDemon", "Mimic", "NPCWizard", "OgreBrute", "OgreWarlord", "Rat", "Scorpion", "Shade", "Skeleton", "SkeletonLord", "SmallAlbinoSpider", "SmallSpider", "Spider", "SpittingSpider", "StoneGolem", "StrongWizardWhite", "Swordsman", "TalkingSkull", "Troll", "Urchin", "UrchinShaman", "VileZombie", "Wasp", "WeirdlingBeast", "WhiteWolf", "WillOWisp", "Wizard", "WizardGreen", "WizardRed", "WizardWhite", "Wolf", "WoundedApprentice", "WoundedConjurer", "WoundedWarrior", "Zombie", };
-            SoundSet.Items.AddRange(extraVoices);
-
-            string xferSound = Xfer.NPCVoiceSet.ToUpper();
-            foreach (string item in SoundSet.Items)
+            int index = 0;
+            if (Xfer.NPCVoiceSet != null)
             {
-                string itemSound = item.ToUpper();
-
-                if (itemSound.Equals(xferSound))
+                index = SoundSet.FindString(Xfer.NPCVoiceSet);
+                if (index == -1)
                 {
-                    SoundSet.SelectedItem = item;
-                    break;
+                    index = 0;
+                    // preserve original value if unrecognized
+                    SoundSet.Items.Insert(0, Xfer.NPCVoiceSet);
                 }
             }
-			expReward.Text = Xfer.Experience.ToString(numberFormat);
+            SoundSet.SelectedIndex = index;
+
+            expReward.Text = Xfer.Experience.ToString(numberFormat);
 			for (int i = 0; i < 6; i++)
 				npcColorSelectors[i].BackColor = Xfer.NPCColors[i];
 		}
@@ -147,7 +145,7 @@ namespace MapEditor.XferGui
 			Xfer.PoisonLevel = (byte) poisonPower.Value;
 			Xfer.NPCSpeed = float.Parse(npcUnknown.Text, numberFormat);
 			Xfer.NPCStrength = (byte) npcStrength.Value;
-            Xfer.NPCVoiceSet = SoundSet.SelectedItem.ToString();
+            Xfer.NPCVoiceSet = (SoundSet.SelectedItem != null) ? SoundSet.SelectedItem.ToString() : "";
 			Xfer.Experience = float.Parse(expReward.Text, numberFormat);
 			for (int i = 0; i < 6; i++)
 				Xfer.NPCColors[i] = npcColorSelectors[i].BackColor;
@@ -225,9 +223,7 @@ namespace MapEditor.XferGui
 			MonsterScriptForm form = new MonsterScriptForm();
 			form.SetScriptStrings(Xfer.ScriptEvents);
 			if (form.ShowDialog() == DialogResult.OK)
-			{
 				Xfer.ScriptEvents = form.GetScriptStrings();
-			}
 		}
 		
 		public override void SetDefaultData(Map.Object obj)
@@ -312,5 +308,13 @@ namespace MapEditor.XferGui
         {
 
         }
-	}
+
+        private void callBuffEditor_Click(object sender, EventArgs e)
+        {
+            MonsterBuffEdit form = new MonsterBuffEdit();
+            form.SetBuffs(Xfer.BuffList);
+            if (form.ShowDialog() == DialogResult.OK)
+                Xfer.BuffList = form.GetBuffs();
+        }
+    }
 }

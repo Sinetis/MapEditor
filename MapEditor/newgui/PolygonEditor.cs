@@ -4,6 +4,7 @@
  * Дата: 12.02.2015
  */
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using MapEditor.MapInt;
@@ -67,9 +68,8 @@ namespace MapEditor.newgui
             // Update items
             listBoxPolygons.Items.Clear();
             foreach (Map.Polygon p in subjMap.Polygons)
-            {
-                listBoxPolygons.Items.Add(p.Name);
-            }
+                listBoxPolygons.Items.Add("[" + p.MinimapGroup + "]\t" + p.Name);
+
             // Restore selection
             if (oldIndex >= 0)
             {
@@ -97,12 +97,26 @@ namespace MapEditor.newgui
             buttonCopyMap.Enabled = true;
             MapInterface.CurrentMode = EditMode.POLYGON_RESHAPE;
         }
+        private int[] GetCustomColors()
+        {
+            var colors = new List<int>();
+            foreach (Map.Polygon p in subjMap.Polygons)
+            {
+                int color = ColorTranslator.ToOle(p.AmbientLightColor);
+                if (!colors.Contains(color))
+                    colors.Add(color);
+            }
+
+            return colors.ToArray();
+        }
 
         public void ButtonModifyClick(object sender, EventArgs e)
         {
             if (listBoxPolygons.SelectedIndex < 0) return;
 
             polygonDlg.Polygon = (Map.Polygon)subjMap.Polygons[listBoxPolygons.SelectedIndex];
+            if (polygonDlg.CustomColors == null)
+                polygonDlg.CustomColors = GetCustomColors();
             polygonDlg.ShowDialog();
             subjMap.Polygons[listBoxPolygons.SelectedIndex] = polygonDlg.Polygon;
             UpdatePolygonList();

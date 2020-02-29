@@ -14,6 +14,7 @@ namespace MapEditor
     {
         private List<MapGroup> groups;
         private string lastGroupName;
+        private string lastGroupID;
 
         public GroupDialog(Map.GroupData groupData)
         {
@@ -102,10 +103,7 @@ namespace MapEditor
             else if (g.Type == 2)
             {
                 wallRadio.Checked = true;
-                if (!txtGroupName.Text.ToUpper().EndsWith("WALLS"))
-                    lblHelpStatus.Text = "Wall Group names must end with 'Walls'";
-                else
-                    lblHelpStatus.Text = "";
+                lblHelpStatus.Text = "";
             }
         }
         private void txtGroupName_KeyDown(object sender, KeyEventArgs e)
@@ -276,6 +274,27 @@ namespace MapEditor
             }
             else
                 lblHelpStatus.Text = "Click New";
+        }
+
+        private void txtGroupID_Enter(object sender, EventArgs e)
+        {
+            lastGroupID = txtGroupID.Text;
+        }
+        private void txtGroupID_Leave(object sender, EventArgs e)
+        {
+            var save = txtGroupID.Text;
+            try
+            {
+                var newID = int.Parse(txtGroupID.Text);
+                var g = GetGroup();
+                g.ID = newID;
+            }
+            catch { txtGroupID.Text = lastGroupID; }
+        }
+
+        private void GroupDialog_DoubleClick(object sender, EventArgs e)
+        {
+            txtGroupID.Enabled = true;
         }
     }
 

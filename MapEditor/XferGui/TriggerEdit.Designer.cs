@@ -69,9 +69,9 @@ namespace MapEditor.XferGui
             this.groupBoxArea.Controls.Add(this.sizeX);
             this.groupBoxArea.Controls.Add(this.label2);
             this.groupBoxArea.Controls.Add(this.label1);
-            this.groupBoxArea.Location = new System.Drawing.Point(12, 106);
+            this.groupBoxArea.Location = new System.Drawing.Point(12, 133);
             this.groupBoxArea.Name = "groupBoxArea";
-            this.groupBoxArea.Size = new System.Drawing.Size(211, 102);
+            this.groupBoxArea.Size = new System.Drawing.Size(211, 130);
             this.groupBoxArea.TabIndex = 0;
             this.groupBoxArea.TabStop = false;
             this.groupBoxArea.Text = "Trigger/PressurePlate only";
@@ -79,9 +79,9 @@ namespace MapEditor.XferGui
             // plateBackColor
             // 
             this.plateBackColor.ForeColor = System.Drawing.Color.White;
-            this.plateBackColor.Location = new System.Drawing.Point(106, 73);
+            this.plateBackColor.Location = new System.Drawing.Point(106, 79);
             this.plateBackColor.Name = "plateBackColor";
-            this.plateBackColor.Size = new System.Drawing.Size(95, 23);
+            this.plateBackColor.Size = new System.Drawing.Size(95, 37);
             this.plateBackColor.TabIndex = 1;
             this.plateBackColor.Text = "Secondary";
             this.plateBackColor.UseVisualStyleBackColor = true;
@@ -89,9 +89,9 @@ namespace MapEditor.XferGui
             // 
             // plateEdgeColor
             // 
-            this.plateEdgeColor.Location = new System.Drawing.Point(9, 73);
+            this.plateEdgeColor.Location = new System.Drawing.Point(9, 79);
             this.plateEdgeColor.Name = "plateEdgeColor";
-            this.plateEdgeColor.Size = new System.Drawing.Size(95, 23);
+            this.plateEdgeColor.Size = new System.Drawing.Size(95, 37);
             this.plateEdgeColor.TabIndex = 1;
             this.plateEdgeColor.Text = "Primary Color";
             this.plateEdgeColor.UseVisualStyleBackColor = true;
@@ -99,7 +99,7 @@ namespace MapEditor.XferGui
             // 
             // sizeY
             // 
-            this.sizeY.Location = new System.Drawing.Point(89, 45);
+            this.sizeY.Location = new System.Drawing.Point(89, 47);
             this.sizeY.Maximum = new decimal(new int[] {
             60,
             0,
@@ -121,7 +121,7 @@ namespace MapEditor.XferGui
             // 
             // sizeX
             // 
-            this.sizeX.Location = new System.Drawing.Point(89, 19);
+            this.sizeX.Location = new System.Drawing.Point(89, 25);
             this.sizeX.Maximum = new decimal(new int[] {
             60,
             0,
@@ -143,7 +143,7 @@ namespace MapEditor.XferGui
             // 
             // label2
             // 
-            this.label2.Location = new System.Drawing.Point(6, 47);
+            this.label2.Location = new System.Drawing.Point(6, 49);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(77, 23);
             this.label2.TabIndex = 1;
@@ -151,7 +151,7 @@ namespace MapEditor.XferGui
             // 
             // label1
             // 
-            this.label1.Location = new System.Drawing.Point(6, 21);
+            this.label1.Location = new System.Drawing.Point(6, 27);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(77, 23);
             this.label1.TabIndex = 0;
@@ -167,7 +167,7 @@ namespace MapEditor.XferGui
             this.groupBox2.Controls.Add(this.label3);
             this.groupBox2.Location = new System.Drawing.Point(12, 10);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(211, 90);
+            this.groupBox2.Size = new System.Drawing.Size(211, 109);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Script event handlers";
@@ -176,7 +176,7 @@ namespace MapEditor.XferGui
             // 
             this.scriptCollided.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.scriptCollided.FormattingEnabled = true;
-            this.scriptCollided.Location = new System.Drawing.Point(63, 63);
+            this.scriptCollided.Location = new System.Drawing.Point(63, 79);
             this.scriptCollided.Name = "scriptCollided";
             this.scriptCollided.Size = new System.Drawing.Size(138, 21);
             this.scriptCollided.TabIndex = 7;
@@ -185,7 +185,7 @@ namespace MapEditor.XferGui
             // 
             this.scriptReleased.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.scriptReleased.FormattingEnabled = true;
-            this.scriptReleased.Location = new System.Drawing.Point(63, 39);
+            this.scriptReleased.Location = new System.Drawing.Point(63, 51);
             this.scriptReleased.Name = "scriptReleased";
             this.scriptReleased.Size = new System.Drawing.Size(138, 21);
             this.scriptReleased.TabIndex = 6;
@@ -194,14 +194,14 @@ namespace MapEditor.XferGui
             // 
             this.scriptActivated.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.scriptActivated.FormattingEnabled = true;
-            this.scriptActivated.Location = new System.Drawing.Point(63, 16);
+            this.scriptActivated.Location = new System.Drawing.Point(63, 23);
             this.scriptActivated.Name = "scriptActivated";
             this.scriptActivated.Size = new System.Drawing.Size(138, 21);
             this.scriptActivated.TabIndex = 5;
             // 
             // label5
             // 
-            this.label5.Location = new System.Drawing.Point(6, 65);
+            this.label5.Location = new System.Drawing.Point(6, 81);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(77, 23);
             this.label5.TabIndex = 4;
@@ -209,7 +209,7 @@ namespace MapEditor.XferGui
             // 
             // label4
             // 
-            this.label4.Location = new System.Drawing.Point(6, 42);
+            this.label4.Location = new System.Drawing.Point(6, 54);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(77, 23);
             this.label4.TabIndex = 2;
@@ -217,7 +217,7 @@ namespace MapEditor.XferGui
             // 
             // label3
             // 
-            this.label3.Location = new System.Drawing.Point(6, 19);
+            this.label3.Location = new System.Drawing.Point(6, 26);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(77, 23);
             this.label3.TabIndex = 0;
@@ -228,9 +228,9 @@ namespace MapEditor.XferGui
             this.groupBox3.Controls.Add(this.label6);
             this.groupBox3.Controls.Add(this.numericUpDown1);
             this.groupBox3.Controls.Add(this.flagsBox);
-            this.groupBox3.Location = new System.Drawing.Point(12, 214);
+            this.groupBox3.Location = new System.Drawing.Point(229, 10);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(211, 158);
+            this.groupBox3.Size = new System.Drawing.Size(216, 253);
             this.groupBox3.TabIndex = 2;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Allowed Activators";
@@ -238,7 +238,7 @@ namespace MapEditor.XferGui
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(6, 129);
+            this.label6.Location = new System.Drawing.Point(42, 226);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(70, 13);
             this.label6.TabIndex = 4;
@@ -246,7 +246,7 @@ namespace MapEditor.XferGui
             // 
             // numericUpDown1
             // 
-            this.numericUpDown1.Location = new System.Drawing.Point(80, 127);
+            this.numericUpDown1.Location = new System.Drawing.Point(116, 224);
             this.numericUpDown1.Name = "numericUpDown1";
             this.numericUpDown1.Size = new System.Drawing.Size(50, 20);
             this.numericUpDown1.TabIndex = 3;
@@ -264,17 +264,19 @@ namespace MapEditor.XferGui
             "WEAPON (Solo Only)",
             "ARMOR (Solo Only)",
             "TREASURE",
-            "WAND (Solo Only)"});
+            "WAND (Solo Only)",
+            "MONSTERGENERATOR"});
             this.flagsBox.Location = new System.Drawing.Point(6, 19);
             this.flagsBox.Name = "flagsBox";
-            this.flagsBox.Size = new System.Drawing.Size(199, 94);
+            this.flagsBox.Size = new System.Drawing.Size(199, 199);
             this.flagsBox.TabIndex = 2;
             // 
             // buttonOK
             // 
-            this.buttonOK.Location = new System.Drawing.Point(75, 378);
+            this.buttonOK.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonOK.Location = new System.Drawing.Point(187, 272);
             this.buttonOK.Name = "buttonOK";
-            this.buttonOK.Size = new System.Drawing.Size(75, 23);
+            this.buttonOK.Size = new System.Drawing.Size(75, 29);
             this.buttonOK.TabIndex = 3;
             this.buttonOK.Text = "OK";
             this.buttonOK.UseVisualStyleBackColor = true;
@@ -284,7 +286,7 @@ namespace MapEditor.XferGui
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(235, 413);
+            this.ClientSize = new System.Drawing.Size(458, 307);
             this.Controls.Add(this.buttonOK);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);

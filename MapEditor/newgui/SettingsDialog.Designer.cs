@@ -61,8 +61,8 @@ namespace MapEditor.newgui
             this.checkBoxMinimapHide = new System.Windows.Forms.CheckBox();
             this.checkBoxTeleports = new System.Windows.Forms.CheckBox();
             this.groupBoxMapView = new System.Windows.Forms.GroupBox();
-            this.checkBoxMinimapShow = new System.Windows.Forms.CheckBox();
             this.checkBoxColorWalls = new System.Windows.Forms.CheckBox();
+            this.checkBoxMinimapShow = new System.Windows.Forms.CheckBox();
             this.groupBoxMapfile.SuspendLayout();
             this.groupBoxObjLbl.SuspendLayout();
             this.groupBoxElems.SuspendLayout();
@@ -398,6 +398,17 @@ namespace MapEditor.newgui
             this.groupBoxMapView.TabStop = false;
             this.groupBoxMapView.Text = "Map View";
             // 
+            // checkBoxColorWalls
+            // 
+            this.checkBoxColorWalls.AutoSize = true;
+            this.checkBoxColorWalls.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.checkBoxColorWalls.Location = new System.Drawing.Point(15, 105);
+            this.checkBoxColorWalls.Name = "checkBoxColorWalls";
+            this.checkBoxColorWalls.Size = new System.Drawing.Size(144, 17);
+            this.checkBoxColorWalls.TabIndex = 14;
+            this.checkBoxColorWalls.Text = "Color Special Walls (F11)";
+            this.checkBoxColorWalls.UseVisualStyleBackColor = true;
+            // 
             // checkBoxMinimapShow
             // 
             this.checkBoxMinimapShow.AutoSize = true;
@@ -408,17 +419,6 @@ namespace MapEditor.newgui
             this.checkBoxMinimapShow.TabIndex = 12;
             this.checkBoxMinimapShow.UseVisualStyleBackColor = true;
             this.checkBoxMinimapShow.CheckedChanged += new System.EventHandler(this.checkBoxMinimapShow_CheckedChanged);
-            // 
-            // checkBoxColorWalls
-            // 
-            this.checkBoxColorWalls.AutoSize = true;
-            this.checkBoxColorWalls.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkBoxColorWalls.Location = new System.Drawing.Point(15, 105);
-            this.checkBoxColorWalls.Name = "checkBoxColorWalls";
-            this.checkBoxColorWalls.Size = new System.Drawing.Size(117, 17);
-            this.checkBoxColorWalls.TabIndex = 14;
-            this.checkBoxColorWalls.Text = "Color Special Walls";
-            this.checkBoxColorWalls.UseVisualStyleBackColor = true;
             // 
             // SettingsDialog
             // 

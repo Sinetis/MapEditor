@@ -102,7 +102,7 @@ namespace MapEditor.XferGui
             this.npcColor1 = new System.Windows.Forms.Button();
             this.label21 = new System.Windows.Forms.Label();
             this.callScriptEditor = new System.Windows.Forms.Button();
-            this.callEffectEditor = new System.Windows.Forms.Button();
+            this.callBuffEditor = new System.Windows.Forms.Button();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.buttonSaveChanges = new System.Windows.Forms.Button();
             this.buttonCancel = new System.Windows.Forms.Button();
@@ -733,18 +733,84 @@ namespace MapEditor.XferGui
             // 
             // SoundSet
             // 
-            this.SoundSet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.SoundSet.FormattingEnabled = true;
             this.SoundSet.Items.AddRange(new object[] {
-            "Necromancer",
+            "",
             "_FireKnight1",
             "_FireKnight2",
-            "NPC",
+            "_Guard1",
+            "_Guard2",
+            "_Maiden1",
+            "_Maiden2",
             "_MaleNPC1",
             "_MaleNPC2",
-            "Maiden",
             "_Wizard1",
-            "_Wizard2"});
+            "_Wizard2",
+            "_WoundedNPC",
+            "AirshipCaptain",
+            "AlbinoSpider",
+            "Archer",
+            "Bat",
+            "Bear",
+            "Beholder",
+            "BlackBear",
+            "BlackWolf",
+            "Bomber",
+            "BomberBlue",
+            "BomberGreen",
+            "BomberYellow",
+            "CarnivorousPlant",
+            "Demon",
+            "EmberDemon",
+            "EvilCherub",
+            "FishBig",
+            "FishSmall",
+            "FlyingGolem",
+            "Ghost",
+            "GiantLeech",
+            "GreenFrog",
+            "GruntAxe",
+            "Hecubah",
+            "HecubahWithOrb",
+            "Horrendous",
+            "Imp",
+            "Lich",
+            "LichLord",
+            "Maiden",
+            "MechanicalGolem",
+            "MeleeDemon",
+            "Mimic",
+            "Necromancer",
+            "NPC",
+            "OgreBrute",
+            "OgreWarlord",
+            "Rat",
+            "Scorpion",
+            "Shade",
+            "Skeleton",
+            "SkeletonLord",
+            "SmallAlbinoSpider",
+            "SmallSpider",
+            "Spider",
+            "SpittingSpider",
+            "StoneGolem",
+            "Swordsman",
+            "Troll",
+            "Urchin",
+            "UrchinShaman",
+            "VileZombie",
+            "Wasp",
+            "WeirdlingBeast",
+            "WhiteWolf",
+            "WillOWisp",
+            "Wizard",
+            "WizardGreen",
+            "WizardWhite",
+            "Wolf",
+            "WoundedApprentice",
+            "WoundedConjurer",
+            "WoundedWarrior",
+            "Zombie"});
             this.SoundSet.Location = new System.Drawing.Point(66, 24);
             this.SoundSet.Name = "SoundSet";
             this.SoundSet.Size = new System.Drawing.Size(104, 21);
@@ -824,19 +890,20 @@ namespace MapEditor.XferGui
             this.callScriptEditor.UseVisualStyleBackColor = true;
             this.callScriptEditor.Click += new System.EventHandler(this.CallScriptEditorClick);
             // 
-            // callEffectEditor
+            // callBuffEditor
             // 
-            this.callEffectEditor.Location = new System.Drawing.Point(35, 48);
-            this.callEffectEditor.Name = "callEffectEditor";
-            this.callEffectEditor.Size = new System.Drawing.Size(125, 23);
-            this.callEffectEditor.TabIndex = 25;
-            this.callEffectEditor.Text = "Edit Effects List";
-            this.callEffectEditor.UseVisualStyleBackColor = true;
+            this.callBuffEditor.Location = new System.Drawing.Point(35, 48);
+            this.callBuffEditor.Name = "callBuffEditor";
+            this.callBuffEditor.Size = new System.Drawing.Size(125, 23);
+            this.callBuffEditor.TabIndex = 25;
+            this.callBuffEditor.Text = "Edit Buffs";
+            this.callBuffEditor.UseVisualStyleBackColor = true;
+            this.callBuffEditor.Click += new System.EventHandler(this.callBuffEditor_Click);
             // 
             // groupBox5
             // 
             this.groupBox5.Controls.Add(this.callScriptEditor);
-            this.groupBox5.Controls.Add(this.callEffectEditor);
+            this.groupBox5.Controls.Add(this.callBuffEditor);
             this.groupBox5.Location = new System.Drawing.Point(485, 181);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Size = new System.Drawing.Size(193, 86);
@@ -934,7 +1001,7 @@ namespace MapEditor.XferGui
 		private System.Windows.Forms.Button buttonCancel;
 		private System.Windows.Forms.Button buttonSaveChanges;
 		private System.Windows.Forms.GroupBox groupBox5;
-		private System.Windows.Forms.Button callEffectEditor;
+		private System.Windows.Forms.Button callBuffEditor;
 		private System.Windows.Forms.Button callScriptEditor;
 		private System.Windows.Forms.Button npcColor3;
 		private System.Windows.Forms.Button npcColor4;

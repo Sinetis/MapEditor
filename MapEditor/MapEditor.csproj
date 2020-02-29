@@ -230,6 +230,9 @@
     <Compile Include="newgui\WallProperties.Designer.cs">
       <DependentUpon>WallProperties.cs</DependentUpon>
     </Compile>
+    <Compile Include="WaypointListDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="ObjectShopEditorDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -288,6 +291,9 @@
     <Compile Include="SyntaxHighlighter\SyntaxRichTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="WaypointProperties.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="WizardForm\WizardForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -336,11 +342,11 @@
     <Compile Include="XferGui\GoldEdit.Designer.cs">
       <DependentUpon>GoldEdit.cs</DependentUpon>
     </Compile>
-    <Compile Include="XferGui\MonsterEdit.cs">
+    <Compile Include="XferGui\MonsterBuffEdit.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="XferGui\MonsterEdit.Designer.cs">
-      <DependentUpon>MonsterEdit.cs</DependentUpon>
+    <Compile Include="XferGui\MonsterEdit.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="XferGui\MonsterGenEdit.cs">
       <SubType>Form</SubType>
@@ -355,11 +361,7 @@
       <DependentUpon>MonsterScriptForm.cs</DependentUpon>
     </Compile>
     <Compile Include="XferGui\MonsterSpellForm.cs">
-      <DependentUpon>MonsterEdit.cs</DependentUpon>
       <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="XferGui\MonsterSpellForm.Designer.cs">
-      <DependentUpon>MonsterSpellForm.cs</DependentUpon>
     </Compile>
     <Compile Include="XferGui\MoverEdit.cs">
       <SubType>Form</SubType>
@@ -430,6 +432,7 @@
     <Compile Include="XferGui\TriggerEdit.Designer.cs">
       <DependentUpon>TriggerEdit.cs</DependentUpon>
     </Compile>
+    <Compile Include="XferGui\VoiceSet.cs" />
     <Compile Include="XferGui\XferEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -473,12 +476,6 @@
     <Compile Include="Splash.Designer.cs">
       <DependentUpon>Splash.cs</DependentUpon>
     </Compile>
-    <Compile Include="UpdateList.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="UpdateList.Designer.cs">
-      <DependentUpon>UpdateList.cs</DependentUpon>
-    </Compile>
     <EmbeddedResource Include="AboutDialog.resx">
       <DependentUpon>AboutDialog.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -498,6 +495,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ObjectInventoryDialog.resx">
       <DependentUpon>ObjectInventoryDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WaypointListDialog.resx">
+      <DependentUpon>WaypointListDialog.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="ObjectListDialog.resx">
@@ -526,6 +527,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ScriptFunctionDialog.resx">
       <DependentUpon>ScriptFunctionDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WaypointProperties.resx">
+      <DependentUpon>WaypointProperties.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="WizardForm\WizardForm.en-GB.resx">
       <DependentUpon>WizardForm.cs</DependentUpon>
@@ -561,6 +565,9 @@
     <EmbeddedResource Include="XferGui\GoldEdit.resx">
       <DependentUpon>GoldEdit.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="XferGui\MonsterBuffEdit.resx">
+      <DependentUpon>MonsterBuffEdit.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="XferGui\MonsterEdit.resx">
       <DependentUpon>MonsterEdit.cs</DependentUpon>
     </EmbeddedResource>
@@ -569,9 +576,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="XferGui\MonsterScriptForm.resx">
       <DependentUpon>MonsterScriptForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="XferGui\MonsterSpellForm.resx">
-      <DependentUpon>MonsterSpellForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="XferGui\MoverEdit.resx">
       <DependentUpon>MoverEdit.cs</DependentUpon>
@@ -817,10 +821,6 @@
       <SubType>Designer</SubType>
       <DependentUpon>Splash.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UpdateList.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>UpdateList.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="bin\Debug\picker.cur" />
@@ -837,11 +837,17 @@
     <None Include="Resources\0deg.png" />
     <None Include="Resources\bucket.cur" />
     <None Include="Resources\bucketPaint.png" />
+    <None Include="Resources\aboutPic.jpg" />
     <Content Include="Resources\categories.xml" />
     <None Include="Resources\nsc.exe" />
     <None Include="Resources\nsdc.exe" />
     <None Include="Resources\gear.png" />
     <None Include="Resources\transTile.png" />
+    <None Include="Resources\random.png" />
+    <None Include="Resources\customSnap.png" />
+    <None Include="Resources\noSnap.png" />
+    <None Include="Resources\fullSnap.png" />
+    <None Include="Resources\sideSnap.png" />
     <Content Include="ScriptCompiler\ScriptCompiler.csproj" />
     <Content Include="SyntaxHighlighter\SyntaxHighlighter.csproj" />
     <Content Include="WizardForm\WizardForm.csproj" />

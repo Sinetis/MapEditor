@@ -15,45 +15,18 @@ namespace MapEditor.newgui
     /// </summary>
     public class StatusbarHelper
     {
-        Map map
-        {
-            get
-            {
-                return MapInterface.TheMap;
-            }
-        }
-
-        string statusLocation;
+        Map map { get { return MapInterface.TheMap; } }
         /// <summary>
         /// Workaround to prevent flickering.
         /// </summary>
         bool updateStatusbars = false;
+        string statusLocation;
         string statusMapItem;
         string statusPolygon;
 
-        public string StatusLocation
-        {
-            get
-            {
-                return statusLocation;
-            }
-        }
-
-        public string StatusMapItem
-        {
-            get
-            {
-                return statusMapItem;
-            }
-        }
-
-        public string StatusPolygon
-        {
-            get
-            {
-                return statusPolygon;
-            }
-        }
+        public string StatusLocation { get { return statusLocation; } }
+        public string StatusMapItem { get { return statusMapItem; } }
+        public string StatusPolygon { get { return statusPolygon; } }
 
         const int squareSize = MapView.squareSize;
         // Format strings
@@ -62,25 +35,26 @@ namespace MapEditor.newgui
         const string FORMAT_TILE_INFO = "{0}-0x{1:x2}";
         const string FORMAT_EDGE_COUNT = " Edges({0}):";
         const string FORMAT_EDGE_INFO = " {0}-0x{1:x2}-{2}-{3}";
-        const string FORMAT_OBJECT_INFO = "ThingId: {0} Ext: {1}";
+        const string FORMAT_OBJECT_INFO = "Object: {0} Ext: {1}";
+        const string FORMAT_WAYPOINT_INFO = "Waypoint: {0} Num: {1}";
 
         // Used for tracking changes
         Map.Wall prevWall = null;
         Map.Tile prevTile = null;
         Map.Object prevObj = null;
+        Map.Waypoint prevWP = null;
         Map.Polygon prevPoly = null;
         int prevEdge = -1;
         int edgeCount = 0;
         public void Update(Point mousePt)
         {
-
             bool iWalls = (MapInterface.CurrentMode >= EditMode.WALL_PLACE && MapInterface.CurrentMode <= EditMode.WALL_CHANGE);
             bool iTiles = (MapInterface.CurrentMode >= EditMode.FLOOR_PLACE && MapInterface.CurrentMode <= EditMode.EDGE_PLACE);
             bool iObjs = (MapInterface.CurrentMode == EditMode.OBJECT_SELECT);
+            bool iWps = (MapInterface.CurrentMode == EditMode.WAYPOINT_SELECT);
 
             // Search for walls/tiles/objects under cursor
-
-            statusLocation = String.Format(FORMAT_COORDINATES, mousePt.X, mousePt.Y);
+            statusLocation = string.Format(FORMAT_COORDINATES, mousePt.X, mousePt.Y);
             statusMapItem = "";
             statusPolygon = "";
 
@@ -89,23 +63,19 @@ namespace MapEditor.newgui
             {
                 var wallPt = MapView.GetNearestWallPoint(mousePt);
                 Map.Wall wall = map.Walls.ContainsKey(wallPt) ? map.Walls[wallPt] : null;
-                statusLocation = String.Format(FORMAT_COORDINATES, wallPt.X, wallPt.Y);
+                statusLocation = string.Format(FORMAT_COORDINATES, wallPt.X, wallPt.Y);
 
                 if (wall != null)
-                    statusMapItem = String.Format(FORMAT_WALL_INFO, wall.Material, wall.Variation);
-
-
+                    statusMapItem = string.Format(FORMAT_WALL_INFO, wall.Material, wall.Variation);
 
                 if (prevWall != wall)
                 {
                     prevWall = wall;
                     updateStatusbars = true;
                 }
-
             }
             else
                 prevWall = null;
-
 
 
             // Tile tracking
@@ -113,20 +83,19 @@ namespace MapEditor.newgui
             {
                 var tilePt = MapView.GetNearestTilePoint(mousePt);
                 Map.Tile tile = map.Tiles.ContainsKey(tilePt) ? map.Tiles[tilePt] : null;
-                statusLocation = String.Format(FORMAT_COORDINATES, tilePt.X, tilePt.Y);
+                statusLocation = string.Format(FORMAT_COORDINATES, tilePt.X, tilePt.Y);
 
                 if (tile != null)
                 {
-                    statusMapItem = String.Format(FORMAT_TILE_INFO, tile.Graphic, tile.Variation);
+                    statusMapItem = string.Format(FORMAT_TILE_INFO, tile.Graphic, tile.Variation);
                     edgeCount = tile.EdgeTiles.Count;
                     if (tile.EdgeTiles.Count > 0)
                     {
-
-                        statusMapItem += String.Format(FORMAT_EDGE_COUNT, tile.EdgeTiles.Count);
+                        statusMapItem += string.Format(FORMAT_EDGE_COUNT, tile.EdgeTiles.Count);
 
                         foreach (Map.Tile.EdgeTile edge in tile.EdgeTiles)
                         {
-                            statusMapItem += String.Format(FORMAT_EDGE_INFO, ThingDb.FloorTileNames[edge.Graphic], edge.Variation, edge.Dir, ThingDb.EdgeTileNames[edge.Edge]);
+                            statusMapItem += string.Format(FORMAT_EDGE_INFO, ThingDb.FloorTileNames[edge.Graphic], edge.Variation, edge.Dir, ThingDb.EdgeTileNames[edge.Edge]);
 
                         }
                     }
@@ -142,16 +111,9 @@ namespace MapEditor.newgui
                     prevEdge = tile.EdgeTiles.Count;
                     updateStatusbars = true;
                 }
-
-
-
             }
             else
                 prevTile = null;
-
-
-
-
 
 
             // Object tracking
@@ -160,19 +122,34 @@ namespace MapEditor.newgui
                 Map.Object obj = MapInterface.ObjectSelect(mousePt);
                 if (obj == null) return;
 
-                statusMapItem = String.Format(FORMAT_OBJECT_INFO, obj.Name, obj.Extent);
-
-
+                statusMapItem = string.Format(FORMAT_OBJECT_INFO, obj.Name, obj.Extent);
 
                 if (prevObj != obj)
                 {
                     prevObj = obj;
                     updateStatusbars = true;
                 }
-
             }
             else
                 prevObj = null;
+
+
+            // Waypoint tracking
+            if (iWps)
+            {
+                Map.Waypoint wp = MapInterface.WaypointSelect(mousePt);
+                if (wp == null) return;
+
+                statusMapItem = string.Format(FORMAT_WAYPOINT_INFO, wp.Name, wp.Number);
+
+                if (prevWP != wp)
+                {
+                    prevWP = wp;
+                    updateStatusbars = true;
+                }
+            }
+            else
+                prevWP = null;
 
 
             // Polygon tracking
@@ -191,21 +168,11 @@ namespace MapEditor.newgui
                     {
                         MainWindow.Instance.mapView.PolygonEditDlg.listBoxPolygons.SelectedIndex = i;
                         MainWindow.Instance.mapView.PolygonEditDlg.SelectedPolygon = ins;
-                        //System.Windows.Forms.MessageBox.Show("ON:");
                     }
                     break;
                 }
                
             }
-            /*
-            if (ins == null)
-            {
-                
-                MainWindow.Instance.mapView.PolygonEditDlg.listBoxPolygons.ClearSelected();
-                MainWindow.Instance.mapView.PolygonEditDlg.SelectedPolygon = null;
-                 // System.Windows.Forms.MessageBox.Show("OFF:");
-            }
-            */
             if (prevPoly != ins)
             {
                 prevPoly = ins;

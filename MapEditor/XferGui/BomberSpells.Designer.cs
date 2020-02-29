@@ -91,7 +91,6 @@ namespace MapEditor.XferGui
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "BomberSpells";
-            this.Load += new System.EventHandler(this.BomberSpells_Load);
             this.ResumeLayout(false);
 
 		}

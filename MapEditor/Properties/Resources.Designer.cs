@@ -97,6 +97,16 @@ namespace MapEditor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap aboutPic {
+            get {
+                object obj = ResourceManager.GetObject("aboutPic", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {\rtf1\ansi\ansicpg1252\deff0\deflang1033\deflangfe1033{\fonttbl{\f0\froman\fcharset0 Times New Roman;}{\f1\fmodern\fprq1\fcharset0 Courier New;}{\f2\fswiss\fprq2\fcharset0 Arial;}{\f3\fswiss\fcharset0 Arial;}}
         ///{\colortbl ;\red0\green128\blue128;\red164\green21\blue21;}
         ///{\*\generator Msftedit 5.41.21.2510;}\viewkind4\uc1\pard\sb100\sa100\f0\fs52 AggressionLevel(object,float)\fs24  \par
@@ -599,6 +609,16 @@ namespace MapEditor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap customSnap {
+            get {
+                object obj = ResourceManager.GetObject("customSnap", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {\rtf1\ansi\ansicpg1252\deff0{\fonttbl{\f0\froman\fprq2\fcharset0 Times New Roman;}{\f1\fmodern\fprq1\fcharset0 Courier New;}{\f2\fswiss\fcharset0 Arial;}}
         ///{\colortbl ;\red128\green128\blue128;\red0\green0\blue255;\red164\green21\blue21;}
         ///{\*\generator Msftedit 5.41.21.2510;}\viewkind4\uc1\pard\lang1033\f0\fs52 Damage(Object,Object,Value,Int)\fs24\par
@@ -853,6 +873,16 @@ namespace MapEditor.Properties {
         public static string frozen {
             get {
                 return ResourceManager.GetString("frozen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap fullSnap {
+            get {
+                object obj = ResourceManager.GetObject("fullSnap", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
@@ -1917,6 +1947,16 @@ namespace MapEditor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap noSnap {
+            get {
+                object obj = ResourceManager.GetObject("noSnap", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {\rtf1\ansi\deff0\adeflang1025
         ///{\fonttbl{\f0\froman\fprq2\fcharset0 Times New Roman;}{\f1\froman\fprq2\fcharset2 Symbol;}{\f2\fswiss\fprq2\fcharset0 Arial;}{\f3\fmodern\fprq1\fcharset0 Courier New;}{\f4\fnil\fprq2\fcharset0 Microsoft YaHei;}{\f5\fnil\fprq2\fcharset0 Mangal;}{\f6\fnil\fprq0\fcharset128 Mangal;}}
         ///{\colortbl;\red0\green0\blue0;\red51\green153\blue255;\red128\green128\blue128;}
@@ -2225,6 +2265,16 @@ namespace MapEditor.Properties {
         public static string random {
             get {
                 return ResourceManager.GetString("random", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap random1 {
+            get {
+                object obj = ResourceManager.GetObject("random1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
@@ -2541,6 +2591,16 @@ namespace MapEditor.Properties {
         public static System.Drawing.Bitmap showPreview {
             get {
                 object obj = ResourceManager.GetObject("showPreview", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap sideSnap {
+            get {
+                object obj = ResourceManager.GetObject("sideSnap", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -22,6 +22,7 @@ namespace MapEditor.MapInt
     /// </summary>
     public class MapInterface
     {
+        #region Globals
         // Singleton
         private static MapInterface _instance = new MapInterface();
         public static ArrayList RecSelected = new ArrayList();
@@ -123,6 +124,7 @@ namespace MapEditor.MapInt
         }
 
         const string BLANK_MAP_NAME = "blankmap.map";
+        #endregion
 
         public MapInterface()
         {
@@ -1044,7 +1046,7 @@ namespace MapEditor.MapInt
                         if (!(pat2.X < 0 || pat2.Y < 0 || pat2.X > 252 || pat2.Y > 252))
                         {
                             // _instance._mapHelper.RemoveTile(pat2.X, pat2.Y);
-                            _instance._mapHelper.PlaceTile(pat2.X, pat2.Y);
+                            _instance._mapHelper.PlaceTile(pat2.X, pat2.Y, mapView.TileMakeNewCtrl.checkAutoVari.Checked, mapView.TileMakeNewCtrl.tileVariation);
                             _instance._mapHelper.BrushAutoBlend(pat2.X, pat2.Y);
                         }
 
@@ -1055,7 +1057,7 @@ namespace MapEditor.MapInt
             else
             {
                 //_instance._mapHelper.RemoveTile(x, y);
-                _instance._mapHelper.PlaceTile(x, y);
+                _instance._mapHelper.PlaceTile(x, y, mapView.TileMakeNewCtrl.checkAutoVari.Checked, mapView.TileMakeNewCtrl.tileVariation);
                 _instance._mapHelper.BrushAutoBlend(x, y);
             }
             //  OpUpdatedTiles = true;
@@ -1645,7 +1647,7 @@ namespace MapEditor.MapInt
         }
         public static Map.Waypoint WaypointPlace(string name, PointF loc, bool enabled)
         {
-            Map.Waypoint wp = new Map.Waypoint("", loc, GetNextWaypointNumber());
+            Map.Waypoint wp = new Map.Waypoint(name, loc, GetNextWaypointNumber());
             wp.Flags = enabled ? 1 : 0;
             TheMap.Waypoints.Add(wp);
             TheMap.Waypoints.num_wp.Add(wp.Number, wp);
@@ -1676,9 +1678,8 @@ namespace MapEditor.MapInt
             foreach (Map.Waypoint wp in TheMap.Waypoints)
                 wp.connections.Clear();
         }
-        public static bool WaypointConnect(Map.Waypoint wp, Map.Waypoint proxyWP = null)
+        public static bool WaypointConnect(Map.Waypoint wp, byte flag, Map.Waypoint proxyWP = null)
         {
-
             Map.Waypoint destWaypoint = proxyWP == null ? SelectedWaypoint : proxyWP;
 
             if (wp != null && destWaypoint != null && !wp.Equals(destWaypoint))
@@ -1687,7 +1688,6 @@ namespace MapEditor.MapInt
 
                 foreach (Map.Waypoint.WaypointConnection wpc in wp.connections)
                 {
-
                     foreach (Map.Waypoint.WaypointConnection wpcs in destWaypoint.connections)//Checks if the waypoint connection is connecting to wp
                     {
                         if (wpcs.wp.Equals(wp))
@@ -1701,36 +1701,28 @@ namespace MapEditor.MapInt
                 if (ok)
                 {
                     mapView.ApplyStore();
-                    destWaypoint.AddConnByNum(wp, WaypointFlag);
+                    destWaypoint.AddConnByNum(wp, flag);
                     OpUpdatedWaypoints = true;
-                    // MessageBox.Show("sdsd");
-
                 }
                 if (mapView.doubleWp.Checked && proxyWP == null)
-                {
-                    WaypointConnect(SelectedWaypoint, wp);
-                }
-                if (ok) return true;
+                    WaypointConnect(SelectedWaypoint, flag, wp);
 
+                if (ok) return true;
             }
             return false;
         }
         public static bool WaypointUnconnect(Map.Waypoint wp)
         {
-
-
             if (wp != null && SelectedWaypoint != null && !wp.Equals(SelectedWaypoint))
             {
                 bool ok = false;
                 foreach (Map.Waypoint.WaypointConnection wpc in wp.connections)
                 {
-
                     if (wpc.wp.Equals(SelectedWaypoint))
                     {
                         ok = true;
                         break;
                     }
-
                 }
 
                 if (ok)
@@ -1740,7 +1732,6 @@ namespace MapEditor.MapInt
                     OpUpdatedWaypoints = true;
                     return true;
                 }
-
             }
             return false;
         }
@@ -1878,6 +1869,7 @@ namespace MapEditor.MapInt
                     break;
                 case EditMode.OBJECT_PLACE:
                     ObjectPlace(mapView.cboObjCreate.Text, pt.X, pt.Y);
+                    mapView.cboObjCreate.Focus();
                     break;
                 case EditMode.OBJECT_SELECT:
                     var obj = ObjectSelect(pt);
@@ -1902,9 +1894,10 @@ namespace MapEditor.MapInt
                     }
                     break;
                 case EditMode.WAYPOINT_PLACE:
-                    mapView.waypointName.Text = "";
                     WaypointPlace(mapView.waypointName.Text, new PointF(pt.X, pt.Y), mapView.waypointEnabled.Checked);
-
+                    mapView.waypointName.Text = "";
+                    SelectedWaypoint = null;
+                    SelectedWaypoints.Clear();
                     break;
                 case EditMode.WAYPOINT_CONNECT:
                 case EditMode.WAYPOINT_SELECT:
@@ -1914,18 +1907,37 @@ namespace MapEditor.MapInt
                         if (KeyHelper.ShiftKey) // Shift unconnects (reverse)
                             WaypointUnconnect(WaypointSelect(pt));
                         else
-                            WaypointConnect(WaypointSelect(pt));
+                            WaypointConnect(WaypointSelect(pt), Convert.ToByte(mapView.wpConnFlag.Value), null);
                     }
                     // Mark waypoint under cursor as selected, or reset
                     SelectedWaypoint = WaypointSelect(pt);
                     if (SelectedWaypoint != null)
                     {
-                        // update info box
-                        mapView.waypointName.Text = SelectedWaypoint.Name;
-                        mapView.waypointEnabled.Checked = SelectedWaypoint.Flags > 0;
+                        if (!SelectedWaypoints.Contains(SelectedWaypoint))
+                        {
+                            if (!KeyHelper.ShiftKey)
+                                SelectedWaypoints.Clear();
+                            SelectedWaypoints.Add(SelectedWaypoint);
+                        }
+                        else if (KeyHelper.ShiftKey)
+                        {
+                            mapView.DeletefromSelected(SelectedWaypoint);
+                            SelectedWaypoint = null;
+                        }
+                        if (SelectedWaypoint != null)
+                        {
+                            mapView.waypointName.Text = SelectedWaypoint.Name;
+                            mapView.waypointEnabled.Checked = SelectedWaypoint.Flags > 0;
+                            //mapView.WPnum.Text = SelectedWaypoint.Number.ToString();
+                            break;
+                        }
+                        //mapView.WPnum.Text = "";
+                        mapView.waypointEnabled.Checked = true;
+                        break;
                     }
-                    else
-                        SelectedWaypoints.Clear();
+                    if (mapView.contextMenuOpen || KeyHelper.ShiftKey)
+                        break;
+                    SelectedWaypoints.Clear();
                     break;
             }
         }

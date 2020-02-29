@@ -469,7 +469,7 @@ namespace NoxShared
             public short Prefix = 1;
             public byte Count = 0;
             public List<ScriptDataEntry> entries = new List<ScriptDataEntry>();
-            private byte[] data;
+            private byte[] data = new byte[0]; // some maps load null, breaks Write(), must initialize
 
             public ScriptData() : base() { }
             public ScriptData(Stream stream) : base(stream) { }
@@ -686,20 +686,19 @@ namespace NoxShared
             {
                 BinaryWriter wtr = new BinaryWriter(stream);
 
-                int index = Count;
-                wtr.Write((short)Unknown);
-                wtr.Write((int)Count);
+                wtr.Write(Unknown);
+                wtr.Write(Count);
                 foreach (Group grp in Values)
                 {
                     wtr.Write(grp.name);
                     wtr.Write((byte)grp.type);
-                    wtr.Write(index--);
+                    wtr.Write(grp.id);
                     wtr.Write(grp.Count);
 
-                    foreach (System.Object obj in grp)
+                    foreach (object obj in grp)
                     {
-                        if (obj.GetType() == typeof(Int32))
-                            wtr.Write((Int32)obj);
+                        if (obj.GetType() == typeof(int))
+                            wtr.Write((int)obj);
                         else if (obj.GetType() == typeof(Point))
                         {
                             wtr.Write(((Point)obj).X);
@@ -1378,6 +1377,9 @@ namespace NoxShared
                 {
                     Tile left = null, right = null;
                     Tile tile1 = tEnum.Current;
+                    // Tile Map Compression -KITTY
+                    if (!tiles.ContainsKey(tile1.Location))
+                        continue;
                     if (tile1.Location.X % 2 == 1)//we got a right tile. the right tile will always come before it's left tile
                     {
                         right = tile1;
@@ -2675,12 +2677,11 @@ namespace NoxShared
         {
             WriteMapData();
 
-            //System.Windows.Forms.MessageBox.Show(FileName+ "  map.cs");
             try
             {
-                if (File.Exists(FileName)) File.Delete(FileName);
+                if (File.Exists(FileName))
+                    File.Delete(FileName);
 
-                //System.Windows.Forms.MessageBox.Show(FileName);
                 BinaryWriter fileWtr = new BinaryWriter(File.Create(FileName));
                 fileWtr.Write(mapData);
                 fileWtr.Close();
@@ -2690,7 +2691,27 @@ namespace NoxShared
                 System.Windows.Forms.MessageBox.Show("No permission!"+" "+e);
                 return;
             }
+        }
 
+        public void ExtractNxz()
+        {
+            if (!File.Exists(FileName))
+            {
+                System.Windows.Forms.MessageBox.Show("Missing .map file.", "Error");
+                return;
+            }
+            var path = Path.GetDirectoryName(FileName) + Path.DirectorySeparatorChar.ToString() + Path.GetFileNameWithoutExtension(FileName);
+            var mapPath = path + ".map";
+            var nxzPath = path + ".nxz";
+
+            if (File.Exists(nxzPath))
+                File.Delete(nxzPath);
+
+            long length = new FileInfo(mapPath).Length;
+            BinaryWriter binaryWriter = new BinaryWriter(File.Create(nxzPath));
+            binaryWriter.Write((uint)length);
+            binaryWriter.Write(NoxLzCompression.Compress(File.ReadAllBytes(mapPath)));
+            binaryWriter.Close();
         }
 
         /// <summary>

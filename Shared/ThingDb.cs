@@ -1491,11 +1491,23 @@ namespace NoxShared
 
         public static Thing GetThing(string name)
         {
-            /*foreach (Thing thing in Things)
-                if (thing.Name == name)
-                    return thing;
-            return null;*/
-            return (Thing)Things[name];
+            string str = name;
+            if (string.IsNullOrEmpty(str))
+                return null;
+            string lower = str.ToLower();
+            string index = "";
+            bool match = false;
+            foreach (string key in Things.Keys)
+            {
+                if (lower.Equals(key.ToLower()))
+                {
+                    match = true;
+                    index = key;
+                }
+            }
+            if (match)
+                return Things[index];
+            return null;
         }
     }
 }

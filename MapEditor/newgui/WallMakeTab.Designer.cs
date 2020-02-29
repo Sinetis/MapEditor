@@ -60,6 +60,7 @@ namespace MapEditor.newgui
             this.WallProp = new System.Windows.Forms.Panel();
             this.cmdCancel = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.PickerProp = new System.Windows.Forms.CheckBox();
             this.openWallBox = new System.Windows.Forms.CheckBox();
             this.label5 = new System.Windows.Forms.Label();
             this.checkListFlags = new System.Windows.Forms.CheckedListBox();
@@ -350,17 +351,19 @@ namespace MapEditor.newgui
             this.cmdCancel.Name = "cmdCancel";
             this.cmdCancel.Size = new System.Drawing.Size(86, 24);
             this.cmdCancel.TabIndex = 5;
-            this.cmdCancel.Text = "Cancel";
+            this.cmdCancel.Text = "Back";
             this.cmdCancel.UseVisualStyleBackColor = true;
             this.cmdCancel.Click += new System.EventHandler(this.cmdCancel_Click);
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.PickerProp);
             this.groupBox2.Controls.Add(this.openWallBox);
             this.groupBox2.Controls.Add(this.label5);
             this.groupBox2.Controls.Add(this.checkListFlags);
             this.groupBox2.Controls.Add(this.numericCloseDelay);
             this.groupBox2.Controls.Add(this.label6);
+            this.groupBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox2.Location = new System.Drawing.Point(10, 3);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(191, 124);
@@ -368,11 +371,28 @@ namespace MapEditor.newgui
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Secret Wall";
             // 
+            // PickerProp
+            // 
+            this.PickerProp.Appearance = System.Windows.Forms.Appearance.Button;
+            this.PickerProp.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("PickerProp.BackgroundImage")));
+            this.PickerProp.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.PickerProp.FlatAppearance.CheckedBackColor = System.Drawing.Color.Lime;
+            this.PickerProp.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.PickerProp.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.PickerProp.Location = new System.Drawing.Point(153, 16);
+            this.PickerProp.Name = "PickerProp";
+            this.PickerProp.Size = new System.Drawing.Size(30, 30);
+            this.PickerProp.TabIndex = 38;
+            this.toolTip1.SetToolTip(this.PickerProp, "Wall Picker (Ctrl+A)");
+            this.PickerProp.UseVisualStyleBackColor = true;
+            this.PickerProp.CheckedChanged += new System.EventHandler(this.PickerProp_CheckedChanged);
+            // 
             // openWallBox
             // 
             this.openWallBox.AutoSize = true;
             this.openWallBox.Enabled = false;
-            this.openWallBox.Location = new System.Drawing.Point(19, 27);
+            this.openWallBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.openWallBox.Location = new System.Drawing.Point(120, 52);
             this.openWallBox.Name = "openWallBox";
             this.openWallBox.Size = new System.Drawing.Size(52, 17);
             this.openWallBox.TabIndex = 5;
@@ -381,21 +401,23 @@ namespace MapEditor.newgui
             // 
             // label5
             // 
-            this.label5.Location = new System.Drawing.Point(76, 10);
+            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label5.Location = new System.Drawing.Point(7, 16);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(107, 14);
+            this.label5.Size = new System.Drawing.Size(90, 14);
             this.label5.TabIndex = 3;
-            this.label5.Text = "Wall status && flags";
+            this.label5.Text = "Status && Flags:";
             // 
             // checkListFlags
             // 
+            this.checkListFlags.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.checkListFlags.FormattingEnabled = true;
             this.checkListFlags.Items.AddRange(new object[] {
             "Scripted",
             "Auto-Open",
             "Auto-Close",
             "UnkFlag8"});
-            this.checkListFlags.Location = new System.Drawing.Point(77, 26);
+            this.checkListFlags.Location = new System.Drawing.Point(8, 30);
             this.checkListFlags.Name = "checkListFlags";
             this.checkListFlags.Size = new System.Drawing.Size(106, 64);
             this.checkListFlags.TabIndex = 2;
@@ -406,7 +428,8 @@ namespace MapEditor.newgui
             // 
             // numericCloseDelay
             // 
-            this.numericCloseDelay.Location = new System.Drawing.Point(131, 97);
+            this.numericCloseDelay.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.numericCloseDelay.Location = new System.Drawing.Point(101, 97);
             this.numericCloseDelay.Name = "numericCloseDelay";
             this.numericCloseDelay.Size = new System.Drawing.Size(52, 20);
             this.numericCloseDelay.TabIndex = 1;
@@ -418,12 +441,12 @@ namespace MapEditor.newgui
             // 
             // label6
             // 
-            this.label6.Location = new System.Drawing.Point(19, 100);
+            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label6.Location = new System.Drawing.Point(7, 100);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(112, 17);
             this.label6.TabIndex = 0;
             this.label6.Text = "Open/close delay:";
-            this.label6.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // checkDestructable
             // 
@@ -480,6 +503,8 @@ namespace MapEditor.newgui
             this.Bucket.Appearance = System.Windows.Forms.Appearance.Button;
             this.Bucket.BackgroundImage = global::MapEditor.Properties.Resources.bucketPaint;
             this.Bucket.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.Bucket.FlatAppearance.CheckedBackColor = System.Drawing.Color.Lime;
+            this.Bucket.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Bucket.Location = new System.Drawing.Point(146, 30);
             this.Bucket.Name = "Bucket";
             this.Bucket.Size = new System.Drawing.Size(30, 30);
@@ -492,7 +517,9 @@ namespace MapEditor.newgui
             // 
             this.Picker.Appearance = System.Windows.Forms.Appearance.Button;
             this.Picker.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("Picker.BackgroundImage")));
-            this.Picker.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.Picker.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.Picker.FlatAppearance.CheckedBackColor = System.Drawing.Color.Lime;
+            this.Picker.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Picker.Location = new System.Drawing.Point(175, 30);
             this.Picker.Name = "Picker";
             this.Picker.Size = new System.Drawing.Size(30, 30);
@@ -678,8 +705,7 @@ namespace MapEditor.newgui
             // 
             // WallMakeTab
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.Controls.Add(this.WallProp);
             this.Controls.Add(this.Bucket);
             this.Controls.Add(this.RecLinePanel);
@@ -767,5 +793,6 @@ namespace MapEditor.newgui
         public System.Windows.Forms.CheckBox autovari;
         public System.Windows.Forms.CheckBox checkWindow;
         public System.Windows.Forms.CheckBox Bucket;
+        public System.Windows.Forms.CheckBox PickerProp;
     }
 }

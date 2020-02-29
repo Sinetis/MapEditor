@@ -201,7 +201,7 @@ namespace MapEditor.mapgen
         /// Places tile onto the map.
         /// </summary>
         /// <returns>true on success, false otherwise</returns>
-        public bool PlaceTile(int x, int y)
+        public bool PlaceTile(int x, int y, bool autovar = true, int variation = 0)
         {
             // check coordinates testudo
             if (x >= 255) return false;
@@ -213,6 +213,8 @@ namespace MapEditor.mapgen
             int cols = ThingDb.FloorTiles[usingTileMaterial].numCols;
             int rows = ThingDb.FloorTiles[usingTileMaterial].numRows;
             ushort vari = (ushort)(((x + y) / 2 % cols) + (((y % rows) + 1 + cols - ((x + y) / 2) % cols) % rows) * cols);
+            if (!autovar)
+                vari = (ushort)variation;
             Map.Tile newTile = new Map.Tile(pt, usingTileMaterial, vari);
             if (map.Tiles.ContainsKey(pt))
             {

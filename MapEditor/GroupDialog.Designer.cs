@@ -109,6 +109,8 @@
             this.txtGroupID.Name = "txtGroupID";
             this.txtGroupID.Size = new System.Drawing.Size(33, 22);
             this.txtGroupID.TabIndex = 5;
+            this.txtGroupID.Enter += new System.EventHandler(this.txtGroupID_Enter);
+            this.txtGroupID.Leave += new System.EventHandler(this.txtGroupID_Leave);
             // 
             // closeButton
             // 
@@ -212,6 +214,7 @@
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "Groups";
             this.TopMost = true;
+            this.DoubleClick += new System.EventHandler(this.GroupDialog_DoubleClick);
             this.groupBoxTypes.ResumeLayout(false);
             this.groupBoxTypes.PerformLayout();
             this.ResumeLayout(false);

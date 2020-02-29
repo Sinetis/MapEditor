@@ -144,10 +144,10 @@ namespace NoxShared.ObjDataXfer
 		[Serializable]
 		public struct BuffEntry
 		{
-			public string Name;
-			public byte Power;
-			public int Duration;
-			public int ShieldHealth; // only for ENCHANT_SHIELD (0x1A)
+			public string Name { get; set; }
+			public byte Power { get; set; }
+			public int Duration { get; set; }
+			public int ShieldHealth { get; set; } // only for ENCHANT_SHIELD (0x1A)
 		}
 		
 		[Serializable]
@@ -272,6 +272,9 @@ namespace NoxShared.ObjDataXfer
 			NoxBinaryReader br = new NoxBinaryReader(mstream);
 			DirectionId = (byte) Array.IndexOf(NOX_DIRECT_LONG, br.ReadUInt64());
 			ScriptEvents = new string[10];
+            // Fix for some old maps (null)
+            WoundedNPCVoiceSet = "";
+            BuffList = new BuffEntry[0];
 			// Read script event handler names
 			for (int i = 0; i < 10; i++)
 			{
@@ -477,7 +480,7 @@ namespace NoxShared.ObjDataXfer
 						if (be.Name == ENCHANT_SHIELD && entryType >= 2)
 							be.ShieldHealth = br.ReadInt32();
 							
-						BuffList[count] = be;
+						BuffList[count - 1] = be;
 						count--;
 					}
 					Array.Reverse(BuffList);

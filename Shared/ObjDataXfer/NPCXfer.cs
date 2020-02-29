@@ -66,8 +66,11 @@ namespace NoxShared.ObjDataXfer
 			NoxBinaryReader br = new NoxBinaryReader(mstream);
 			DirectionId = (byte) Array.IndexOf(MonsterXfer.NOX_DIRECT_LONG, br.ReadUInt64());
 			ScriptEvents = new string[10];
-			// Читаем имена обработчиков скриптовых событий
-			for (int i = 0; i < 10; i++)
+            // Fix for some old maps (null)
+            NPCVoiceSet = "";
+            BuffList = new MonsterXfer.BuffEntry[0];
+            // Читаем имена обработчиков скриптовых событий
+            for (int i = 0; i < 10; i++)
 			{
 				if (i == 2)
 					DetectEventTimeout = br.ReadUInt16();
@@ -179,9 +182,9 @@ namespace NoxShared.ObjDataXfer
 				}
 				if (ParsingRule >= 41)
 				{
-					// здесь придётся читать просто огромное кол-во инфы
-					// однако она используется очень редко, обычно entryType = 4; forced = 0
-					short entryType = br.ReadInt16();
+                    // here you have to read just a huge amount of information
+                    // however it is used very rarely, usually entryType = 4; forced = 0
+                    short entryType = br.ReadInt16();
 					if (entryType <= 4)
 					{
 						byte forced = 1;
@@ -225,7 +228,7 @@ namespace NoxShared.ObjDataXfer
 					if (be.Name == ENCHANT_SHIELD && buffsType >= 2)
 						be.ShieldHealth = br.ReadInt32();
 					
-					BuffList[count] = be;
+					BuffList[count - 1] = be;
 					count--;
 				}
 				Array.Reverse(BuffList);

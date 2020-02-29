@@ -230,7 +230,9 @@ namespace MapEditor.newgui
             // 
             this.Picker.Appearance = System.Windows.Forms.Appearance.Button;
             this.Picker.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("Picker.BackgroundImage")));
-            this.Picker.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.Picker.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.Picker.FlatAppearance.CheckedBackColor = System.Drawing.Color.Lime;
+            this.Picker.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Picker.Location = new System.Drawing.Point(175, 30);
             this.Picker.Name = "Picker";
             this.Picker.Size = new System.Drawing.Size(30, 30);
@@ -244,6 +246,8 @@ namespace MapEditor.newgui
             this.Bucket.Appearance = System.Windows.Forms.Appearance.Button;
             this.Bucket.BackgroundImage = global::MapEditor.Properties.Resources.bucketPaint;
             this.Bucket.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.Bucket.FlatAppearance.CheckedBackColor = System.Drawing.Color.Lime;
+            this.Bucket.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Bucket.Location = new System.Drawing.Point(146, 30);
             this.Bucket.Name = "Bucket";
             this.Bucket.Size = new System.Drawing.Size(30, 30);
@@ -297,8 +301,7 @@ namespace MapEditor.newgui
             // 
             // TileMakeTab
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.Controls.Add(this.Bucket);
             this.Controls.Add(this.miniEdges);
             this.Controls.Add(this.Picker);
@@ -334,7 +337,6 @@ namespace MapEditor.newgui
         private System.Windows.Forms.Label label5;
         public System.Windows.Forms.CheckBox WallBlockBrush;
         private System.Windows.Forms.Label labelSep1;
-        private System.Windows.Forms.CheckBox checkAutoVari;
         public SwitchModeButton buttonMode;
         public System.Windows.Forms.RadioButton AutoTileBtn;
         public System.Windows.Forms.RadioButton PlaceTileBtn;
@@ -344,5 +346,6 @@ namespace MapEditor.newgui
         public System.Windows.Forms.ComboBox edgeBox;
         private System.Windows.Forms.Label label2;
         public System.Windows.Forms.CheckBox Bucket;
+        public System.Windows.Forms.CheckBox checkAutoVari;
     }
 }

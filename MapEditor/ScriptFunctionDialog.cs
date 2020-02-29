@@ -23,6 +23,7 @@ namespace MapEditor
         private string prevname;
         public bool hasLoaded = false;
         private int lastHeight;
+        private string lastLine = "";
         protected List<string> strings;
         protected Map.ScriptFunction sf;
         protected Map.ScriptObject sct;
@@ -377,6 +378,7 @@ namespace MapEditor
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "Scripting";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ScriptFunctionDialog_FormClosing);
+            this.Load += new System.EventHandler(this.ScriptFunctionDialog_Load);
             this.treeMenu.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -423,6 +425,10 @@ namespace MapEditor
             chkShowHelp.Checked = EditorSettings.Default.Script_ShowHelp;
             chkColorTheme.Checked = EditorSettings.Default.Script_LightTheme;
         }
+        private void ScriptFunctionDialog_Load(object sender, EventArgs e)
+        {
+            treeNode2.Expand();
+        }
 
         private void okButton_Click(object sender, EventArgs e)
         {
@@ -430,11 +436,13 @@ namespace MapEditor
             {
                 ParseFunction();
             }
-            catch
+            catch (Exception ex)
             {
-                MessageBox.Show("Wrong Syntax!");
+                MessageBox.Show("Wrong Syntax!\n\nLine: " + lastLine + "\n\n" + ex.Message, sf.name);
                 return;
             }
+            
+            MainWindow.Instance.mapView.SaveScripts(Scripts);
             Close();
         }
         private void cancelButton_Click(object sender, EventArgs e)
@@ -471,39 +479,49 @@ namespace MapEditor
                 Dictionary<int, string> jumps = new Dictionary<int, string>();
                 Dictionary<string, int> labels = new Dictionary<string, int>();
 
-                while ((start = scr.IndexOf('"')) != -1)
+                //while ((start = scr.IndexOf('"')) != -1)
+                for (; (start = scr.IndexOf('"')) != -1; scr = scr.Remove(start, end - start + 1).Insert(start, string.Format("*{0}", Scripts.SctStr.IndexOf(s))))
                 {
                     end = scr.IndexOf('"', start + 1);
                     s = scr.Substring(start + 1, end - start - 1);
                     if (!Scripts.SctStr.Contains(s))
                         Scripts.SctStr.Add(s);
-                    scr = scr.Remove(start, end - start + 1).Insert(start, string.Format("*{0}", Scripts.SctStr.IndexOf(s)));
+                    //scr = scr.Remove(start, end - start + 1).Insert(start, string.Format("*{0}", Scripts.SctStr.IndexOf(s)));
                 }
                 foreach (var str in scr.Split('\n'))
                 {
                     linenum++;
                     flags = 0;
                     string line = str.Trim();
+                    lastLine = line; // Only used for debugging
                     if (line.StartsWith("Gvar") && line.Contains("=")) // Set global variable
                     {
-                        int line_len = line.StartsWith("GvarF") ? 5 : 4;
+                        int line_len = line.StartsWith("GvarF") ? 5 : 4;  // GvarF is never used in declaration, not sure why this is here
                         wtr.Write(2);
                         wtr.Write(1);
-                        if (line.Substring(line_len + 1, 1) == " ")
-                            wtr.Write(Int32.Parse(line.Substring(line_len, line.IndexOf('[') > -1 ? line.IndexOf('[') - line_len : line.IndexOf(' ') - line_len)));
+
+                        var bracketPos = line.IndexOf('[');
+
+                        var newPos = -1;
+                        if (bracketPos > -1)
+                            newPos = bracketPos - line_len;
                         else
-                            wtr.Write(Int32.Parse(line.Substring(line_len, line.IndexOf('[') > -1 ? line.IndexOf('[') - line_len : line.IndexOf('=') - line_len)));
-                        if (line.IndexOf('[') > -1)
+                            newPos = GetValidDigitsFrom(line, line_len) - line_len;
+
+                        var result = int.Parse(line.Substring(line_len, newPos));
+
+                        wtr.Write(result);
+                        if (bracketPos > -1 && line.IndexOf('[') < line.IndexOf('='))
                         {
                             try
                             {
                                 ParseWord(wtr, 0, line.Substring(line.IndexOf('[') + 1, line.IndexOf(']') - line.IndexOf('[') - 1));
                             }
                             catch
-                            { 
-                                MessageBox.Show("Wromg Syntax!");
+                            {
+                                MessageBox.Show("Wrong Syntax!\nFailed to parse array variable.\n\nLine: " + line, sf.name);
                                 return;
-                            }   
+                            }
                             wtr.Write(0x44);
                         }
                         switch (line[line.IndexOf("=") - 1])
@@ -522,27 +540,35 @@ namespace MapEditor
                     }
                     else if (line.StartsWith("var") && line.Contains("=")) // Set local variable
                     {
-
                         int line_len = line.StartsWith("varF") ? 4 : 3;
                         wtr.Write(2);
                         wtr.Write(0);//var0 = Ob
-                        //MessageBox.Show(line.Substring(line_len+1,1));
-                        if (line.Substring(line_len+1,1) == " ")
-                        wtr.Write(Int32.Parse(line.Substring(line_len, line.IndexOf('[') > -1 ? line.IndexOf('[') - line_len : line.IndexOf(' ') - line_len)));
+
+                        var leftside = line.Substring(0, line.IndexOf('='));
+                        var bracketPos = leftside.IndexOf('[');
+
+                        var newPos = -1;
+                        if (bracketPos > -1)
+                            newPos = bracketPos - line_len;
                         else
-                        wtr.Write(Int32.Parse(line.Substring(line_len, line.IndexOf('[') > -1 ? line.IndexOf('[') - line_len : line.IndexOf('=') - line_len)));
-                        if (line.IndexOf('[') > -1)
+                            newPos = GetValidDigitsFrom(line, line_len) - line_len;
+
+                        var result = int.Parse(line.Substring(line_len, newPos));
+
+                        wtr.Write(result);
+
+                        if (bracketPos > -1)
                         {
 
                             try
                             {
-                                ParseWord(wtr, 0, line.Substring(line.IndexOf('[') + 1, line.IndexOf(']') - line.IndexOf('[') - 1));
+                                ParseWord(wtr, 0, line.Substring(bracketPos + 1, line.IndexOf(']') - bracketPos - 1));
                             }
                             catch
                             {
-                                MessageBox.Show("Wrong Syntax!");
+                                MessageBox.Show("Wrong Syntax!\nFailed to parse array variable.\n\nLine: " + line, sf.name);
                                 return;
-                            }   
+                            }
                             wtr.Write(0x44);
                         }
                         switch (line[line.IndexOf("=") - 1])
@@ -603,7 +629,7 @@ namespace MapEditor
                         try { line = ParseWord(wtr, 0, line); }
                         catch
                         {
-                            MessageBox.Show("Wrong Syntax!");
+                            MessageBox.Show("Wrong Syntax!\n\nLine: " + line, sf.name);
                             return;
                         }
                     }
@@ -615,17 +641,19 @@ namespace MapEditor
                         wtr.Write(0);
                     }
                 }
+                var lastJump = "null";
                 try
                 {
                     foreach (KeyValuePair<int, string> kv in jumps)
                     {
+                        lastJump = kv.Value;
                         ms.Seek(kv.Key, SeekOrigin.Begin);
                         wtr.Write(labels[kv.Value]);
                     }
                 }
                 catch
                 {
-                    MessageBox.Show("Wrong Syntax!");
+                    MessageBox.Show("Wrong Syntax!\n\nTried to jump to invalid position: jump " + lastJump, sf.name);
                     return;
                 }
             }
@@ -640,6 +668,17 @@ namespace MapEditor
                         sf.vars.Add(int.Parse(s.Remove(s.IndexOf(']'), 1).Remove(0, s.IndexOf('[') + 1).Trim()));
             }
         }
+
+        private int GetValidDigitsFrom(string input, int startAt)
+        {
+            // Used to find variable number; i.e. GetValidDigitsFrom("Gvar55 f= GetObjectX(Gvar0)", 4) returns 2
+            for (int i = startAt; i < input.Length; i++)
+                if (!char.IsDigit(input[i]))
+                    return i;
+
+            return -1;
+        }
+                    
         private string ParseWord(BinaryWriter wtr, int wordi, string line)
         {
             string[] words = line.Split(' '), args;
@@ -916,14 +955,16 @@ namespace MapEditor
                             }
                             s = Join(wordi + 1, line);
                         }
-                        else if (word.Contains("("))
+                        else if (word.Contains("("))    // Parse method and args
                         {
+                            
                             name = s.Remove(s.IndexOf('('));
                             int end = FindClosing(s.Substring(s.IndexOf('(') + 1));
                             if (end > 0)
                                 args = s.Substring(s.IndexOf('(') + 1, end - 1).Split(',');
                             else
                                 args = new string[0];
+
                             foreach (string arg in args)
                             {
                                 s2 = arg;
@@ -934,7 +975,7 @@ namespace MapEditor
                             wtr.Write((int)Enum.Parse(typeof(methods), name, true));
                             s = s.Remove(0, end + 1 + s.IndexOf('(')).Trim();
                         }
-                        else if (word[0] == '*' && word[1] != ' ')
+                        else if (word[0] == '*' && word[1] != ' ')  // String pointer (i.e. *20 = 21st String in array)
                         {
                             wtr.Write(6);
                             wtr.Write(Int32.Parse(word.Remove(0, 1)));
@@ -1061,7 +1102,7 @@ namespace MapEditor
             if (e.Node.Parent == treeNode2)
             {
                 try { ParseFunction(); }
-                catch { MessageBox.Show("Wrong Syntax!"); }
+                catch (Exception ex) { MessageBox.Show("Wrong Syntax!\n\nLine: " + lastLine + "\n\n" + ex.Message, sf.name); }
 
                 symbBox.Clear();
                 scriptBox.m_bPaint = false;
@@ -1314,7 +1355,7 @@ namespace MapEditor
         private string GetCode()
         {
             Stack<string> args = new Stack<string>();
-            List<int> jumps = new List<int>();
+            List<int> jumps = GetJumps();
 
             int index = 0;
             while (index < sf.vars.Count)
@@ -1431,20 +1472,14 @@ namespace MapEditor
                         break;
                     case 0x13:
                         opcode = rdr.ReadInt32();
-                        if (!jumps.Contains(opcode))
-                            jumps.Add(opcode);
                         args.Push("jump " + opcode.ToString());
                         break;
                     case 0x14:
                         opcode = rdr.ReadInt32();
-                        if (!jumps.Contains(opcode))
-                            jumps.Add(opcode);
                         args.Push("if " + args.Pop() + " jump " + opcode.ToString());
                         break;
                     case 0x15:
                         opcode = rdr.ReadInt32();
-                        if (!jumps.Contains(opcode))
-                            jumps.Add(opcode);
                         args.Push("if not " + args.Pop() + " jump " + opcode.ToString());
                         break;
                     case 0x23:
@@ -1555,7 +1590,10 @@ namespace MapEditor
                             equals = Enum.GetName(typeof(methods), funccode) + "(";
                             index = equals.Length;
                             for (int i = 0; i < (int)Enum.Parse(typeof(numArgs), Enum.GetName(typeof(methods), funccode)); i++)
-                                equals = equals.Insert(index, (i == 0) ? args.Pop() : args.Pop() + ",");
+                            {
+                                if (args.Count > 0)
+                                    equals = equals.Insert(index, (i == 0) ? args.Pop() : args.Pop() + ",");
+                            }
                             equals += ')';
                             args.Push(equals);
                         }
@@ -1583,6 +1621,32 @@ namespace MapEditor
 
             return human;
         }
+        private List<int> GetJumps()
+        {
+            // Must get jumps first or won't find all
+            var jumps = new List<int>();
+            int opcode;
+            MemoryStream ms = new MemoryStream(sf.code);
+            BinaryReader rdr = new BinaryReader(ms);
+
+            while (ms.Position < ms.Length)
+            {
+                opcode = rdr.ReadInt32();
+                switch (opcode)
+                {
+                    case 0x13:
+                    case 0x14:
+                    case 0x15:
+                        opcode = rdr.ReadInt32();
+                        if (!jumps.Contains(opcode))
+                            jumps.Add(opcode);
+                        break;
+                }
+            }
+
+            return jumps;
+        }
+
         public string ExportNativeScript()
         {
             var result = "// #########  STRINGS  #########" + Environment.NewLine;

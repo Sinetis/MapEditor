@@ -1,21 +1,13 @@
 using System;
-using System.Reflection;
-using System.Drawing;
-using System.Collections;
-using System.ComponentModel;
 using System.Windows.Forms;
-using System.Text.RegularExpressions;
 using System.IO;
 using System.Diagnostics;
-
-using MapEditor;
 using MapEditor.XferGui;
 using NoxShared;
-using NoxShared.ObjDataXfer;
 
 namespace MapEditor
 {
-	public class ObjectPropertiesDialog : System.Windows.Forms.Form
+	public class ObjectPropertiesDialog : Form
 	{
 		protected Map.Object obj;
 		protected ThingDb.Thing objPs;
@@ -38,10 +30,9 @@ namespace MapEditor
 				scrNameBox.Text = obj.Scr_Name;
                 xtraBox.Checked = (obj.Terminator > 0);
                 xtraBox_CheckedChanged(null, EventArgs.Empty);
-				animFlBox.Text = String.Format("{0:x}", obj.AnimFlags); // 0x40 "shiny sparks"
+				animFlBox.Text = string.Format("{0:x}", obj.AnimFlags); // 0x40 "shiny sparks"
                 pickupBox.Text = obj.pickup_func;
-
-
+                invenButton.Text = "View Inventory" + Environment.NewLine + this.obj.InventoryList.Count.ToString() + " item(s)";
 
                 // AngryKirC: ставим флаг?
                 flagsListBox.SetItemChecked(0, (obj.CreateFlags & 0x1000000) == 0x1000000); // ENABLED
@@ -65,32 +56,9 @@ namespace MapEditor
                 flagsListBox.SetItemChecked(18, (obj.CreateFlags & 0x40000000) ==  0x40000000); // SELECTED
                 flagsListBox.SetItemChecked(19, (obj.CreateFlags & 0x80000000) == 0x80000000); // MARKED
 
-
-
-				
-				objPs = ((ThingDb.Thing)ThingDb.Things[nameBox.Text]);
+				objPs = ThingDb.Things[nameBox.Text];
             }
 		}
-		private System.Windows.Forms.Label label1;
-		private System.Windows.Forms.Button buttonOK;
-		private System.Windows.Forms.Button buttonCancel;
-		private System.Windows.Forms.Label label2;
-		private System.Windows.Forms.Label label3;
-		private System.Windows.Forms.TextBox xBox;
-		private System.Windows.Forms.TextBox yBox;
-		private System.Windows.Forms.Label label4;
-		private System.Windows.Forms.TextBox extentBox;
-		private System.Windows.Forms.ComboBox nameBox;
-		private System.Windows.Forms.Label label5;
-		private System.Windows.Forms.TextBox teamBox;
-		private System.Windows.Forms.Label label6;
-		private System.Windows.Forms.TextBox scrNameBox;
-		private System.Windows.Forms.CheckBox xtraBox;
-		private System.Windows.Forms.Button invenButton;
-		private System.Windows.Forms.Label label7;
-        private TextBox pickupBox;
-        private Label label8;
-
 
 		public ObjectPropertiesDialog()
 		{
@@ -102,14 +70,122 @@ namespace MapEditor
 			
 			//TODO ToolTip tt = new ToolTip();
 		}
+        private void ObjectPropertiesDialog_Activated(object sender, EventArgs e)
+        {
+            invenButton.Text = "View Inventory" + Environment.NewLine + obj.InventoryList.Count.ToString() + " item(s)";
+        }
 
-		#region Windows Form Designer generated code
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
+        private void buttonOK_Click(object sender, System.EventArgs e)
 		{
+			//verify that we have valid input
+			if (ThingDb.GetThing(nameBox.Text) == null)
+			{
+				MessageBox.Show("Invalid object name.", "Error");
+				return;
+			}
+			//commit the changes
+
+            obj.Name = nameBox.Text;
+
+            obj.Location.X = Single.Parse(xBox.Text);
+			obj.Location.Y = Single.Parse(yBox.Text);
+            
+            //REMOVEOBJECT,ADDOBJECT
+			obj.Extent = Int32.Parse(extentBox.Text);
+			obj.Terminator = (byte)(xtraBox.Checked==true? 0xFF : 0x00);
+			obj.Team = Byte.Parse(teamBox.Text);
+			obj.Scr_Name = scrNameBox.Text;
+            obj.pickup_func = pickupBox.Text;
+			obj.AnimFlags = UInt16.Parse(animFlBox.Text, System.Globalization.NumberStyles.HexNumber);
+
+            uint[] flags = { 0x1000000, 1, 0x20, 0x40, 0x100, 0x8000, 2, 0x10000000, 0x2000, 0x4000, 0x10000, 0x40000, 0x100000, 0x800000, 0x2000000, 0x4000000, 0x20000000, 0x400000, 0x40000000, 0x80000000 };
+
+           
+            obj.CreateFlags = 0;
+			foreach (int i in flagsListBox.CheckedIndices)
+			{
+				obj.CreateFlags |= flags[i];
+			}
+			
+			Visible = false;
+		}
+
+		private void nameBox_SelectedIndexChanged(object sender, System.EventArgs e)
+		{
+			objPs = ThingDb.Things[nameBox.Text];
+            
+			if (nameBox.Text != obj.Name)
+            {
+				obj.Name = nameBox.Text;
+                XferEditor editor = XferEditors.GetEditorForXfer(ThingDb.Things[nameBox.Text].Xfer);
+                if (editor != null) editor.SetDefaultData(obj);
+                else obj.NewDefaultExtraData();
+            }
+            xtraBox.Checked = (obj.Terminator > 0);
+		}
+
+		private void xtraBox_CheckedChanged(object sender, System.EventArgs e)
+		{
+			if(xtraBox.Checked)
+			{
+				scrNameBox.Enabled = true;
+				teamBox.Enabled = true;
+				invenButton.Enabled = true;
+                pickupBox.Enabled = true;
+                flagsListBox.Enabled = true;
+                animFlBox.Enabled = true;
+
+            }
+			else
+			{
+				scrNameBox.Enabled = false;
+                pickupBox.Enabled = false;
+                teamBox.Enabled = false;
+				invenButton.Enabled = false;
+				flagsListBox.Enabled = false;
+				animFlBox.Enabled = false;
+			}
+		}
+
+		private void invenButton_Click(object sender, System.EventArgs e)
+		{
+			ObjectInventoryDialog invenDlg = new ObjectInventoryDialog();
+			invenDlg.Object = obj;
+			invenDlg.ShowDialog();
+		}
+		
+		private void buttonXData_Click(object sender, EventArgs e)
+		{
+			if (objPs.Xfer != null) // DefaultXfer
+			{
+				XferEditor editor = XferEditors.GetEditorForXfer(objPs.Xfer);
+				if (editor != null)
+				{
+					try
+					{
+						editor.SetObject(obj);
+						if (editor.ShowDialog() == DialogResult.OK)
+						{
+							obj = editor.GetObject();
+						}
+					}
+					catch (Exception) 
+					{
+						#if DEBUG
+						throw;
+						#endif
+					}
+				}
+				else
+            	{
+                	MessageBox.Show("There is no internal mod-gen for that object.");
+            	}
+			}
+		}
+
+        #region Windows Form Designer generated code
+        private void InitializeComponent()
+        {
             this.label1 = new System.Windows.Forms.Label();
             this.buttonOK = new System.Windows.Forms.Button();
             this.buttonCancel = new System.Windows.Forms.Button();
@@ -170,7 +246,6 @@ namespace MapEditor
             this.buttonCancel.Size = new System.Drawing.Size(75, 23);
             this.buttonCancel.TabIndex = 3;
             this.buttonCancel.Text = "Cancel";
-            this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click);
             // 
             // label2
             // 
@@ -259,27 +334,27 @@ namespace MapEditor
             this.label6.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.label6.Location = new System.Drawing.Point(8, 152);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(72, 16);
+            this.label6.Size = new System.Drawing.Size(91, 19);
             this.label6.TabIndex = 18;
             this.label6.Text = "Script Name";
             // 
             // scrNameBox
             // 
-            this.scrNameBox.Location = new System.Drawing.Point(88, 151);
+            this.scrNameBox.Location = new System.Drawing.Point(84, 151);
             this.scrNameBox.Margin = new System.Windows.Forms.Padding(3, 1, 3, 2);
             this.scrNameBox.Name = "scrNameBox";
-            this.scrNameBox.Size = new System.Drawing.Size(112, 20);
+            this.scrNameBox.Size = new System.Drawing.Size(116, 20);
             this.scrNameBox.TabIndex = 19;
             // 
             // invenButton
             // 
             this.invenButton.Enabled = false;
             this.invenButton.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.invenButton.Location = new System.Drawing.Point(16, 56);
+            this.invenButton.Location = new System.Drawing.Point(16, 40);
             this.invenButton.Name = "invenButton";
-            this.invenButton.Size = new System.Drawing.Size(99, 23);
+            this.invenButton.Size = new System.Drawing.Size(99, 34);
             this.invenButton.TabIndex = 21;
-            this.invenButton.Text = "View Inventory";
+            this.invenButton.Text = "View Inventory\r\n0 item(s)";
             this.invenButton.Click += new System.EventHandler(this.invenButton_Click);
             // 
             // label7
@@ -314,13 +389,12 @@ namespace MapEditor
             this.animFlBox.Name = "animFlBox";
             this.animFlBox.Size = new System.Drawing.Size(76, 20);
             this.animFlBox.TabIndex = 31;
-            this.animFlBox.TextChanged += new System.EventHandler(this.animFlBox_TextChanged);
             // 
             // label10
             // 
             this.label10.Location = new System.Drawing.Point(7, 95);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(63, 23);
+            this.label10.Size = new System.Drawing.Size(73, 23);
             this.label10.TabIndex = 32;
             this.label10.Text = "AnimFlags:";
             // 
@@ -332,11 +406,10 @@ namespace MapEditor
             this.buttonXData.TabIndex = 31;
             this.buttonXData.Text = "Special Properties";
             this.buttonXData.UseVisualStyleBackColor = true;
-            this.buttonXData.Click += new System.EventHandler(this.Button2Click);
+            this.buttonXData.Click += new System.EventHandler(this.buttonXData_Click);
             // 
             // xtraGroupBox
             // 
-            this.xtraGroupBox.Controls.Add(this.label11);
             this.xtraGroupBox.Controls.Add(this.flagsListBox);
             this.xtraGroupBox.Controls.Add(this.label10);
             this.xtraGroupBox.Controls.Add(this.pickupBox);
@@ -347,13 +420,13 @@ namespace MapEditor
             this.xtraGroupBox.Controls.Add(this.label5);
             this.xtraGroupBox.Controls.Add(this.scrNameBox);
             this.xtraGroupBox.Controls.Add(this.label6);
+            this.xtraGroupBox.Controls.Add(this.label11);
             this.xtraGroupBox.Location = new System.Drawing.Point(8, 112);
             this.xtraGroupBox.Name = "xtraGroupBox";
             this.xtraGroupBox.Size = new System.Drawing.Size(280, 183);
             this.xtraGroupBox.TabIndex = 34;
             this.xtraGroupBox.TabStop = false;
             this.xtraGroupBox.Text = "Extra Bytes";
-            this.xtraGroupBox.Enter += new System.EventHandler(this.xtraGroupBox_Enter);
             // 
             // label11
             // 
@@ -391,14 +464,13 @@ namespace MapEditor
             this.flagsListBox.Name = "flagsListBox";
             this.flagsListBox.Size = new System.Drawing.Size(145, 64);
             this.flagsListBox.TabIndex = 34;
-            this.flagsListBox.SelectedIndexChanged += new System.EventHandler(this.flagsListBox_SelectedIndexChanged);
             // 
             // xtraBox
             // 
             this.xtraBox.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.xtraBox.Location = new System.Drawing.Point(16, 80);
             this.xtraBox.Name = "xtraBox";
-            this.xtraBox.Size = new System.Drawing.Size(84, 23);
+            this.xtraBox.Size = new System.Drawing.Size(107, 23);
             this.xtraBox.TabIndex = 20;
             this.xtraBox.Text = "Extra Bytes";
             this.xtraBox.CheckedChanged += new System.EventHandler(this.xtraBox_CheckedChanged);
@@ -406,7 +478,7 @@ namespace MapEditor
             // ObjectPropertiesDialog
             // 
             this.AcceptButton = this.buttonOK;
-            this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.CancelButton = this.buttonCancel;
             this.ClientSize = new System.Drawing.Size(296, 335);
             this.Controls.Add(this.buttonXData);
@@ -430,152 +502,38 @@ namespace MapEditor
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Object Properties";
-            this.Load += new System.EventHandler(this.ObjectPropertiesDialog_Load);
+            this.Activated += new System.EventHandler(this.ObjectPropertiesDialog_Activated);
             this.xtraGroupBox.ResumeLayout(false);
             this.xtraGroupBox.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
-		private System.Windows.Forms.CheckedListBox flagsListBox;
-		private System.Windows.Forms.Label label11;
-		private System.Windows.Forms.GroupBox xtraGroupBox;
-		private System.Windows.Forms.Button buttonXData;
-		private System.Windows.Forms.Label label10;
-		private System.Windows.Forms.TextBox animFlBox;
-		#endregion
-
-		private void buttonOK_Click(object sender, System.EventArgs e)
-		{
-			//verify that we have valid input
-			if (ThingDb.GetThing(nameBox.Text) == null)
-			{
-				MessageBox.Show("Invalid object name.", "Error");
-				return;
-			}
-			//commit the changes
-
-            obj.Name = nameBox.Text;
-
-            obj.Location.X = Single.Parse(xBox.Text);
-			obj.Location.Y = Single.Parse(yBox.Text);
-            
-            //REMOVEOBJECT,ADDOBJECT
-			obj.Extent = Int32.Parse(extentBox.Text);
-			obj.Terminator = (byte)(xtraBox.Checked==true? 0xFF : 0x00);
-			obj.Team = Byte.Parse(teamBox.Text);
-			obj.Scr_Name = scrNameBox.Text;
-            obj.pickup_func = pickupBox.Text;
-			obj.AnimFlags = UInt16.Parse(animFlBox.Text, System.Globalization.NumberStyles.HexNumber);
-
-            uint[] flags = { 0x1000000, 1, 0x20, 0x40, 0x100, 0x8000, 2, 0x10000000, 0x2000, 0x4000, 0x10000, 0x40000, 0x100000, 0x800000, 0x2000000, 0x4000000, 0x20000000, 0x400000, 0x40000000, 0x80000000 };
-
-           
-            obj.CreateFlags = 0;
-			foreach (int i in flagsListBox.CheckedIndices)
-			{
-				obj.CreateFlags |= flags[i];
-			}
-			
-			this.Visible = false;
-		}
-
-		private void nameBox_SelectedIndexChanged(object sender, System.EventArgs e)
-		{
-			objPs = ThingDb.Things[nameBox.Text];
-            
-			if (nameBox.Text != obj.Name)
-            {
-				obj.Name = nameBox.Text;
-                XferEditor editor = XferEditors.GetEditorForXfer(ThingDb.Things[nameBox.Text].Xfer);
-                if (editor != null) editor.SetDefaultData(obj);
-                else obj.NewDefaultExtraData();
-            }
-            xtraBox.Checked = (obj.Terminator > 0);
-		}
-
-		private void xtraBox_CheckedChanged(object sender, System.EventArgs e)
-		{
-			if(xtraBox.Checked)
-			{
-				scrNameBox.Enabled = true;
-				teamBox.Enabled = true;
-				invenButton.Enabled = true;
-                pickupBox.Enabled = true;
-                flagsListBox.Enabled = true;
-                animFlBox.Enabled = true;
-
-            }
-			else
-			{
-				scrNameBox.Enabled = false;
-                pickupBox.Enabled = false;
-                teamBox.Enabled = false;
-				invenButton.Enabled = false;
-				flagsListBox.Enabled = false;
-				animFlBox.Enabled = false;
-			}
-		}
-
-		private void invenButton_Click(object sender, System.EventArgs e)
-		{
-			ObjectInventoryDialog invenDlg = new ObjectInventoryDialog();
-			invenDlg.Object = obj;
-			invenDlg.ShowDialog();
-		}
-		
-		private void Button2Click(object sender, EventArgs e)
-		{
-			if (objPs.Xfer != null) // DefaultXfer
-			{
-				XferEditor editor = XferEditors.GetEditorForXfer(objPs.Xfer);
-				if (editor != null)
-				{
-					try
-					{
-						editor.SetObject(obj);
-						if (editor.ShowDialog() == DialogResult.OK)
-						{
-							obj = editor.GetObject();
-						}
-					}
-					catch (Exception) 
-					{
-						#if DEBUG
-						throw;
-						#endif
-					}
-				}
-				else
-            	{
-                	MessageBox.Show("There is no internal mod-gen for that object.");
-            	}
-			}
-		}
-
-        private void buttonCancel_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void xtraGroupBox_Enter(object sender, EventArgs e)
-        {
-
-        }
-
-        private void flagsListBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void ObjectPropertiesDialog_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void animFlBox_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-	}
+        private System.Windows.Forms.TextBox pickupBox;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.CheckedListBox flagsListBox;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.GroupBox xtraGroupBox;
+        private System.Windows.Forms.Button buttonXData;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.TextBox animFlBox;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button buttonOK;
+        private System.Windows.Forms.Button buttonCancel;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox xBox;
+        private System.Windows.Forms.TextBox yBox;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox extentBox;
+        private System.Windows.Forms.ComboBox nameBox;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox teamBox;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.TextBox scrNameBox;
+        private System.Windows.Forms.CheckBox xtraBox;
+        private System.Windows.Forms.Button invenButton;
+        private System.Windows.Forms.Label label7;
+        #endregion
+    }
 }

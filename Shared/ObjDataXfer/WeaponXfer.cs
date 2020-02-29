@@ -79,8 +79,13 @@ namespace NoxShared.ObjDataXfer
 			{
 				bw.Write(WandChargesCurrent);
 				bw.Write(WandChargesLimit);
-				float recalculated = (float) (WandChargesCurrent / WandChargesLimit) * 100f;
-				bw.Write((int) recalculated);
+                if (WandChargesLimit != 0)
+                {
+                    float recalculated = (float)(WandChargesCurrent / WandChargesLimit) * 100f;
+                    bw.Write((int)recalculated);
+                }
+                else
+                    bw.Write(0);
 			}
 			bw.Write(Durability);
 			if (ParsingRule == 63) bw.Write((byte) 0);

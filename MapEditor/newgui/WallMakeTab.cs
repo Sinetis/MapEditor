@@ -347,6 +347,17 @@ namespace MapEditor.newgui
                 mapView.mapPanel.Cursor = Cursors.Default;
             }
         }
+        private void PickerProp_CheckedChanged(object sender, EventArgs e)
+        {
+            if (PickerProp.Checked)
+                mapView.Picker.Checked = true;
+            else
+            {
+                mapView.Picker.Checked = false;
+                mapView.picking = false;
+                mapView.mapPanel.Cursor = Cursors.Default;
+            }
+        }
         private void Bucket_CheckedChanged(object sender, EventArgs e)
         {
             if (Bucket.Checked)

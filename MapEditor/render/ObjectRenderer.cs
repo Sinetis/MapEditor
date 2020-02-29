@@ -45,6 +45,7 @@ namespace MapEditor.render
         private readonly Pen doorPen = new Pen(Color.Brown, 2F);
         private readonly Pen triggerPen = new Pen(Color.MediumOrchid, 2F);
         private readonly Pen sentryPen = new Pen(Color.DarkViolet, 2F);
+        private readonly Color disabledCol = Color.FromArgb(100, 100, 95);
 
         public ObjectRenderer(MapViewRenderer mapRenderer)
         {
@@ -501,8 +502,8 @@ namespace MapEditor.render
 
             TriggerXfer trigger = obj.GetExtraData<TriggerXfer>();
             bool isUnderCursor = false;
-           
-           
+            bool isDisabled = !obj.HasFlag(ThingDb.Thing.FlagsFlags.ENABLED) && obj.Terminator == byte.MaxValue;
+
             if (underCursor != null) isUnderCursor = underCursor.Equals(obj);
 
             bool isSelected = mapRenderer.SelectedObjects.Items.Contains(obj);
@@ -523,7 +524,7 @@ namespace MapEditor.render
             int y = (int)obj.Location.Y;
             Rectangle triggerRect = new Rectangle(x - trigger.SizeX / 2, y - trigger.SizeY / 2, trigger.SizeX, trigger.SizeY);
 
-            using (var m = new System.Drawing.Drawing2D.Matrix())
+            using (var m = new Matrix())
             {
                 m.RotateAt(45, obj.Location);
                 g.Transform = m;
@@ -531,13 +532,27 @@ namespace MapEditor.render
                 switch (tt.DrawType)
                 {
                     case "TriggerDraw":
-
-                        g.DrawRectangle(triggerPen, triggerRect);
+                        if (!isDisabled)
+                            g.DrawRectangle(triggerPen, triggerRect);
+                        else
+                            g.DrawRectangle(new Pen(Color.Gray, 2f), triggerRect);
                         if (isSelected || isSelected2)
-                            g.FillRectangle(new SolidBrush(Color.FromArgb(100, 0, 255, 0)), triggerRect);
+                        {
+                            if (!isDisabled)
+                            {
+                                g.FillRectangle(new SolidBrush(Color.FromArgb(100, 0, 255, 0)), triggerRect);
+                                break;
+                            }
+                            g.FillRectangle(new SolidBrush(Color.FromArgb(150, 50, 50, 50)), triggerRect);
+                            break;
+                        }
                         else if (isUnderCursor)
-                            g.FillRectangle(new SolidBrush(Color.FromArgb(60, 0, 255, 0)), triggerRect);
-                       
+                        {
+                            if (!isDisabled)
+                                g.FillRectangle(new SolidBrush(Color.FromArgb(60, 0, 255, 0)), triggerRect);
+                            else
+                                g.FillRectangle(new SolidBrush(Color.FromArgb(100, 50, 50, 50)), triggerRect);
+                        }
                         break;
                     case "PressurePlateDraw":
                         Rectangle shadeRect = new Rectangle(triggerRect.X + 1, triggerRect.Y + 1, triggerRect.Width, triggerRect.Height);
@@ -753,7 +768,6 @@ namespace MapEditor.render
                     }
                     continue;
                 }
-                // black powder
                 if (EditorSettings.Default.Edit_PreviewMode) // Visual Preview
                 {
                     if (tt.DrawType == "BlackPowderDraw")
@@ -765,7 +779,7 @@ namespace MapEditor.render
                         g.FillRectangle(new SolidBrush(Color.Gray), bp);
                         continue;
                     }
-                    if (tt.Xfer == "InvisibleLightXfer")
+                    if (tt.Xfer == "InvisibleLightXfer") // ColorLight
                     {
                         if (MainWindow.Instance.imgMode)
                             continue;
@@ -832,16 +846,19 @@ namespace MapEditor.render
                             isSelected = false;
                             isSelected2 = false;
                         }
+                        bool isDisabled = !oe.HasFlag(ThingDb.Thing.FlagsFlags.ENABLED) && oe.Terminator == byte.MaxValue;
                         bool isUnderCursor = false;
                         if (underCursor != null) isUnderCursor = underCursor.Equals(oe);
                         // draw the image
-                        if ((isSelected || isUnderCursor || shadow || isSelected2) && (!MainWindow.Instance.imgMode))
+                        if ((isSelected || isUnderCursor || (shadow || isSelected2) || isDisabled) && (!MainWindow.Instance.imgMode))
                         {
                             // highlight selection
                             var shader = new BitmapShader(image);
                             shader.LockBitmap();
 
                             var hltColor = mapRenderer.ColorLayout.Selection;
+                            if (isDisabled && tt.Xfer != "HoleXfer")
+                                shader.ColorShade(disabledCol, 0.7f);
 
                             if (isSelected || isSelected2)
                             {
@@ -952,7 +969,7 @@ namespace MapEditor.render
                     Point textLocaton = new Point(Convert.ToInt32(oe.Location.X), Convert.ToInt32(oe.Location.Y));
                     textLocaton.X -= objectSelectionRadius; textLocaton.Y -= objectSelectionRadius;
 
-                    if (EditorSettings.Default.Draw_ObjCustomLabels && oe.Team > 0)
+                    if (EditorSettings.Default.Draw_ObjTeams && oe.Team > 0)
                     {
                         // Draw team
                         Point loc = new Point(textLocaton.X, textLocaton.Y - 12);

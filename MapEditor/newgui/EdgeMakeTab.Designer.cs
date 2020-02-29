@@ -134,7 +134,9 @@ namespace MapEditor.newgui
             // 
             this.Picker.Appearance = System.Windows.Forms.Appearance.Button;
             this.Picker.BackgroundImage = global::MapEditor.Properties.Resources.color_picker;
-            this.Picker.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.Picker.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.Picker.FlatAppearance.CheckedBackColor = System.Drawing.Color.Lime;
+            this.Picker.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.Picker.Location = new System.Drawing.Point(175, 30);
             this.Picker.Name = "Picker";
             this.Picker.Size = new System.Drawing.Size(30, 30);
@@ -157,8 +159,7 @@ namespace MapEditor.newgui
             // 
             // EdgeMakeTab
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.Controls.Add(this.Picker);
             this.Controls.Add(this.chkAutoVariation);
             this.Controls.Add(this.chkAutoEdge);

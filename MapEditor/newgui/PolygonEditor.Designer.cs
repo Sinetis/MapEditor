@@ -58,7 +58,7 @@ namespace MapEditor.newgui
             this.listBoxPolygons.Location = new System.Drawing.Point(8, 12);
             this.listBoxPolygons.Name = "listBoxPolygons";
             this.listBoxPolygons.ScrollAlwaysVisible = true;
-            this.listBoxPolygons.Size = new System.Drawing.Size(128, 160);
+            this.listBoxPolygons.Size = new System.Drawing.Size(201, 160);
             this.listBoxPolygons.TabIndex = 0;
             this.listBoxPolygons.SelectedIndexChanged += new System.EventHandler(this.listBoxPolygons_SelectedIndexChanged);
             this.listBoxPolygons.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.listBoxPolygons_ControlAdded);
@@ -89,7 +89,7 @@ namespace MapEditor.newgui
             // 
             this.groupBox1.Controls.Add(this.buttonDown);
             this.groupBox1.Controls.Add(this.buttonUp);
-            this.groupBox1.Location = new System.Drawing.Point(144, 7);
+            this.groupBox1.Location = new System.Drawing.Point(216, 7);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(120, 44);
             this.groupBox1.TabIndex = 5;
@@ -103,7 +103,7 @@ namespace MapEditor.newgui
             this.groupBox2.Controls.Add(this.buttonNew);
             this.groupBox2.Controls.Add(this.buttonDelete);
             this.groupBox2.Controls.Add(this.buttonModify);
-            this.groupBox2.Location = new System.Drawing.Point(144, 78);
+            this.groupBox2.Location = new System.Drawing.Point(216, 78);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(120, 106);
             this.groupBox2.TabIndex = 7;
@@ -166,7 +166,7 @@ namespace MapEditor.newgui
             // ambientColors
             // 
             this.ambientColors.AutoSize = true;
-            this.ambientColors.Location = new System.Drawing.Point(143, 204);
+            this.ambientColors.Location = new System.Drawing.Point(215, 204);
             this.ambientColors.Name = "ambientColors";
             this.ambientColors.Size = new System.Drawing.Size(122, 17);
             this.ambientColors.TabIndex = 9;
@@ -176,7 +176,7 @@ namespace MapEditor.newgui
             // 
             // buttonDone
             // 
-            this.buttonDone.Location = new System.Drawing.Point(166, 187);
+            this.buttonDone.Location = new System.Drawing.Point(238, 191);
             this.buttonDone.Name = "buttonDone";
             this.buttonDone.Size = new System.Drawing.Size(72, 23);
             this.buttonDone.TabIndex = 8;
@@ -188,7 +188,7 @@ namespace MapEditor.newgui
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.label2.Location = new System.Drawing.Point(143, 59);
+            this.label2.Location = new System.Drawing.Point(215, 59);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(106, 12);
             this.label2.TabIndex = 10;
@@ -199,9 +199,9 @@ namespace MapEditor.newgui
             this.LockedBox.AutoSize = true;
             this.LockedBox.Location = new System.Drawing.Point(8, 199);
             this.LockedBox.Name = "LockedBox";
-            this.LockedBox.Size = new System.Drawing.Size(127, 17);
+            this.LockedBox.Size = new System.Drawing.Size(128, 17);
             this.LockedBox.TabIndex = 11;
-            this.LockedBox.Text = "Lock current Polygon";
+            this.LockedBox.Text = "Lock Current Polygon";
             this.LockedBox.UseVisualStyleBackColor = true;
             this.LockedBox.CheckedChanged += new System.EventHandler(this.LockedBox_CheckedChanged);
             // 
@@ -220,7 +220,7 @@ namespace MapEditor.newgui
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoValidate = System.Windows.Forms.AutoValidate.EnableAllowFocusChange;
-            this.ClientSize = new System.Drawing.Size(273, 222);
+            this.ClientSize = new System.Drawing.Size(343, 222);
             this.Controls.Add(this.snapPoly);
             this.Controls.Add(this.LockedBox);
             this.Controls.Add(this.label2);

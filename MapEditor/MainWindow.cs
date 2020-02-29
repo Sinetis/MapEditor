@@ -30,6 +30,7 @@ namespace MapEditor
         public int mapZoom = 2;
         public int mapDimension = 256;
         public bool RightDown = false;
+        public bool suggestBlocked = false;
         public Point mouseLocation;
         public MapView mapView;
         public FlickerFreePanel miniViewPanel;
@@ -48,6 +49,10 @@ namespace MapEditor
         private string scriptPath;
         private Bitmap lastMapImage;
         private Rectangle redraw;
+        private ToolStripMenuItem menuSaveNXZOnly;
+        private ToolStripMenuItem menuWaypoints;
+        public ListBox suggestBox;
+        private ToolStripMenuItem menuHelpLink5;
         private Process nsdc = null;
 
         public class FlickerFreePanel : Panel
@@ -137,6 +142,7 @@ namespace MapEditor
         }
         private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
+            EditorSettings.Default.Save();
             if (mapView.TimeManager.Count == 0)
                 return;
 
@@ -263,6 +269,10 @@ namespace MapEditor
                 menuSave.PerformClick();
             }
         }
+        private void menuSaveNXZOnly_Click(object sender, EventArgs e)
+        {
+            map.ExtractNxz();
+        }
         private void menuImportSave_Click(object sender, EventArgs e)
         {
             if (scriptPath == "")
@@ -308,11 +318,16 @@ namespace MapEditor
 
             if (map.Scripts.SctStr.Count > 0 && map.Scripts.SctStr[0].StartsWith("NOXSCRIPT3.0"))
             {
+                if (map.Scripts.SctStr[0].Length <= 12)
+                {
+                    // Full script NOT stored in first element
+                    MessageBox.Show("Using Nox Script 3.0 but script was not preserved. Unknown compiler.", "Error");
+                    return;
+                }
+
                 // we already have script code, just save it
                 if (fd.ShowDialog() == DialogResult.OK)
-                {
                     File.WriteAllText(fd.FileName, map.Scripts.SctStr[0].Substring(12));
-                }
             }
             else
             {
@@ -466,6 +481,13 @@ namespace MapEditor
                 miniEdit.Checked = true;
             }
         }
+        private void menuWaypoints_Click(object sender, EventArgs e)
+        {
+            WaypointListDialog waypointListDialog = new WaypointListDialog();
+            waypointListDialog.WpsTable = map.Waypoints;
+            waypointListDialog.Map = mapView;
+            waypointListDialog.ShowDialog();
+        }
         private void menuFixExtents_Click(object sender, EventArgs e)
         {
             var dupesFound = MapInterface.FixObjectExtents();
@@ -555,6 +577,10 @@ namespace MapEditor
         {
             Process.Start("https://noxtools.github.io/noxscript/builtins_8h.html");
         }
+        private void menuHelpLink5_Click(object sender, EventArgs e)
+        {
+            Process.Start("https://nox.fandom.com/wiki/Map_Editor_Scripting");
+        }
         private void menuAbout_Click(object sender, EventArgs e)
         {
             AboutDialog dlg = new AboutDialog();
@@ -625,6 +651,61 @@ namespace MapEditor
         {
             EditorSettings.Default.Draw_ColorWalls = !EditorSettings.Default.Draw_ColorWalls;
             mapView.mapPanel.Invalidate();
+        }
+        #endregion
+        #region Object Search
+        private void suggestBox_MouseClick(object sender, MouseEventArgs e)
+        {
+            mapView.cboObjCreate.Text = suggestBox.SelectedItem.ToString();
+            if (!MapInterface.KeyHelper.ShiftKey)
+                suggestBox.Visible = false;
+            else
+                suggestBlocked = true;
+        }
+        private void suggestBox_MouseMove(object sender, MouseEventArgs e)
+        {
+            mapView.mapPanel.Invalidate();
+            if (suggestBlocked)
+                return;
+            int itemHeight = suggestBox.ItemHeight;
+            int num1 = suggestBox.TopIndex * itemHeight;
+            int num2 = (e.Y + num1) / itemHeight;
+            if (num2 >= suggestBox.Items.Count)
+                return;
+            suggestBox.SelectedIndex = num2;
+            string index = suggestBox.SelectedItem.ToString();
+            ThingDb.Thing thing = ThingDb.Things[index];
+            Bitmap bitmap = null;
+            if (thing.SpritePrettyImage > 0 && (thing.Class & ThingDb.Thing.ClassFlags.MONSTER) == ThingDb.Thing.ClassFlags.NULL)
+                bitmap = mapView.MapRenderer.VideoBag.GetBitmap(thing.SpritePrettyImage);
+            else if (thing.SpriteMenuIcon > 0)
+            {
+                bitmap = mapView.MapRenderer.VideoBag.GetBitmap(thing.SpriteMenuIcon);
+                if (thing.Xfer != "InvisibleLightXfer" && !thing.Name.StartsWith("Amb") && thing.SpriteAnimFrames.Count > 0)
+                    bitmap = mapView.MapRenderer.VideoBag.GetBitmap(thing.SpriteAnimFrames[thing.SpriteAnimFrames.Count - 1]);
+            }
+            mapView.objectPreview.BackgroundImage = (Image)bitmap;
+        }
+        private void suggestBox_MouseEnter(object sender, EventArgs e)
+        {
+            suggestBox.Focus();
+        }
+        private void suggestBox_MouseLeave(object sender, EventArgs e)
+        {
+            ThingDb.Thing thing1 = ThingDb.GetThing(mapView.cboObjCreate.Text);
+            if (thing1 == null)
+                return;
+            ThingDb.Thing thing2 = ThingDb.Things[thing1.Name];
+            Bitmap bitmap = null;
+            if (thing2.SpritePrettyImage > 0 && (thing2.Class & ThingDb.Thing.ClassFlags.MONSTER) == ThingDb.Thing.ClassFlags.NULL)
+                bitmap = mapView.MapRenderer.VideoBag.GetBitmap(thing2.SpritePrettyImage);
+            else if (thing2.SpriteMenuIcon > 0)
+            {
+                bitmap = mapView.MapRenderer.VideoBag.GetBitmap(thing2.SpriteMenuIcon);
+                if (thing2.Xfer != "InvisibleLightXfer" && !thing2.Name.StartsWith("Amb") && thing2.SpriteAnimFrames.Count > 0)
+                    bitmap = mapView.MapRenderer.VideoBag.GetBitmap(thing2.SpriteAnimFrames[thing2.SpriteAnimFrames.Count - 1]);
+            }
+            mapView.objectPreview.BackgroundImage = bitmap;
         }
         #endregion
 
@@ -1289,6 +1370,7 @@ namespace MapEditor
             Cursor = Cursors.Default;
             mapView.MapRenderer.ColorLayout.Background = Color.Black;
             progBarImage.Value = 0;
+            EditorSettings.Default.Reload();
         }
         private void cmdImgExport_Click(object sender, EventArgs e)
         {
@@ -1490,7 +1572,7 @@ namespace MapEditor
                 catch (Exception ex)
                 {
                     Logger.Log("Failed to write .nxz file! \n" + ex.Message);
-                    MessageBox.Show("Couldn't write the compressed map. Map compression is still buggy. Try changing your map in any way and saving again.");
+                    MessageBox.Show("Couldn't write the compressed map. Try changing your map in any way and saving again.");
                 }
             }
 
@@ -1615,7 +1697,7 @@ namespace MapEditor
             {
                 // Remove old entries
                 while (EditorSettings.Default.RecentFiles.Count > 20)
-                    EditorSettings.Default.RecentFiles.RemoveAt(0);
+                    EditorSettings.Default.RecentFiles.RemoveAt(EditorSettings.Default.RecentFiles.Count - 1);
 
                 EditorSettings.Default.RecentFiles.Insert(0, filename);
                 EditorSettings.Default.Save();
@@ -1911,6 +1993,7 @@ namespace MapEditor
             this.chkDivide = new System.Windows.Forms.CheckBox();
             this.cmdGoToCenter = new System.Windows.Forms.Button();
             this.largeMap = new System.Windows.Forms.TabPage();
+            this.suggestBox = new System.Windows.Forms.ListBox();
             this.mapView = new MapEditor.MapView();
             this.panelTabs = new System.Windows.Forms.TabControl();
             this.mapImageTab = new System.Windows.Forms.TabPage();
@@ -1950,6 +2033,7 @@ namespace MapEditor
             this.menuInstallMap = new System.Windows.Forms.ToolStripMenuItem();
             this.menuSave = new System.Windows.Forms.ToolStripMenuItem();
             this.menuSaveAs = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuSaveNXZOnly = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.menuImportSave = new System.Windows.Forms.ToolStripMenuItem();
             this.menuImportScript = new System.Windows.Forms.ToolStripMenuItem();
@@ -1962,6 +2046,7 @@ namespace MapEditor
             this.menuScripts = new System.Windows.Forms.ToolStripMenuItem();
             this.menuGroups = new System.Windows.Forms.ToolStripMenuItem();
             this.menuPolygons = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuWaypoints = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.menuFixExtents = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMapGenerator = new System.Windows.Forms.ToolStripMenuItem();
@@ -1993,6 +2078,7 @@ namespace MapEditor
             this.menuDrawTeleportPaths = new System.Windows.Forms.ToolStripMenuItem();
             this.menuDrawWaypoints = new System.Windows.Forms.ToolStripMenuItem();
             this.menuColorSpecialWalls = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuHelpLink5 = new System.Windows.Forms.ToolStripMenuItem();
             this.mapInfoTab.SuspendLayout();
             this.groupMapInfoTab.SuspendLayout();
             this.minimapTab.SuspendLayout();
@@ -2727,6 +2813,7 @@ namespace MapEditor
             // 
             // largeMap
             // 
+            this.largeMap.Controls.Add(this.suggestBox);
             this.largeMap.Controls.Add(this.mapView);
             this.largeMap.Location = new System.Drawing.Point(4, 22);
             this.largeMap.Name = "largeMap";
@@ -2734,6 +2821,20 @@ namespace MapEditor
             this.largeMap.TabIndex = 0;
             this.largeMap.Text = "Large Map";
             this.largeMap.UseVisualStyleBackColor = true;
+            // 
+            // suggestBox
+            // 
+            this.suggestBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.suggestBox.FormattingEnabled = true;
+            this.suggestBox.Location = new System.Drawing.Point(208, 226);
+            this.suggestBox.Name = "suggestBox";
+            this.suggestBox.Size = new System.Drawing.Size(159, 80);
+            this.suggestBox.TabIndex = 1;
+            this.suggestBox.Visible = false;
+            this.suggestBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.suggestBox_MouseClick);
+            this.suggestBox.MouseEnter += new System.EventHandler(this.suggestBox_MouseEnter);
+            this.suggestBox.MouseLeave += new System.EventHandler(this.suggestBox_MouseLeave);
+            this.suggestBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.suggestBox_MouseMove);
             // 
             // mapView
             // 
@@ -3138,8 +3239,8 @@ namespace MapEditor
             // 
             // picMapImage
             // 
-            this.picMapImage.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.picMapImage.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.picMapImage.BackgroundImage = global::MapEditor.Properties.Resources.transTile;
             this.picMapImage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
@@ -3172,6 +3273,7 @@ namespace MapEditor
             this.menuInstallMap,
             this.menuSave,
             this.menuSaveAs,
+            this.menuSaveNXZOnly,
             this.toolStripSeparator1,
             this.menuImportSave,
             this.menuImportScript,
@@ -3227,6 +3329,13 @@ namespace MapEditor
             this.menuSaveAs.Size = new System.Drawing.Size(189, 22);
             this.menuSaveAs.Text = "Save As...";
             this.menuSaveAs.Click += new System.EventHandler(this.menuSaveAs_Click);
+            // 
+            // menuSaveNXZOnly
+            // 
+            this.menuSaveNXZOnly.Name = "menuSaveNXZOnly";
+            this.menuSaveNXZOnly.Size = new System.Drawing.Size(189, 22);
+            this.menuSaveNXZOnly.Text = "Save NXZ Only";
+            this.menuSaveNXZOnly.Click += new System.EventHandler(this.menuSaveNXZOnly_Click);
             // 
             // toolStripSeparator1
             // 
@@ -3285,6 +3394,7 @@ namespace MapEditor
             this.menuScripts,
             this.menuGroups,
             this.menuPolygons,
+            this.menuWaypoints,
             this.toolStripSeparator3,
             this.menuFixExtents,
             this.menuMapGenerator});
@@ -3295,16 +3405,16 @@ namespace MapEditor
             // menuListObjects
             // 
             this.menuListObjects.Name = "menuListObjects";
-            this.menuListObjects.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift)
-            | System.Windows.Forms.Keys.L)));
+            this.menuListObjects.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.O)));
             this.menuListObjects.Size = new System.Drawing.Size(207, 22);
-            this.menuListObjects.Text = "List Objects";
+            this.menuListObjects.Text = "Objects";
             this.menuListObjects.Click += new System.EventHandler(this.menuListObjects_Click);
             // 
             // menuScripts
             // 
             this.menuScripts.Name = "menuScripts";
-            this.menuScripts.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift)
+            this.menuScripts.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.S)));
             this.menuScripts.Size = new System.Drawing.Size(207, 22);
             this.menuScripts.Text = "Scripts";
@@ -3313,7 +3423,7 @@ namespace MapEditor
             // menuGroups
             // 
             this.menuGroups.Name = "menuGroups";
-            this.menuGroups.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift)
+            this.menuGroups.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.G)));
             this.menuGroups.Size = new System.Drawing.Size(207, 22);
             this.menuGroups.Text = "Groups";
@@ -3322,11 +3432,20 @@ namespace MapEditor
             // menuPolygons
             // 
             this.menuPolygons.Name = "menuPolygons";
-            this.menuPolygons.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift)
+            this.menuPolygons.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.P)));
             this.menuPolygons.Size = new System.Drawing.Size(207, 22);
             this.menuPolygons.Text = "Polygons";
             this.menuPolygons.Click += new System.EventHandler(this.menuPolygons_Click);
+            // 
+            // menuWaypoints
+            // 
+            this.menuWaypoints.Name = "menuWaypoints";
+            this.menuWaypoints.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.W)));
+            this.menuWaypoints.Size = new System.Drawing.Size(207, 22);
+            this.menuWaypoints.Text = "Waypoints";
+            this.menuWaypoints.Click += new System.EventHandler(this.menuWaypoints_Click);
             // 
             // toolStripSeparator3
             // 
@@ -3417,6 +3536,7 @@ namespace MapEditor
             this.menuHelpLink2,
             this.toolStripSeparator5,
             this.menuHelpLink3,
+            this.menuHelpLink5,
             this.menuHelpLink4,
             this.toolStripSeparator6,
             this.menuAbout});
@@ -3427,45 +3547,45 @@ namespace MapEditor
             // menuHelpLink1
             // 
             this.menuHelpLink1.Name = "menuHelpLink1";
-            this.menuHelpLink1.Size = new System.Drawing.Size(159, 22);
+            this.menuHelpLink1.Size = new System.Drawing.Size(180, 22);
             this.menuHelpLink1.Text = "Nox Forum";
             this.menuHelpLink1.Click += new System.EventHandler(this.menuHelpLink1_Click);
             // 
             // menuHelpLink2
             // 
             this.menuHelpLink2.Name = "menuHelpLink2";
-            this.menuHelpLink2.Size = new System.Drawing.Size(159, 22);
+            this.menuHelpLink2.Size = new System.Drawing.Size(180, 22);
             this.menuHelpLink2.Text = "Nox Discord";
             this.menuHelpLink2.Click += new System.EventHandler(this.menuHelpLink2_Click);
             // 
             // toolStripSeparator5
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(156, 6);
+            this.toolStripSeparator5.Size = new System.Drawing.Size(177, 6);
             // 
             // menuHelpLink3
             // 
             this.menuHelpLink3.Name = "menuHelpLink3";
-            this.menuHelpLink3.Size = new System.Drawing.Size(159, 22);
+            this.menuHelpLink3.Size = new System.Drawing.Size(180, 22);
             this.menuHelpLink3.Text = "Game Texts";
             this.menuHelpLink3.Click += new System.EventHandler(this.menuHelpLink3_Click);
             // 
             // menuHelpLink4
             // 
             this.menuHelpLink4.Name = "menuHelpLink4";
-            this.menuHelpLink4.Size = new System.Drawing.Size(159, 22);
-            this.menuHelpLink4.Text = "Script Functions";
+            this.menuHelpLink4.Size = new System.Drawing.Size(180, 22);
+            this.menuHelpLink4.Text = "Script 3.0 Wiki";
             this.menuHelpLink4.Click += new System.EventHandler(this.menuHelpLink4_Click);
             // 
             // toolStripSeparator6
             // 
             this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(156, 6);
+            this.toolStripSeparator6.Size = new System.Drawing.Size(177, 6);
             // 
             // menuAbout
             // 
             this.menuAbout.Name = "menuAbout";
-            this.menuAbout.Size = new System.Drawing.Size(159, 22);
+            this.menuAbout.Size = new System.Drawing.Size(180, 22);
             this.menuAbout.Text = "About";
             this.menuAbout.Click += new System.EventHandler(this.menuAbout_Click);
             // 
@@ -3584,6 +3704,13 @@ namespace MapEditor
             this.menuColorSpecialWalls.Size = new System.Drawing.Size(216, 22);
             this.menuColorSpecialWalls.Text = "Color Special Walls";
             this.menuColorSpecialWalls.Click += new System.EventHandler(this.menuColorSpecialWalls_Click);
+            // 
+            // menuHelpLink5
+            // 
+            this.menuHelpLink5.Name = "menuHelpLink5";
+            this.menuHelpLink5.Size = new System.Drawing.Size(180, 22);
+            this.menuHelpLink5.Text = "Script Wiki";
+            this.menuHelpLink5.Click += new System.EventHandler(this.menuHelpLink5_Click);
             // 
             // MainWindow
             // 

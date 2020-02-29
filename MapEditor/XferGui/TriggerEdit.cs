@@ -71,6 +71,7 @@ namespace MapEditor.XferGui
             flagsBox.SetItemChecked(7, (xfer.AllowedObjClass & 0x2000000) == 0x2000000); // NO_AUTO_DROP
             flagsBox.SetItemChecked(8, (xfer.AllowedObjClass & 0x8000000) == 0x8000000); // NO_PUSH_CHARACTERS
             flagsBox.SetItemChecked(9, (xfer.AllowedObjClass & 0x1000) == 0x1000); // wand
+            flagsBox.SetItemChecked(10, (xfer.AllowedObjClass & 0x20000) == 0x20000); // MONSTERGENERATOR
             numericUpDown1.Value = xfer.AllowedTeamID;
             LoadScripts();
 		}
@@ -86,7 +87,7 @@ namespace MapEditor.XferGui
             xfer.BackColor = plateBackColor.BackColor;
             xfer.AllowedTeamID = (byte)numericUpDown1.Value;
 
-            uint[] flags = { 0x2, 0x4, 0x1, 0x8, 0x80000000, 0x10, 0x1000000, 0x2000000, 0x8000000, 0x1000 };
+            uint[] flags = { 0x2, 0x4, 0x1, 0x8, 0x80000000, 0x10, 0x1000000, 0x2000000, 0x8000000, 0x1000, 0x20000 };
 
             uint CreatedFlags = 0;
             foreach (int i in flagsBox.CheckedIndices)

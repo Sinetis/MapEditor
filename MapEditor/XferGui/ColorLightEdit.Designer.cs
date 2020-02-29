@@ -34,19 +34,19 @@ namespace MapEditor.XferGui
 		/// </summary>
 		private void InitializeComponent()
 		{
-            this.button1 = new System.Windows.Forms.Button();
+            this.cmdOK = new System.Windows.Forms.Button();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.numericUpDown2 = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.numericUpDown3 = new System.Windows.Forms.NumericUpDown();
             this.label3 = new System.Windows.Forms.Label();
-            this.button2 = new System.Windows.Forms.Button();
-            this.Colbutton2 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
+            this.cmdColor1 = new System.Windows.Forms.Button();
+            this.cmdColor2 = new System.Windows.Forms.Button();
+            this.cmdColor = new System.Windows.Forms.Button();
             this.outterSize = new System.Windows.Forms.NumericUpDown();
             this.label7 = new System.Windows.Forms.Label();
-            this.staticClolor2 = new System.Windows.Forms.Button();
+            this.cmdGradient = new System.Windows.Forms.Button();
             this.PulsingOptions = new System.Windows.Forms.GroupBox();
             this.xxx = new System.Windows.Forms.NumericUpDown();
             this.PulseSpeedSingleNum = new System.Windows.Forms.NumericUpDown();
@@ -55,18 +55,18 @@ namespace MapEditor.XferGui
             this.StaticOptions = new System.Windows.Forms.GroupBox();
             this.PulsingBox = new System.Windows.Forms.CheckBox();
             this.shadow = new System.Windows.Forms.CheckBox();
-            this.crazy = new System.Windows.Forms.CheckBox();
-            this.UnknownRBut = new System.Windows.Forms.Button();
+            this.chkCrazyLight = new System.Windows.Forms.CheckBox();
+            this.cmdCrazyColor = new System.Windows.Forms.Button();
             this.labelSep2 = new System.Windows.Forms.Label();
             this.unkwn11 = new System.Windows.Forms.NumericUpDown();
-            this.color3but = new System.Windows.Forms.Button();
-            this.button4 = new System.Windows.Forms.Button();
-            this.button5 = new System.Windows.Forms.Button();
-            this.button6 = new System.Windows.Forms.Button();
-            this.button7 = new System.Windows.Forms.Button();
-            this.button8 = new System.Windows.Forms.Button();
-            this.button9 = new System.Windows.Forms.Button();
-            this.button10 = new System.Windows.Forms.Button();
+            this.cmdColor3 = new System.Windows.Forms.Button();
+            this.cmdColor4 = new System.Windows.Forms.Button();
+            this.cmdColor5 = new System.Windows.Forms.Button();
+            this.cmdColor6 = new System.Windows.Forms.Button();
+            this.cmdColor7 = new System.Windows.Forms.Button();
+            this.cmdColor8 = new System.Windows.Forms.Button();
+            this.cmdColor9 = new System.Windows.Forms.Button();
+            this.cmdColor10 = new System.Windows.Forms.Button();
             this.max2 = new System.Windows.Forms.NumericUpDown();
             this.min2 = new System.Windows.Forms.NumericUpDown();
             this.max3 = new System.Windows.Forms.NumericUpDown();
@@ -85,9 +85,9 @@ namespace MapEditor.XferGui
             this.max10 = new System.Windows.Forms.NumericUpDown();
             this.min10 = new System.Windows.Forms.NumericUpDown();
             this.sequenceOptions = new System.Windows.Forms.GroupBox();
-            this.RemoveColor = new System.Windows.Forms.Button();
+            this.cmdRemoveColor = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
-            this.AddColor = new System.Windows.Forms.Button();
+            this.cmdAddColor = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -103,7 +103,7 @@ namespace MapEditor.XferGui
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
-            this.button11 = new System.Windows.Forms.Button();
+            this.cmdCancel = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
@@ -138,15 +138,16 @@ namespace MapEditor.XferGui
             ((System.ComponentModel.ISupportInitialize)(this.min6)).BeginInit();
             this.SuspendLayout();
             // 
-            // button1
+            // cmdOK
             // 
-            this.button1.Location = new System.Drawing.Point(130, 295);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "OK";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.cmdOK.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cmdOK.Location = new System.Drawing.Point(284, 291);
+            this.cmdOK.Name = "cmdOK";
+            this.cmdOK.Size = new System.Drawing.Size(82, 31);
+            this.cmdOK.TabIndex = 0;
+            this.cmdOK.Text = "OK";
+            this.cmdOK.UseVisualStyleBackColor = true;
+            this.cmdOK.Click += new System.EventHandler(this.cmdOK_Click);
             // 
             // numericUpDown1
             // 
@@ -159,7 +160,6 @@ namespace MapEditor.XferGui
             this.numericUpDown1.Name = "numericUpDown1";
             this.numericUpDown1.Size = new System.Drawing.Size(45, 20);
             this.numericUpDown1.TabIndex = 1;
-            this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
             // 
             // numericUpDown2
             // 
@@ -177,7 +177,6 @@ namespace MapEditor.XferGui
             0,
             0,
             0});
-            this.numericUpDown2.ValueChanged += new System.EventHandler(this.numericUpDown2_ValueChanged);
             // 
             // label1
             // 
@@ -187,7 +186,6 @@ namespace MapEditor.XferGui
             this.label1.Size = new System.Drawing.Size(78, 13);
             this.label1.TabIndex = 4;
             this.label1.Text = "Gradient radius";
-            this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // label2
             // 
@@ -197,7 +195,6 @@ namespace MapEditor.XferGui
             this.label2.Size = new System.Drawing.Size(65, 13);
             this.label2.TabIndex = 5;
             this.label2.Text = "Pulse speed";
-            this.label2.Click += new System.EventHandler(this.label2_Click);
             // 
             // numericUpDown3
             // 
@@ -215,7 +212,6 @@ namespace MapEditor.XferGui
             0,
             0,
             0});
-            this.numericUpDown3.ValueChanged += new System.EventHandler(this.numericUpDown3_ValueChanged);
             // 
             // label3
             // 
@@ -225,38 +221,37 @@ namespace MapEditor.XferGui
             this.label3.Size = new System.Drawing.Size(101, 13);
             this.label3.TabIndex = 7;
             this.label3.Text = "minimal Pulse radius";
-            this.label3.Click += new System.EventHandler(this.label3_Click);
             // 
-            // button2
+            // cmdColor1
             // 
-            this.button2.Location = new System.Drawing.Point(16, 54);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(57, 25);
-            this.button2.TabIndex = 8;
-            this.button2.Text = "Color 1";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.cmdColor1.Location = new System.Drawing.Point(16, 54);
+            this.cmdColor1.Name = "cmdColor1";
+            this.cmdColor1.Size = new System.Drawing.Size(57, 25);
+            this.cmdColor1.TabIndex = 8;
+            this.cmdColor1.Text = "Color 1";
+            this.cmdColor1.UseVisualStyleBackColor = true;
+            this.cmdColor1.Click += new System.EventHandler(this.cmdColor1_Click);
             // 
-            // Colbutton2
+            // cmdColor2
             // 
-            this.Colbutton2.Location = new System.Drawing.Point(75, 54);
-            this.Colbutton2.Name = "Colbutton2";
-            this.Colbutton2.Size = new System.Drawing.Size(57, 25);
-            this.Colbutton2.TabIndex = 9;
-            this.Colbutton2.Text = "Color 2";
-            this.Colbutton2.UseVisualStyleBackColor = true;
-            this.Colbutton2.VisibleChanged += new System.EventHandler(this.Colbutton2_VisibleChanged);
-            this.Colbutton2.Click += new System.EventHandler(this.Colbutton2_Click);
+            this.cmdColor2.Location = new System.Drawing.Point(75, 54);
+            this.cmdColor2.Name = "cmdColor2";
+            this.cmdColor2.Size = new System.Drawing.Size(57, 25);
+            this.cmdColor2.TabIndex = 9;
+            this.cmdColor2.Text = "Color 2";
+            this.cmdColor2.UseVisualStyleBackColor = true;
+            this.cmdColor2.VisibleChanged += new System.EventHandler(this.cmdColor2_VisibleChanged);
+            this.cmdColor2.Click += new System.EventHandler(this.cmdColor2_Click);
             // 
-            // button3
+            // cmdColor
             // 
-            this.button3.Location = new System.Drawing.Point(13, 122);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(150, 25);
-            this.button3.TabIndex = 16;
-            this.button3.Text = "Color";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
+            this.cmdColor.Location = new System.Drawing.Point(13, 122);
+            this.cmdColor.Name = "cmdColor";
+            this.cmdColor.Size = new System.Drawing.Size(150, 25);
+            this.cmdColor.TabIndex = 16;
+            this.cmdColor.Text = "Color";
+            this.cmdColor.UseVisualStyleBackColor = true;
+            this.cmdColor.Click += new System.EventHandler(this.cmdColor_Click);
             // 
             // outterSize
             // 
@@ -269,7 +264,6 @@ namespace MapEditor.XferGui
             this.outterSize.Name = "outterSize";
             this.outterSize.Size = new System.Drawing.Size(45, 20);
             this.outterSize.TabIndex = 17;
-            this.outterSize.ValueChanged += new System.EventHandler(this.outterSize_ValueChanged);
             // 
             // label7
             // 
@@ -279,17 +273,16 @@ namespace MapEditor.XferGui
             this.label7.Size = new System.Drawing.Size(62, 13);
             this.label7.TabIndex = 18;
             this.label7.Text = "Color radius";
-            this.label7.Click += new System.EventHandler(this.label7_Click);
             // 
-            // staticClolor2
+            // cmdGradient
             // 
-            this.staticClolor2.Location = new System.Drawing.Point(9, 30);
-            this.staticClolor2.Name = "staticClolor2";
-            this.staticClolor2.Size = new System.Drawing.Size(89, 23);
-            this.staticClolor2.TabIndex = 20;
-            this.staticClolor2.Text = "Gradient color";
-            this.staticClolor2.UseVisualStyleBackColor = true;
-            this.staticClolor2.Click += new System.EventHandler(this.staticClolor2_Click);
+            this.cmdGradient.Location = new System.Drawing.Point(9, 30);
+            this.cmdGradient.Name = "cmdGradient";
+            this.cmdGradient.Size = new System.Drawing.Size(89, 23);
+            this.cmdGradient.TabIndex = 20;
+            this.cmdGradient.Text = "Gradient Color";
+            this.cmdGradient.UseVisualStyleBackColor = true;
+            this.cmdGradient.Click += new System.EventHandler(this.cmdGradient_Click);
             // 
             // PulsingOptions
             // 
@@ -317,7 +310,6 @@ namespace MapEditor.XferGui
             this.xxx.Name = "xxx";
             this.xxx.Size = new System.Drawing.Size(45, 20);
             this.xxx.TabIndex = 27;
-            this.xxx.ValueChanged += new System.EventHandler(this.xxx_ValueChanged);
             // 
             // PulseSpeedSingleNum
             // 
@@ -330,7 +322,6 @@ namespace MapEditor.XferGui
             this.PulseSpeedSingleNum.Name = "PulseSpeedSingleNum";
             this.PulseSpeedSingleNum.Size = new System.Drawing.Size(45, 20);
             this.PulseSpeedSingleNum.TabIndex = 26;
-            this.PulseSpeedSingleNum.ValueChanged += new System.EventHandler(this.PulseSpeedSingleNum_ValueChanged);
             // 
             // label4
             // 
@@ -340,7 +331,6 @@ namespace MapEditor.XferGui
             this.label4.Size = new System.Drawing.Size(104, 13);
             this.label4.TabIndex = 28;
             this.label4.Text = "Maximal pulse radius";
-            this.label4.Click += new System.EventHandler(this.label4_Click);
             // 
             // ChangeIntensitySingleNum
             // 
@@ -388,28 +378,27 @@ namespace MapEditor.XferGui
             this.shadow.Text = "Shadow";
             this.shadow.UseVisualStyleBackColor = true;
             this.shadow.CheckedChanged += new System.EventHandler(this.shadow_CheckedChanged);
-            this.shadow.Click += new System.EventHandler(this.shadow_Click);
             // 
-            // crazy
+            // chkCrazyLight
             // 
-            this.crazy.AutoSize = true;
-            this.crazy.Location = new System.Drawing.Point(104, 64);
-            this.crazy.Name = "crazy";
-            this.crazy.Size = new System.Drawing.Size(74, 17);
-            this.crazy.TabIndex = 21;
-            this.crazy.Text = "Crazy light";
-            this.crazy.UseVisualStyleBackColor = true;
-            this.crazy.CheckedChanged += new System.EventHandler(this.crazy_CheckedChanged);
+            this.chkCrazyLight.AutoSize = true;
+            this.chkCrazyLight.Location = new System.Drawing.Point(104, 64);
+            this.chkCrazyLight.Name = "chkCrazyLight";
+            this.chkCrazyLight.Size = new System.Drawing.Size(74, 17);
+            this.chkCrazyLight.TabIndex = 21;
+            this.chkCrazyLight.Text = "Crazy light";
+            this.chkCrazyLight.UseVisualStyleBackColor = true;
+            this.chkCrazyLight.CheckedChanged += new System.EventHandler(this.chkCrazyLight_CheckedChanged);
             // 
-            // UnknownRBut
+            // cmdCrazyColor
             // 
-            this.UnknownRBut.Location = new System.Drawing.Point(9, 60);
-            this.UnknownRBut.Name = "UnknownRBut";
-            this.UnknownRBut.Size = new System.Drawing.Size(89, 23);
-            this.UnknownRBut.TabIndex = 23;
-            this.UnknownRBut.Text = "Crazy Color";
-            this.UnknownRBut.UseVisualStyleBackColor = true;
-            this.UnknownRBut.Click += new System.EventHandler(this.UnknownRBut_Click);
+            this.cmdCrazyColor.Location = new System.Drawing.Point(9, 60);
+            this.cmdCrazyColor.Name = "cmdCrazyColor";
+            this.cmdCrazyColor.Size = new System.Drawing.Size(89, 23);
+            this.cmdCrazyColor.TabIndex = 23;
+            this.cmdCrazyColor.Text = "Crazy Color";
+            this.cmdCrazyColor.UseVisualStyleBackColor = true;
+            this.cmdCrazyColor.Click += new System.EventHandler(this.cmdCrazyColor_Click);
             // 
             // labelSep2
             // 
@@ -431,85 +420,85 @@ namespace MapEditor.XferGui
             this.unkwn11.Size = new System.Drawing.Size(44, 20);
             this.unkwn11.TabIndex = 27;
             // 
-            // color3but
+            // cmdColor3
             // 
-            this.color3but.Location = new System.Drawing.Point(134, 54);
-            this.color3but.Name = "color3but";
-            this.color3but.Size = new System.Drawing.Size(57, 25);
-            this.color3but.TabIndex = 28;
-            this.color3but.Text = "Color 3";
-            this.color3but.UseVisualStyleBackColor = true;
-            this.color3but.Click += new System.EventHandler(this.color3but_Click);
+            this.cmdColor3.Location = new System.Drawing.Point(134, 54);
+            this.cmdColor3.Name = "cmdColor3";
+            this.cmdColor3.Size = new System.Drawing.Size(57, 25);
+            this.cmdColor3.TabIndex = 28;
+            this.cmdColor3.Text = "Color 3";
+            this.cmdColor3.UseVisualStyleBackColor = true;
+            this.cmdColor3.Click += new System.EventHandler(this.cmdColor3_Click);
             // 
-            // button4
+            // cmdColor4
             // 
-            this.button4.Location = new System.Drawing.Point(193, 54);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(57, 25);
-            this.button4.TabIndex = 29;
-            this.button4.Text = "Color 4";
-            this.button4.UseVisualStyleBackColor = false;
-            this.button4.Click += new System.EventHandler(this.button4_Click);
+            this.cmdColor4.Location = new System.Drawing.Point(193, 54);
+            this.cmdColor4.Name = "cmdColor4";
+            this.cmdColor4.Size = new System.Drawing.Size(57, 25);
+            this.cmdColor4.TabIndex = 29;
+            this.cmdColor4.Text = "Color 4";
+            this.cmdColor4.UseVisualStyleBackColor = false;
+            this.cmdColor4.Click += new System.EventHandler(this.cmdColor4_Click);
             // 
-            // button5
+            // cmdColor5
             // 
-            this.button5.Location = new System.Drawing.Point(252, 54);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(57, 25);
-            this.button5.TabIndex = 30;
-            this.button5.Text = "color 5";
-            this.button5.UseVisualStyleBackColor = true;
-            this.button5.Click += new System.EventHandler(this.button5_Click);
+            this.cmdColor5.Location = new System.Drawing.Point(252, 54);
+            this.cmdColor5.Name = "cmdColor5";
+            this.cmdColor5.Size = new System.Drawing.Size(57, 25);
+            this.cmdColor5.TabIndex = 30;
+            this.cmdColor5.Text = "Color 5";
+            this.cmdColor5.UseVisualStyleBackColor = true;
+            this.cmdColor5.Click += new System.EventHandler(this.cmdColor5_Click);
             // 
-            // button6
+            // cmdColor6
             // 
-            this.button6.Location = new System.Drawing.Point(16, 84);
-            this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(57, 25);
-            this.button6.TabIndex = 31;
-            this.button6.Text = "color 6";
-            this.button6.UseVisualStyleBackColor = true;
-            this.button6.Click += new System.EventHandler(this.button6_Click);
+            this.cmdColor6.Location = new System.Drawing.Point(16, 84);
+            this.cmdColor6.Name = "cmdColor6";
+            this.cmdColor6.Size = new System.Drawing.Size(57, 25);
+            this.cmdColor6.TabIndex = 31;
+            this.cmdColor6.Text = "Color 6";
+            this.cmdColor6.UseVisualStyleBackColor = true;
+            this.cmdColor6.Click += new System.EventHandler(this.cmdColor6_Click);
             // 
-            // button7
+            // cmdColor7
             // 
-            this.button7.Location = new System.Drawing.Point(75, 84);
-            this.button7.Name = "button7";
-            this.button7.Size = new System.Drawing.Size(57, 25);
-            this.button7.TabIndex = 32;
-            this.button7.Text = "color 7";
-            this.button7.UseVisualStyleBackColor = true;
-            this.button7.Click += new System.EventHandler(this.button7_Click);
+            this.cmdColor7.Location = new System.Drawing.Point(75, 84);
+            this.cmdColor7.Name = "cmdColor7";
+            this.cmdColor7.Size = new System.Drawing.Size(57, 25);
+            this.cmdColor7.TabIndex = 32;
+            this.cmdColor7.Text = "Color 7";
+            this.cmdColor7.UseVisualStyleBackColor = true;
+            this.cmdColor7.Click += new System.EventHandler(this.cmdColor7_Click);
             // 
-            // button8
+            // cmdColor8
             // 
-            this.button8.Location = new System.Drawing.Point(134, 84);
-            this.button8.Name = "button8";
-            this.button8.Size = new System.Drawing.Size(57, 25);
-            this.button8.TabIndex = 33;
-            this.button8.Text = "color 8 ";
-            this.button8.UseVisualStyleBackColor = true;
-            this.button8.Click += new System.EventHandler(this.button8_Click);
+            this.cmdColor8.Location = new System.Drawing.Point(134, 84);
+            this.cmdColor8.Name = "cmdColor8";
+            this.cmdColor8.Size = new System.Drawing.Size(57, 25);
+            this.cmdColor8.TabIndex = 33;
+            this.cmdColor8.Text = "Color 8 ";
+            this.cmdColor8.UseVisualStyleBackColor = true;
+            this.cmdColor8.Click += new System.EventHandler(this.cmdColor8_Click);
             // 
-            // button9
+            // cmdColor9
             // 
-            this.button9.Location = new System.Drawing.Point(193, 84);
-            this.button9.Name = "button9";
-            this.button9.Size = new System.Drawing.Size(57, 25);
-            this.button9.TabIndex = 34;
-            this.button9.Text = "color 9";
-            this.button9.UseVisualStyleBackColor = true;
-            this.button9.Click += new System.EventHandler(this.button9_Click);
+            this.cmdColor9.Location = new System.Drawing.Point(193, 84);
+            this.cmdColor9.Name = "cmdColor9";
+            this.cmdColor9.Size = new System.Drawing.Size(57, 25);
+            this.cmdColor9.TabIndex = 34;
+            this.cmdColor9.Text = "Color 9";
+            this.cmdColor9.UseVisualStyleBackColor = true;
+            this.cmdColor9.Click += new System.EventHandler(this.cmdColor9_Click);
             // 
-            // button10
+            // cmdColor10
             // 
-            this.button10.Location = new System.Drawing.Point(252, 84);
-            this.button10.Name = "button10";
-            this.button10.Size = new System.Drawing.Size(57, 25);
-            this.button10.TabIndex = 35;
-            this.button10.Text = "color 10";
-            this.button10.UseVisualStyleBackColor = true;
-            this.button10.Click += new System.EventHandler(this.button10_Click);
+            this.cmdColor10.Location = new System.Drawing.Point(252, 84);
+            this.cmdColor10.Name = "cmdColor10";
+            this.cmdColor10.Size = new System.Drawing.Size(57, 25);
+            this.cmdColor10.TabIndex = 35;
+            this.cmdColor10.Text = "Color 10";
+            this.cmdColor10.UseVisualStyleBackColor = true;
+            this.cmdColor10.Click += new System.EventHandler(this.cmdColor10_Click);
             // 
             // max2
             // 
@@ -522,7 +511,6 @@ namespace MapEditor.XferGui
             this.max2.Name = "max2";
             this.max2.Size = new System.Drawing.Size(39, 20);
             this.max2.TabIndex = 36;
-            this.max2.ValueChanged += new System.EventHandler(this.max2_ValueChanged);
             // 
             // min2
             // 
@@ -535,7 +523,6 @@ namespace MapEditor.XferGui
             this.min2.Name = "min2";
             this.min2.Size = new System.Drawing.Size(41, 20);
             this.min2.TabIndex = 37;
-            this.min2.ValueChanged += new System.EventHandler(this.min2_ValueChanged);
             // 
             // max3
             // 
@@ -548,7 +535,6 @@ namespace MapEditor.XferGui
             this.max3.Name = "max3";
             this.max3.Size = new System.Drawing.Size(41, 20);
             this.max3.TabIndex = 38;
-            this.max3.ValueChanged += new System.EventHandler(this.max3_ValueChanged);
             // 
             // min3
             // 
@@ -561,7 +547,6 @@ namespace MapEditor.XferGui
             this.min3.Name = "min3";
             this.min3.Size = new System.Drawing.Size(40, 20);
             this.min3.TabIndex = 39;
-            this.min3.ValueChanged += new System.EventHandler(this.min3_ValueChanged);
             // 
             // max4
             // 
@@ -586,7 +571,6 @@ namespace MapEditor.XferGui
             this.min4.Name = "min4";
             this.min4.Size = new System.Drawing.Size(39, 20);
             this.min4.TabIndex = 41;
-            this.min4.ValueChanged += new System.EventHandler(this.min4_ValueChanged);
             // 
             // max5
             // 
@@ -722,19 +706,19 @@ namespace MapEditor.XferGui
             // 
             // sequenceOptions
             // 
-            this.sequenceOptions.Controls.Add(this.RemoveColor);
+            this.sequenceOptions.Controls.Add(this.cmdRemoveColor);
             this.sequenceOptions.Controls.Add(this.label5);
-            this.sequenceOptions.Controls.Add(this.AddColor);
-            this.sequenceOptions.Controls.Add(this.button10);
-            this.sequenceOptions.Controls.Add(this.button2);
-            this.sequenceOptions.Controls.Add(this.color3but);
-            this.sequenceOptions.Controls.Add(this.button4);
-            this.sequenceOptions.Controls.Add(this.Colbutton2);
-            this.sequenceOptions.Controls.Add(this.button5);
-            this.sequenceOptions.Controls.Add(this.button6);
-            this.sequenceOptions.Controls.Add(this.button7);
-            this.sequenceOptions.Controls.Add(this.button8);
-            this.sequenceOptions.Controls.Add(this.button9);
+            this.sequenceOptions.Controls.Add(this.cmdAddColor);
+            this.sequenceOptions.Controls.Add(this.cmdColor10);
+            this.sequenceOptions.Controls.Add(this.cmdColor1);
+            this.sequenceOptions.Controls.Add(this.cmdColor3);
+            this.sequenceOptions.Controls.Add(this.cmdColor4);
+            this.sequenceOptions.Controls.Add(this.cmdColor2);
+            this.sequenceOptions.Controls.Add(this.cmdColor5);
+            this.sequenceOptions.Controls.Add(this.cmdColor6);
+            this.sequenceOptions.Controls.Add(this.cmdColor7);
+            this.sequenceOptions.Controls.Add(this.cmdColor8);
+            this.sequenceOptions.Controls.Add(this.cmdColor9);
             this.sequenceOptions.Controls.Add(this.numericUpDown2);
             this.sequenceOptions.Controls.Add(this.labelSep2);
             this.sequenceOptions.Location = new System.Drawing.Point(12, 162);
@@ -743,17 +727,16 @@ namespace MapEditor.XferGui
             this.sequenceOptions.TabIndex = 54;
             this.sequenceOptions.TabStop = false;
             this.sequenceOptions.Text = "Color Sequence";
-            this.sequenceOptions.Enter += new System.EventHandler(this.sequenceOptions_Enter);
             // 
-            // RemoveColor
+            // cmdRemoveColor
             // 
-            this.RemoveColor.Location = new System.Drawing.Point(91, 19);
-            this.RemoveColor.Name = "RemoveColor";
-            this.RemoveColor.Size = new System.Drawing.Size(64, 23);
-            this.RemoveColor.TabIndex = 37;
-            this.RemoveColor.Text = "Remove Color";
-            this.RemoveColor.UseVisualStyleBackColor = true;
-            this.RemoveColor.Click += new System.EventHandler(this.button11_Click);
+            this.cmdRemoveColor.Location = new System.Drawing.Point(91, 19);
+            this.cmdRemoveColor.Name = "cmdRemoveColor";
+            this.cmdRemoveColor.Size = new System.Drawing.Size(64, 23);
+            this.cmdRemoveColor.TabIndex = 37;
+            this.cmdRemoveColor.Text = "Remove Color";
+            this.cmdRemoveColor.UseVisualStyleBackColor = true;
+            this.cmdRemoveColor.Click += new System.EventHandler(this.cmdRemoveColor_Click);
             // 
             // label5
             // 
@@ -764,15 +747,15 @@ namespace MapEditor.XferGui
             this.label5.TabIndex = 29;
             this.label5.Text = "Changing Speed:";
             // 
-            // AddColor
+            // cmdAddColor
             // 
-            this.AddColor.Location = new System.Drawing.Point(16, 19);
-            this.AddColor.Name = "AddColor";
-            this.AddColor.Size = new System.Drawing.Size(71, 23);
-            this.AddColor.TabIndex = 36;
-            this.AddColor.Text = "Add Color";
-            this.AddColor.UseVisualStyleBackColor = true;
-            this.AddColor.Click += new System.EventHandler(this.AddColor_Click);
+            this.cmdAddColor.Location = new System.Drawing.Point(16, 19);
+            this.cmdAddColor.Name = "cmdAddColor";
+            this.cmdAddColor.Size = new System.Drawing.Size(71, 23);
+            this.cmdAddColor.TabIndex = 36;
+            this.cmdAddColor.Text = "Add Color";
+            this.cmdAddColor.UseVisualStyleBackColor = true;
+            this.cmdAddColor.Click += new System.EventHandler(this.cmdAddColor_Click);
             // 
             // label6
             // 
@@ -805,9 +788,9 @@ namespace MapEditor.XferGui
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this.staticClolor2);
-            this.groupBox2.Controls.Add(this.UnknownRBut);
-            this.groupBox2.Controls.Add(this.crazy);
+            this.groupBox2.Controls.Add(this.cmdGradient);
+            this.groupBox2.Controls.Add(this.cmdCrazyColor);
+            this.groupBox2.Controls.Add(this.chkCrazyLight);
             this.groupBox2.Location = new System.Drawing.Point(351, 112);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(184, 93);
@@ -864,7 +847,6 @@ namespace MapEditor.XferGui
             this.min6.Name = "min6";
             this.min6.Size = new System.Drawing.Size(41, 20);
             this.min6.TabIndex = 66;
-            this.min6.ValueChanged += new System.EventHandler(this.min6_ValueChanged);
             // 
             // label17
             // 
@@ -947,22 +929,23 @@ namespace MapEditor.XferGui
             this.label9.TabIndex = 57;
             this.label9.Text = "Phase 2";
             // 
-            // button11
+            // cmdCancel
             // 
-            this.button11.Location = new System.Drawing.Point(317, 111);
-            this.button11.Name = "button11";
-            this.button11.Size = new System.Drawing.Size(21, 46);
-            this.button11.TabIndex = 60;
-            this.button11.Text = "+";
-            this.button11.UseVisualStyleBackColor = true;
-            this.button11.Click += new System.EventHandler(this.button11_Click_1);
+            this.cmdCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cmdCancel.Location = new System.Drawing.Point(372, 291);
+            this.cmdCancel.Name = "cmdCancel";
+            this.cmdCancel.Size = new System.Drawing.Size(82, 31);
+            this.cmdCancel.TabIndex = 60;
+            this.cmdCancel.Text = "Cancel";
+            this.cmdCancel.UseVisualStyleBackColor = true;
+            this.cmdCancel.Click += new System.EventHandler(this.cmdCancel_Click);
             // 
             // ColorLightEdit
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(349, 326);
-            this.Controls.Add(this.button11);
+            this.ClientSize = new System.Drawing.Size(737, 326);
+            this.Controls.Add(this.cmdCancel);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -970,9 +953,9 @@ namespace MapEditor.XferGui
             this.Controls.Add(this.shadow);
             this.Controls.Add(this.PulsingOptions);
             this.Controls.Add(this.sequenceOptions);
-            this.Controls.Add(this.button3);
+            this.Controls.Add(this.cmdColor);
             this.Controls.Add(this.StaticOptions);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.cmdOK);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -1022,38 +1005,38 @@ namespace MapEditor.XferGui
 
 		}
 
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button cmdOK;
         private System.Windows.Forms.NumericUpDown numericUpDown1;
         private System.Windows.Forms.NumericUpDown numericUpDown2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.NumericUpDown numericUpDown3;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button Colbutton2;
-        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button cmdColor1;
+        private System.Windows.Forms.Button cmdColor2;
+        private System.Windows.Forms.Button cmdColor;
         private System.Windows.Forms.NumericUpDown outterSize;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.Button staticClolor2;
+        private System.Windows.Forms.Button cmdGradient;
         private System.Windows.Forms.GroupBox PulsingOptions;
         private System.Windows.Forms.GroupBox StaticOptions;
         private System.Windows.Forms.CheckBox shadow;
-        private System.Windows.Forms.CheckBox crazy;
-        private System.Windows.Forms.Button UnknownRBut;
+        private System.Windows.Forms.CheckBox chkCrazyLight;
+        private System.Windows.Forms.Button cmdCrazyColor;
         private System.Windows.Forms.Label labelSep2;
         private System.Windows.Forms.NumericUpDown PulseSpeedSingleNum;
         private System.Windows.Forms.NumericUpDown ChangeIntensitySingleNum;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.NumericUpDown xxx;
         private System.Windows.Forms.NumericUpDown unkwn11;
-        private System.Windows.Forms.Button color3but;
-        private System.Windows.Forms.Button button4;
-        private System.Windows.Forms.Button button5;
-        private System.Windows.Forms.Button button6;
-        private System.Windows.Forms.Button button7;
-        private System.Windows.Forms.Button button8;
-        private System.Windows.Forms.Button button9;
-        private System.Windows.Forms.Button button10;
+        private System.Windows.Forms.Button cmdColor3;
+        private System.Windows.Forms.Button cmdColor4;
+        private System.Windows.Forms.Button cmdColor5;
+        private System.Windows.Forms.Button cmdColor6;
+        private System.Windows.Forms.Button cmdColor7;
+        private System.Windows.Forms.Button cmdColor8;
+        private System.Windows.Forms.Button cmdColor9;
+        private System.Windows.Forms.Button cmdColor10;
         private System.Windows.Forms.NumericUpDown max2;
         private System.Windows.Forms.NumericUpDown min2;
         private System.Windows.Forms.NumericUpDown max3;
@@ -1073,9 +1056,9 @@ namespace MapEditor.XferGui
         private System.Windows.Forms.NumericUpDown max10;
         private System.Windows.Forms.NumericUpDown min10;
         private System.Windows.Forms.GroupBox sequenceOptions;
-        private System.Windows.Forms.Button AddColor;
+        private System.Windows.Forms.Button cmdAddColor;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Button RemoveColor;
+        private System.Windows.Forms.Button cmdRemoveColor;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.GroupBox groupBox1;
@@ -1091,6 +1074,6 @@ namespace MapEditor.XferGui
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.Button button11;
-	}
+        private System.Windows.Forms.Button cmdCancel;
+    }
 }

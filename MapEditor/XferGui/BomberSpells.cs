@@ -12,27 +12,25 @@ using NoxShared.ObjDataXfer;
 
 namespace MapEditor.XferGui
 {
-	/// <summary>
-	/// Description of BomberSpells.
-	/// </summary>
 	public partial class BomberSpells : Form
 	{
 		MonsterXfer xfer;
 		
 		public BomberSpells(MonsterXfer xfer)
 		{
-			//
-			// The InitializeComponent() call is required for Windows Forms designer support.
-			//
 			InitializeComponent();
 			
 			this.xfer = xfer;
 			FillComboBox(comboBoxSpell1);
 			FillComboBox(comboBoxSpell2);
 			FillComboBox(comboBoxSpell3);
-		}
-		
-		private void FillComboBox(ComboBox box)
+
+            comboBoxSpell1.SelectedItem = xfer.TrapSpell1;
+            comboBoxSpell2.SelectedItem = xfer.TrapSpell2;
+            comboBoxSpell3.SelectedItem = xfer.TrapSpell3;
+        }
+
+        private void FillComboBox(ComboBox box)
 		{
 			box.Items.Add("SPELL_INVALID");
 			box.SelectedIndex = 0;
@@ -46,10 +44,5 @@ namespace MapEditor.XferGui
 			xfer.TrapSpell2 = comboBoxSpell2.Text;
 			xfer.TrapSpell3 = comboBoxSpell3.Text;
 		}
-
-        private void BomberSpells_Load(object sender, EventArgs e)
-        {
-
-        }
 	}
 }

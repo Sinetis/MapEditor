@@ -117,72 +117,18 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="menuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>0, 0</value>
-  </metadata>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="goToObjectToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>86, 20</value>
-  </data>
-  <data name="goToObjectToolStripMenuItem.Text" xml:space="preserve">
-    <value>&amp;Go to Object</value>
-  </data>
-  <data name="editObjectToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>77, 20</value>
-  </data>
-  <data name="editObjectToolStripMenuItem.Text" xml:space="preserve">
-    <value>&amp;Edit Object</value>
-  </data>
-  <data name="applyChangesToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>99, 20</value>
-  </data>
-  <data name="applyChangesToolStripMenuItem.Text" xml:space="preserve">
-    <value>Apply Changes</value>
-  </data>
-  <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="onlyAppliesToScriptEnchantsToolStripMenuItem.Enabled" type="System.Boolean, mscorlib">
-    <value>False</value>
-  </data>
-  <data name="onlyAppliesToScriptEnchantsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>192, 20</value>
-  </data>
-  <data name="onlyAppliesToScriptEnchantsToolStripMenuItem.Text" xml:space="preserve">
-    <value>(Only applies to Script/Enchants)</value>
-  </data>
-  <data name="menuStrip1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 0</value>
-  </data>
-  <data name="menuStrip1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>819, 24</value>
-  </data>
-  <data name="menuStrip1.TabIndex" type="System.Int32, mscorlib">
-    <value>1</value>
-  </data>
-  <data name="menuStrip1.Text" xml:space="preserve">
-    <value>menuStrip1</value>
-  </data>
-  <data name="&gt;&gt;menuStrip1.Name" xml:space="preserve">
-    <value>menuStrip1</value>
-  </data>
-  <data name="&gt;&gt;menuStrip1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.MenuStrip, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;menuStrip1.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;menuStrip1.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="dataGrid1.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
   </data>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="dataGrid1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 24</value>
+    <value>0, 27</value>
   </data>
   <data name="dataGrid1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>819, 289</value>
+    <value>819, 286</value>
   </data>
+  <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="dataGrid1.TabIndex" type="System.Int32, mscorlib">
     <value>2</value>
   </data>
@@ -201,6 +147,69 @@
   <metadata name="Helpmark.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>115, 0</value>
   </metadata>
+  <metadata name="menuMain.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>219, 0</value>
+  </metadata>
+  <data name="menuMain.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
+  </data>
+  <data name="menuMain.Size" type="System.Drawing.Size, System.Drawing">
+    <value>819, 27</value>
+  </data>
+  <data name="menuMain.TabIndex" type="System.Int32, mscorlib">
+    <value>3</value>
+  </data>
+  <data name="menuMain.Text" xml:space="preserve">
+    <value>menuStrip2</value>
+  </data>
+  <data name="&gt;&gt;menuMain.Name" xml:space="preserve">
+    <value>menuMain</value>
+  </data>
+  <data name="&gt;&gt;menuMain.Type" xml:space="preserve">
+    <value>System.Windows.Forms.MenuStrip, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;menuMain.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;menuMain.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="menuGoToObj.Size" type="System.Drawing.Size, System.Drawing">
+    <value>89, 23</value>
+  </data>
+  <data name="menuGoToObj.Text" xml:space="preserve">
+    <value>&amp;Go To Object</value>
+  </data>
+  <data name="menuEditObj.Size" type="System.Drawing.Size, System.Drawing">
+    <value>77, 23</value>
+  </data>
+  <data name="menuEditObj.Text" xml:space="preserve">
+    <value>&amp;Edit Object</value>
+  </data>
+  <data name="menuDeleteObj.Size" type="System.Drawing.Size, System.Drawing">
+    <value>90, 23</value>
+  </data>
+  <data name="menuDeleteObj.Text" xml:space="preserve">
+    <value>&amp;Delete Object</value>
+  </data>
+  <data name="menuApplyChanges.Size" type="System.Drawing.Size, System.Drawing">
+    <value>204, 23</value>
+  </data>
+  <data name="menuApplyChanges.Text" xml:space="preserve">
+    <value>&amp;Apply Changes to Scripts/Enchants</value>
+  </data>
+  <data name="txtObjFilter.Size" type="System.Drawing.Size, System.Drawing">
+    <value>150, 23</value>
+  </data>
+  <data name="txtObjFilter.Text" xml:space="preserve">
+    <value>Search Name...</value>
+  </data>
+  <data name="lblSearching.Enabled" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
+  <data name="lblSearching.Size" type="System.Drawing.Size, System.Drawing">
+    <value>12, 23</value>
+  </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
@@ -216,34 +225,46 @@
   <data name="$this.Text" xml:space="preserve">
     <value>Object List</value>
   </data>
-  <data name="&gt;&gt;goToObjectToolStripMenuItem.Name" xml:space="preserve">
-    <value>goToObjectToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;goToObjectToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;editObjectToolStripMenuItem.Name" xml:space="preserve">
-    <value>editObjectToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;editObjectToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;applyChangesToolStripMenuItem.Name" xml:space="preserve">
-    <value>applyChangesToolStripMenuItem</value>
-  </data>
-  <data name="&gt;&gt;applyChangesToolStripMenuItem.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="&gt;&gt;Helpmark.Name" xml:space="preserve">
     <value>Helpmark</value>
   </data>
   <data name="&gt;&gt;Helpmark.Type" xml:space="preserve">
     <value>System.Windows.Forms.Timer, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;onlyAppliesToScriptEnchantsToolStripMenuItem.Name" xml:space="preserve">
-    <value>onlyAppliesToScriptEnchantsToolStripMenuItem</value>
+  <data name="&gt;&gt;menuGoToObj.Name" xml:space="preserve">
+    <value>menuGoToObj</value>
   </data>
-  <data name="&gt;&gt;onlyAppliesToScriptEnchantsToolStripMenuItem.Type" xml:space="preserve">
+  <data name="&gt;&gt;menuGoToObj.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;menuEditObj.Name" xml:space="preserve">
+    <value>menuEditObj</value>
+  </data>
+  <data name="&gt;&gt;menuEditObj.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;menuDeleteObj.Name" xml:space="preserve">
+    <value>menuDeleteObj</value>
+  </data>
+  <data name="&gt;&gt;menuDeleteObj.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;menuApplyChanges.Name" xml:space="preserve">
+    <value>menuApplyChanges</value>
+  </data>
+  <data name="&gt;&gt;menuApplyChanges.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;txtObjFilter.Name" xml:space="preserve">
+    <value>txtObjFilter</value>
+  </data>
+  <data name="&gt;&gt;txtObjFilter.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripTextBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lblSearching.Name" xml:space="preserve">
+    <value>lblSearching</value>
+  </data>
+  <data name="&gt;&gt;lblSearching.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">

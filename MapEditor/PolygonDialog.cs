@@ -12,32 +12,32 @@ namespace MapEditor
 {
 	public class PolygonDialog : System.Windows.Forms.Form
 	{
-		private System.Windows.Forms.Label label1;
-		private System.Windows.Forms.TextBox name;
-		private System.Windows.Forms.Label label2;
-		private System.Windows.Forms.Label label3;
-
 		private ColorDialog clr = new ColorDialog();
-		private System.Windows.Forms.Button colorButton;
-		private System.Windows.Forms.Button buttonOK;
-		private System.Windows.Forms.Button buttonCancel;
+        private NumericUpDown numMinimapGroup;
+        public int[] CustomColors;
 
-        private System.Windows.Forms.TextBox mmGroup;
-
-        private System.Windows.Forms.TextBox boxPoints;
-
-		public PolygonDialog()
+        public PolygonDialog()
 		{
 			InitializeComponent();
 			colorButton.BackColor = Color.White;
 		}
 
-		#region Windows Form Designer generated code
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
+        #region Windows Form Designer generated code
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        /// 
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button colorButton;
+        private System.Windows.Forms.Button buttonOK;
+        private System.Windows.Forms.Button buttonCancel;
+        private System.Windows.Forms.TextBox boxPoints;
+        private System.Windows.Forms.TextBox name;
+
+        private void InitializeComponent()
 		{
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PolygonDialog));
             this.label1 = new System.Windows.Forms.Label();
@@ -48,14 +48,15 @@ namespace MapEditor
             this.name = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.mmGroup = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.scriptOnUnknown = new System.Windows.Forms.TextBox();
             this.scriptOnEnter = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.questSecretChk = new System.Windows.Forms.CheckBox();
+            this.numMinimapGroup = new System.Windows.Forms.NumericUpDown();
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numMinimapGroup)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -67,7 +68,6 @@ namespace MapEditor
             // 
             resources.ApplyResources(this.boxPoints, "boxPoints");
             this.boxPoints.Name = "boxPoints";
-            this.boxPoints.TextChanged += new System.EventHandler(this.boxPoints_TextChanged);
             // 
             // colorButton
             // 
@@ -87,7 +87,6 @@ namespace MapEditor
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             resources.ApplyResources(this.buttonCancel, "buttonCancel");
             this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click);
             // 
             // name
             // 
@@ -103,11 +102,6 @@ namespace MapEditor
             // 
             resources.ApplyResources(this.label3, "label3");
             this.label3.Name = "label3";
-            // 
-            // mmGroup
-            // 
-            resources.ApplyResources(this.mmGroup, "mmGroup");
-            this.mmGroup.Name = "mmGroup";
             // 
             // groupBox1
             // 
@@ -145,30 +139,45 @@ namespace MapEditor
             this.questSecretChk.Name = "questSecretChk";
             this.questSecretChk.UseVisualStyleBackColor = true;
             // 
+            // numMinimapGroup
+            // 
+            resources.ApplyResources(this.numMinimapGroup, "numMinimapGroup");
+            this.numMinimapGroup.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            this.numMinimapGroup.Name = "numMinimapGroup";
+            this.numMinimapGroup.Value = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            // 
             // PolygonDialog
             // 
             this.AcceptButton = this.buttonOK;
             resources.ApplyResources(this, "$this");
             this.CancelButton = this.buttonCancel;
+            this.Controls.Add(this.numMinimapGroup);
             this.Controls.Add(this.questSecretChk);
             this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.mmGroup);
             this.Controls.Add(this.name);
             this.Controls.Add(this.boxPoints);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.label2);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonOK);
             this.Controls.Add(this.colorButton);
             this.Controls.Add(this.label1);
+            this.Controls.Add(this.label2);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "PolygonDialog";
             this.TopMost = true;
-            this.Load += new System.EventHandler(this.PolygonDialog_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numMinimapGroup)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -184,8 +193,13 @@ namespace MapEditor
 		private void changeColorButtonClick(object sender, System.EventArgs e)
 		{
 			clr.Color = colorButton.BackColor;
-			if (clr.ShowDialog() == DialogResult.OK)
-				colorButton.BackColor = clr.Color;
+            if (CustomColors != null)
+                clr.CustomColors = CustomColors;
+            if (clr.ShowDialog() == DialogResult.OK)
+            {
+                colorButton.BackColor = clr.Color;
+                CustomColors = clr.CustomColors;
+            }
 		}
 
 		protected Map.Polygon polygon;
@@ -194,14 +208,14 @@ namespace MapEditor
 			get
 			{
                 List<PointF> points = new List<PointF>();
-              	// Floating point bug fixed
-                Regex regex = new Regex("\\((?<xval>[1-9][0-9]*\\,?[0-9]*([+-]?[0-9]+)?), (?<yval>[1-9][0-9]*\\,?[0-9]*([+-]?[0-9]+)?)\\)");//("\\((?<xval>[0-9]+), (?<yval>[0-9]+)\\)");
-				foreach (Match match in regex.Matches(boxPoints.Text))
-					points.Add(new PointF(Convert.ToSingle(match.Groups["xval"].Value), Convert.ToSingle(match.Groups["yval"].Value)));
+                Regex regex = new Regex(@"(\s*(?<xval>[\+-]?[1-9][0-9]*\.?[0-9]*\s*)\s*,\s*(?<yval>[\+-]?[1-9][0-9]*\.?[0-9]*)\s*)");
+
+                foreach (Match match in regex.Matches(boxPoints.Text))
+                    points.Add(new PointF(Convert.ToSingle(match.Groups["xval"].Value), Convert.ToSingle(match.Groups["yval"].Value)));
 
 				if (polygon == null)
 				{
-					return new Map.Polygon(name.Text, colorButton.BackColor, Convert.ToByte(mmGroup.Text), points, scriptOnEnter.Text, scriptOnUnknown.Text, questSecretChk.Checked);
+					return new Map.Polygon(name.Text, colorButton.BackColor, Convert.ToByte(numMinimapGroup.Value), points, scriptOnEnter.Text, scriptOnUnknown.Text, questSecretChk.Checked);
 				}
 				else
 				{
@@ -210,7 +224,7 @@ namespace MapEditor
 					polygon.IsQuestSecret = questSecretChk.Checked;
 					polygon.Name = name.Text;
 					polygon.AmbientLightColor = colorButton.BackColor;
-					polygon.MinimapGroup = Convert.ToByte(mmGroup.Text);
+					polygon.MinimapGroup = Convert.ToByte(numMinimapGroup.Value);
 					polygon.Points = points;
 
                     return polygon;
@@ -232,7 +246,7 @@ namespace MapEditor
                     questSecretChk.Checked = polygon.IsQuestSecret;
                     name.Text = polygon.Name;
 					colorButton.BackColor = polygon.AmbientLightColor;
-					mmGroup.Text = polygon.MinimapGroup.ToString();
+                    numMinimapGroup.Value = polygon.MinimapGroup;
 					boxPoints.Text = "";
 					foreach (PointF pt in polygon.Points)
 						boxPoints.Text += String.Format("({0}, {1}) ", pt.X, pt.Y);
@@ -240,24 +254,10 @@ namespace MapEditor
 			}
 		}
 
-        private void PolygonDialog_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void boxPoints_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
         private void buttonOK_Click(object sender, EventArgs e)
         {
             MainWindow.Instance.mapView.PolygonEditDlg.SelectedPolygon =  polygon;
             MainWindow.Instance.mapView.PolygonEditDlg.SuperPolygon = polygon;
-        }
-        private void buttonCancel_Click(object sender, EventArgs e)
-        {
-
         }
 	}
 }

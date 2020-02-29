@@ -47,12 +47,14 @@ namespace MapEditor
 		{
             this.lblVersion = new System.Windows.Forms.Label();
             this.lblAbout = new System.Windows.Forms.Label();
+            this.picBox = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.picBox)).BeginInit();
             this.SuspendLayout();
             // 
             // lblVersion
             // 
             this.lblVersion.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblVersion.Location = new System.Drawing.Point(12, 14);
+            this.lblVersion.Location = new System.Drawing.Point(30, 20);
             this.lblVersion.Name = "lblVersion";
             this.lblVersion.Size = new System.Drawing.Size(241, 25);
             this.lblVersion.TabIndex = 1;
@@ -62,7 +64,7 @@ namespace MapEditor
             // lblAbout
             // 
             this.lblAbout.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblAbout.Location = new System.Drawing.Point(12, 45);
+            this.lblAbout.Location = new System.Drawing.Point(30, 51);
             this.lblAbout.Name = "lblAbout";
             this.lblAbout.Size = new System.Drawing.Size(241, 142);
             this.lblAbout.TabIndex = 2;
@@ -70,10 +72,20 @@ namespace MapEditor
     "\r\nKITTY";
             this.lblAbout.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
+            // picBox
+            // 
+            this.picBox.Image = global::MapEditor.Properties.Resources.aboutPic;
+            this.picBox.Location = new System.Drawing.Point(12, 190);
+            this.picBox.Name = "picBox";
+            this.picBox.Size = new System.Drawing.Size(280, 216);
+            this.picBox.TabIndex = 3;
+            this.picBox.TabStop = false;
+            // 
             // AboutDialog
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-            this.ClientSize = new System.Drawing.Size(265, 193);
+            this.ClientSize = new System.Drawing.Size(306, 414);
+            this.Controls.Add(this.picBox);
             this.Controls.Add(this.lblAbout);
             this.Controls.Add(this.lblVersion);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -84,11 +96,13 @@ namespace MapEditor
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "About";
+            ((System.ComponentModel.ISupportInitialize)(this.picBox)).EndInit();
             this.ResumeLayout(false);
 
 		}
 
         private Label lblAbout;
+        private PictureBox picBox;
         private Label lblVersion;
 		#endregion
 

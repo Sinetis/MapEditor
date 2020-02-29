@@ -6,49 +6,37 @@
  */
 using System;
 using System.Drawing;
-
 using System.Windows.Forms;
 using NoxShared.ObjDataXfer;
-using System.Resources;
 namespace MapEditor.XferGui
 {
-    /// <summary>
-    /// Description of ColorLightEdit.
-    /// </summary>
     public partial class ColorLightEdit : XferEditor
     {
         private Color UnknownRcol;
-
         private InvisibleLightXfer xfer;
         int lastPulseVal = 30;
+
         public ColorLightEdit()
         {
-            //
-            // The InitializeComponent() call is required for Windows Forms designer support.
-            //
             InitializeComponent();
+        }
+        private void ColorLightEdit_Load(object sender, EventArgs e)
+        {
+            sizable();
         }
 
         private void sizable()
         {
             sequenceOptions.Height = 60;
 
-            if (button2.Visible)
+            if (cmdColor1.Visible)
                 sequenceOptions.Height = 90;
 
-            if (button6.Visible)
+            if (cmdColor6.Visible)
                 sequenceOptions.Height = 125;
-
-
-
         }
-
-
-
-
         public override void SetObject(NoxShared.Map.Object obj)
         {
-
             this.obj = obj;
             xfer = obj.GetExtraData<InvisibleLightXfer>();
             numericUpDown1.Value = xfer.LightIntensity;
@@ -57,7 +45,6 @@ namespace MapEditor.XferGui
             outterSize.Value = xfer.LightRadius;
             shadow.Checked = xfer.type == 1 ? true : false;
             sequenceOptions.Height = 60;
-
 
             numericUpDown2.Value = xfer.PulseSpeed;
 
@@ -77,8 +64,6 @@ namespace MapEditor.XferGui
 
             UnknownRcol = Color.FromArgb(xfer.UnknownR, xfer.UnknownG, xfer.UnknownB);
 
-
-
             /*
             if (xfer.Color2.R == 0 && xfer.Color2.G == 0 && xfer.Color2.B == 0)
                 Color2Pulse = Color.White;
@@ -88,7 +73,6 @@ namespace MapEditor.XferGui
             
             if (xfer.UnknownR == 0 && xfer.UnknownG == 0 && xfer.UnknownB == 0)
                 UnknownRcol = Color.White;
-
             */
             Color Color1Pulse = xfer.Color1;
             Color Color2Pulse = xfer.Color2;
@@ -101,20 +85,12 @@ namespace MapEditor.XferGui
             Color Color9Pulse = xfer.Color9;
             Color Color10Pulse = xfer.Color10;
 
-
-
-
-
             newColor2 = Color.FromArgb((byte)~newColor2.R, (byte)~newColor2.G, (byte)~newColor2.B);
             if (shadow.Checked)
             {
-
-
                 newColor = Color.FromArgb((byte)~newColor.R, (byte)~newColor.G, (byte)~newColor.B);
                 Color1Pulse = Color.FromArgb((byte)~Color1Pulse.R, (byte)~Color1Pulse.G, (byte)~Color1Pulse.B);
                 Color2Pulse = Color.FromArgb((byte)~Color2Pulse.R, (byte)~Color2Pulse.G, (byte)~Color2Pulse.B);
-
-
                 Color3Pulse = Color.FromArgb((byte)~Color3Pulse.R, (byte)~Color3Pulse.G, (byte)~Color3Pulse.B);
                 Color4Pulse = Color.FromArgb((byte)~Color4Pulse.R, (byte)~Color4Pulse.G, (byte)~Color4Pulse.B);
                 Color5Pulse = Color.FromArgb((byte)~Color5Pulse.R, (byte)~Color5Pulse.G, (byte)~Color5Pulse.B);
@@ -125,166 +101,147 @@ namespace MapEditor.XferGui
                 Color10Pulse = Color.FromArgb((byte)~Color10Pulse.R, (byte)~Color10Pulse.G, (byte)~Color10Pulse.B);
 
             }
-            button3.BackColor = newColor;
-            button2.BackColor = Color1Pulse;
+            cmdColor.BackColor = newColor;
+            cmdColor1.BackColor = Color1Pulse;
 
-            Colbutton2.BackColor = Color2Pulse;
-            color3but.BackColor = Color3Pulse;
-            button4.BackColor = Color4Pulse;
-            button5.BackColor = Color5Pulse;
-            button6.BackColor = Color6Pulse;
+            cmdColor2.BackColor = Color2Pulse;
+            cmdColor3.BackColor = Color3Pulse;
+            cmdColor4.BackColor = Color4Pulse;
+            cmdColor5.BackColor = Color5Pulse;
+            cmdColor6.BackColor = Color6Pulse;
 
-            button7.BackColor = Color7Pulse;
-            button8.BackColor = Color8Pulse;
-            button9.BackColor = Color9Pulse;
-            button10.BackColor = Color10Pulse;
+            cmdColor7.BackColor = Color7Pulse;
+            cmdColor8.BackColor = Color8Pulse;
+            cmdColor9.BackColor = Color9Pulse;
+            cmdColor10.BackColor = Color10Pulse;
 
+            cmdGradient.BackColor = newColor2;
 
-            staticClolor2.BackColor = newColor2;
+            cmdColor1.Visible = false;
+            cmdColor2.Visible = false;
+            cmdColor3.Visible = false;
+            cmdColor4.Visible = false;
+            cmdColor5.Visible = false;
+            cmdColor6.Visible = false;
+            cmdColor7.Visible = false;
+            cmdColor8.Visible = false;
+            cmdColor9.Visible = false;
+            cmdColor10.Visible = false;
 
-            button2.Visible = false;
-            Colbutton2.Visible = false;
-            color3but.Visible = false;
-            button4.Visible = false;
-            button5.Visible = false;
-            button6.Visible = false;
-            button7.Visible = false;
-            button8.Visible = false;
-            button9.Visible = false;
-            button10.Visible = false;
-            //Colbutton2.BackColor = Color2Pulse;
             if (xfer.UnknownR > 0 || xfer.UnknownG > 0 || xfer.UnknownB > 0)
             {
-                crazy.Checked = true;
-                UnknownRBut.Enabled = true;
-                UnknownRBut.BackColor = UnknownRcol;
+                chkCrazyLight.Checked = true;
+                cmdCrazyColor.Enabled = true;
+                cmdCrazyColor.BackColor = UnknownRcol;
             }
             else
             {
-                crazy.Checked = false;
-
-                UnknownRBut.Enabled = false;
+                chkCrazyLight.Checked = false;
+                cmdCrazyColor.Enabled = false;
             }
             if (xfer.Color1.R > 0 || xfer.Color1.G > 0 || xfer.Color1.B > 0)
             {
-                button2.Visible = true;
-                button2.BackColor = Color1Pulse;
+                cmdColor1.Visible = true;
+                cmdColor1.BackColor = Color1Pulse;
             }
             else
             {
-                button2.Visible = false;
+                cmdColor1.Visible = false;
                 goto done;
             }
 
             if (xfer.Color2.R > 0 || xfer.Color2.G > 0 || xfer.Color2.B > 0)
             {
-                Colbutton2.Visible = true;
-                Colbutton2.BackColor = Color2Pulse;
+                cmdColor2.Visible = true;
+                cmdColor2.BackColor = Color2Pulse;
             }
             else
             {
-                button2.Visible = false;
-                Colbutton2.Visible = false;
+                cmdColor1.Visible = false;
+                cmdColor2.Visible = false;
                 goto done;
             }
 
             if (xfer.Color3.R > 0 || xfer.Color3.G > 0 || xfer.Color3.B > 0)
             {
-
-                color3but.Visible = true;
-                color3but.BackColor = Color3Pulse;
+                cmdColor3.Visible = true;
+                cmdColor3.BackColor = Color3Pulse;
             }
             else
             {
-
-                color3but.Visible = false;
+                cmdColor3.Visible = false;
                 goto done;
             }
 
             if (xfer.Color4.R > 0 || xfer.Color4.G > 0 || xfer.Color4.B > 0)
             {
-
-                button4.Visible = true;
-                button4.BackColor = Color4Pulse;
+                cmdColor4.Visible = true;
+                cmdColor4.BackColor = Color4Pulse;
             }
             else
             {
-                button4.Visible = false;
+                cmdColor4.Visible = false;
                 goto done;
-
             }
 
             if (xfer.Color5.R > 0 || xfer.Color5.G > 0 || xfer.Color5.B > 0)
             {
-
-                button5.Visible = true;
-                button5.BackColor = Color5Pulse;
+                cmdColor5.Visible = true;
+                cmdColor5.BackColor = Color5Pulse;
             }
             else
             {
-
-                button5.Visible = false;
+                cmdColor5.Visible = false;
                 goto done;
             }
             if (xfer.Color6.R > 0 || xfer.Color6.G > 0 || xfer.Color6.B > 0)
             {
-
-                button6.Visible = true;
-                button6.BackColor = Color6Pulse;
+                cmdColor6.Visible = true;
+                cmdColor6.BackColor = Color6Pulse;
             }
             else
             {
-
-                button6.Visible = false;
+                cmdColor6.Visible = false;
                 goto done;
             }
             if (xfer.Color7.R > 0 || xfer.Color7.G > 0 || xfer.Color7.B > 0)
             {
-
-                button7.Visible = true;
-                button7.BackColor = Color7Pulse;
+                cmdColor7.Visible = true;
+                cmdColor7.BackColor = Color7Pulse;
             }
             else
             {
-
-                button7.Visible = false;
+                cmdColor7.Visible = false;
                 goto done;
             }
             if (xfer.Color8.R > 0 || xfer.Color8.G > 0 || xfer.Color8.B > 0)
             {
-
-                button8.Visible = true;
-                button8.BackColor = Color8Pulse;
-
+                cmdColor8.Visible = true;
+                cmdColor8.BackColor = Color8Pulse;
             }
             else
             {
-
-                button8.Visible = false;
+                cmdColor8.Visible = false;
                 goto done;
             }
             if (xfer.Color9.R > 0 || xfer.Color9.G > 0 || xfer.Color9.B > 0)
             {
-
-                button9.Visible = true;
-                button9.BackColor = Color9Pulse;
+                cmdColor9.Visible = true;
+                cmdColor9.BackColor = Color9Pulse;
             }
             else
             {
-
-                button9.Visible = false;
+                cmdColor9.Visible = false;
                 goto done;
             }
             if (xfer.Color10.R > 0 || xfer.Color10.G > 0 || xfer.Color10.B > 0)
             {
-
-                button10.Visible = true;
-                button10.BackColor = Color10Pulse;
+                cmdColor10.Visible = true;
+                cmdColor10.BackColor = Color10Pulse;
             }
             else
             {
-
-                button10.Visible = false;
+                cmdColor10.Visible = false;
                 goto done;
             }
         done:
@@ -309,7 +266,6 @@ namespace MapEditor.XferGui
             min9.Value = xfer.MinRadius9;
             min10.Value = xfer.MinRadius10;
 
-
             if (PulseSpeedSingleNum.Value > 0)
             {
                 PulsingBox.Checked = true;
@@ -321,18 +277,30 @@ namespace MapEditor.XferGui
                 PulsingBox.Checked = false;
                 PulsingOptions.Enabled = false;
             }
-
-           
         }
 
-        private void ColorLightEdit_Load(object sender, EventArgs e)
+        private void cmdGradient_Click(object sender, EventArgs e)
         {
-            sizable();
+            MessageBox.Show("This color shouldn't be changed in order to keep normal looking colorlight.");
+            ColorDialog colorDlg = new ColorDialog();
+            colorDlg.Color = cmdGradient.BackColor;
+            if (colorDlg.ShowDialog() == DialogResult.OK)
+            {
+                cmdGradient.BackColor = colorDlg.Color;
+            }
         }
-
-        private void button1_Click(object sender, EventArgs e)
+        private void cmdCrazyColor_Click(object sender, EventArgs e)
         {
-
+            ColorDialog colorDlg = new ColorDialog();
+            colorDlg.Color = cmdCrazyColor.BackColor;
+            if (colorDlg.ShowDialog() == DialogResult.OK)
+            {
+                cmdCrazyColor.BackColor = colorDlg.Color;
+                UnknownRcol = colorDlg.Color;
+            }
+        }
+        private void cmdOK_Click(object sender, EventArgs e)
+        {
             xfer.LightIntensity = (byte)numericUpDown1.Value;
             xfer.PulseSpeed = (byte)numericUpDown2.Value;
             xfer.ChangeIntensity = (byte)numericUpDown3.Value;
@@ -343,27 +311,27 @@ namespace MapEditor.XferGui
             xfer.PulseSpeedSingle = (byte)PulseSpeedSingleNum.Value;
             xfer.ChangeIntensitySingle = (byte)ChangeIntensitySingleNum.Value;
             xfer.Unknown10 = (byte)xxx.Value;
-            byte RR2 = staticClolor2.BackColor.R;
-            byte GG2 = staticClolor2.BackColor.G;
-            byte BB2 = staticClolor2.BackColor.B;
+            byte RR2 = cmdGradient.BackColor.R;
+            byte GG2 = cmdGradient.BackColor.G;
+            byte BB2 = cmdGradient.BackColor.B;
 
             xfer.Unknown11 = (byte)unkwn11.Value;
             //xfer.UnknownR = crazy.Checked ? (byte)crazyNum.Value : (byte)0;
-            Color UnknownRcol = UnknownRBut.BackColor;
+            Color UnknownRcol = cmdCrazyColor.BackColor;
 
-            Color pulseColor1 = button2.BackColor;
-            Color pulseColor2 = Colbutton2.BackColor;
-            Color pulseColor3 = color3but.BackColor;
-            Color pulseColor4 = button4.BackColor;
-            Color pulseColor5 = button5.BackColor;
-            Color pulseColor6 = button6.BackColor;
-            Color pulseColor7 = button7.BackColor;
-            Color pulseColor8 = button8.BackColor;
-            Color pulseColor9 = button9.BackColor;
-            Color pulseColor10 = button10.BackColor;
+            Color pulseColor1 = cmdColor1.BackColor;
+            Color pulseColor2 = cmdColor2.BackColor;
+            Color pulseColor3 = cmdColor3.BackColor;
+            Color pulseColor4 = cmdColor4.BackColor;
+            Color pulseColor5 = cmdColor5.BackColor;
+            Color pulseColor6 = cmdColor6.BackColor;
+            Color pulseColor7 = cmdColor7.BackColor;
+            Color pulseColor8 = cmdColor8.BackColor;
+            Color pulseColor9 = cmdColor9.BackColor;
+            Color pulseColor10 = cmdColor10.BackColor;
 
-            Color gradColor = Color.FromArgb(staticClolor2.BackColor.R, staticClolor2.BackColor.G, staticClolor2.BackColor.B);
-            Color baseColor = Color.FromArgb(button3.BackColor.R, button3.BackColor.G, button3.BackColor.B);
+            Color gradColor = Color.FromArgb(cmdGradient.BackColor.R, cmdGradient.BackColor.G, cmdGradient.BackColor.B);
+            Color baseColor = Color.FromArgb(cmdColor.BackColor.R, cmdColor.BackColor.G, cmdColor.BackColor.B);
             gradColor = Color.FromArgb((byte)~gradColor.R, (byte)~gradColor.G, (byte)~gradColor.B);
             //UnknownRcol = Color.FromArgb((byte)~UnknownRcol.R, (byte)~UnknownRcol.G, (byte)~UnknownRcol.B);
 
@@ -386,7 +354,7 @@ namespace MapEditor.XferGui
                 // UnknownRcol = Color.FromArgb((byte)~pulseColor2.R, (byte)~pulseColor2.G, (byte)~pulseColor2.B);
             }
 
-            UnknownRcol = crazy.Checked ? UnknownRcol : Color.Black;
+            UnknownRcol = chkCrazyLight.Checked ? UnknownRcol : Color.Black;
 
             xfer.R = baseColor.R;
             xfer.G = baseColor.G;
@@ -401,377 +369,398 @@ namespace MapEditor.XferGui
             xfer.UnknownB = UnknownRcol.B;
 
             xfer.Color1 = pulseColor1;
-            xfer.Color2 = Colbutton2.Visible ? pulseColor2 : Color.Black;
-
-            xfer.Color3 = color3but.Visible ? pulseColor3 : Color.Black;
-            xfer.Color4 = button4.Visible ? pulseColor4 : Color.Black;
-            xfer.Color5 = button5.Visible ? pulseColor5 : Color.Black;
-            xfer.Color6 = button6.Visible ? pulseColor6 : Color.Black;
-
-            xfer.Color7 = button7.Visible ? pulseColor7 : Color.Black;
-            xfer.Color8 = button8.Visible ? pulseColor8 : Color.Black;
-            xfer.Color9 = button9.Visible ? pulseColor9 : Color.Black;
-            xfer.Color10 = button10.Visible ? pulseColor10 : Color.Black;
-
+            xfer.Color2 = cmdColor2.Visible ? pulseColor2 : Color.Black;
+            xfer.Color3 = cmdColor3.Visible ? pulseColor3 : Color.Black;
+            xfer.Color4 = cmdColor4.Visible ? pulseColor4 : Color.Black;
+            xfer.Color5 = cmdColor5.Visible ? pulseColor5 : Color.Black;
+            xfer.Color6 = cmdColor6.Visible ? pulseColor6 : Color.Black;
+            xfer.Color7 = cmdColor7.Visible ? pulseColor7 : Color.Black;
+            xfer.Color8 = cmdColor8.Visible ? pulseColor8 : Color.Black;
+            xfer.Color9 = cmdColor9.Visible ? pulseColor9 : Color.Black;
+            xfer.Color10 = cmdColor10.Visible ? pulseColor10 : Color.Black;
 
             xfer.MaxRadius2 = (byte)max2.Value;
             xfer.MinRadius2 = (byte)min2.Value;
-
-
             xfer.MaxRadius3 = (byte)max3.Value;
             xfer.MinRadius3 = (byte)min3.Value;
-
             xfer.MaxRadius4 = (byte)max4.Value;
             xfer.MinRadius4 = (byte)min4.Value;
-
             xfer.MaxRadius5 = (byte)max5.Value;
             xfer.MinRadius5 = (byte)min5.Value;
-
-
             xfer.MaxRadius6 = (byte)max6.Value;
             xfer.MinRadius6 = (byte)min6.Value;
-
-
             xfer.MaxRadius6 = (byte)max6.Value;
             xfer.MinRadius6 = (byte)min6.Value;
-
-
             xfer.MaxRadius7 = (byte)max7.Value;
             xfer.MinRadius7 = (byte)min7.Value;
-
-
             xfer.MaxRadius8 = (byte)max8.Value;
             xfer.MinRadius8 = (byte)min8.Value;
-
-
             xfer.MaxRadius9 = (byte)max9.Value;
             xfer.MinRadius9 = (byte)min9.Value;
-
-
             xfer.MaxRadius10 = (byte)max10.Value;
             xfer.MinRadius10 = (byte)min10.Value;
-
-
 
             Close();
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
+        private void cmdColor_Click(object sender, EventArgs e)
         {
-
+            ColorDialog colorDlg = new ColorDialog();
+            colorDlg.Color = cmdColor.BackColor;
+            if (colorDlg.ShowDialog() == DialogResult.OK)
+            {
+                cmdColor.BackColor = colorDlg.Color;
+            }
         }
-
-        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void numericUpDown2_ValueChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void numericUpDown3_ValueChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void button2_Click(object sender, EventArgs e)
+        private void cmdColor1_Click(object sender, EventArgs e)
         {
             ColorDialog colorDlg = new ColorDialog();
             if (colorDlg.ShowDialog() == DialogResult.OK)
             {
-                button2.BackColor = colorDlg.Color;
-                if (button2.BackColor == (shadow.Checked ? Color.White : Color.Black))
+                cmdColor1.BackColor = colorDlg.Color;
+                if (cmdColor1.BackColor == (shadow.Checked ? Color.White : Color.Black))
                 {
-                    button2.Visible = false;
-                    Colbutton2.Visible = false;
-                    color3but.Visible = false;
-                    button4.Visible = false;
-                    button5.Visible = false;
-                    button6.Visible = false;
-                    button7.Visible = false;
-                    button8.Visible = false;
-                    button9.Visible = false;
-                    button10.Visible = false;
+                    cmdColor1.Visible = false;
+                    cmdColor2.Visible = false;
+                    cmdColor3.Visible = false;
+                    cmdColor4.Visible = false;
+                    cmdColor5.Visible = false;
+                    cmdColor6.Visible = false;
+                    cmdColor7.Visible = false;
+                    cmdColor8.Visible = false;
+                    cmdColor9.Visible = false;
+                    cmdColor10.Visible = false;
                 }
                 sizable();
             }
         }
-
-        private void Colbutton2_Click(object sender, EventArgs e)
+        private void cmdColor2_Click(object sender, EventArgs e)
         {
-
             ColorDialog colorDlg = new ColorDialog();
-            colorDlg.Color = Colbutton2.BackColor;
+            colorDlg.Color = cmdColor2.BackColor;
             if (colorDlg.ShowDialog() == DialogResult.OK)
             {
-                Colbutton2.BackColor = colorDlg.Color;
-                if (Colbutton2.BackColor == (shadow.Checked ? Color.White : Color.Black))
+                cmdColor2.BackColor = colorDlg.Color;
+                if (cmdColor2.BackColor == (shadow.Checked ? Color.White : Color.Black))
                 {
-                    button2.Visible = false;
-                    Colbutton2.Visible = false;
-                    color3but.Visible = false;
-                    button4.Visible = false;
-                    button5.Visible = false;
-                    button6.Visible = false;
-                    button7.Visible = false;
-                    button8.Visible = false;
-                    button9.Visible = false;
-                    button10.Visible = false;
+                    cmdColor1.Visible = false;
+                    cmdColor2.Visible = false;
+                    cmdColor3.Visible = false;
+                    cmdColor4.Visible = false;
+                    cmdColor5.Visible = false;
+                    cmdColor6.Visible = false;
+                    cmdColor7.Visible = false;
+                    cmdColor8.Visible = false;
+                    cmdColor9.Visible = false;
+                    cmdColor10.Visible = false;
                 }
                 sizable();
             }
         }
-
-        private void numericUpDown4_ValueChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void button3_Click(object sender, EventArgs e)
+        private void cmdColor3_Click(object sender, EventArgs e)
         {
             ColorDialog colorDlg = new ColorDialog();
-            colorDlg.Color = button3.BackColor;
+            colorDlg.Color = cmdColor3.BackColor;
             if (colorDlg.ShowDialog() == DialogResult.OK)
             {
-                button3.BackColor = colorDlg.Color;
-            }
-        }
-
-        private void staticClolor2_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("This color shouldn't be changed in order to keep normal looking colorlight.");
-            ColorDialog colorDlg = new ColorDialog();
-            colorDlg.Color = staticClolor2.BackColor;
-            if (colorDlg.ShowDialog() == DialogResult.OK)
-            {
-                staticClolor2.BackColor = colorDlg.Color;
-            }
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void outterSize_ValueChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label7_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void radioButton1_CheckedChanged(object sender, EventArgs e)
-        {
-            StaticOptions.Enabled = true;
-            PulsingOptions.Enabled = false;
-
-        }
-
-        private void radioButton2_CheckedChanged(object sender, EventArgs e)
-        {
-            StaticOptions.Enabled = false;
-            PulsingOptions.Enabled = true;
-
-
-        }
-
-        private void staticPage_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void commonOptions_Enter(object sender, EventArgs e)
-        {
-
-        }
-
-        private void UnknownRBut_Click(object sender, EventArgs e)
-        {
-            ColorDialog colorDlg = new ColorDialog();
-            colorDlg.Color = UnknownRBut.BackColor;
-            if (colorDlg.ShowDialog() == DialogResult.OK)
-            {
-                UnknownRBut.BackColor = colorDlg.Color;
-                UnknownRcol = colorDlg.Color;
-            }
-        }
-
-        private void crazy_CheckedChanged(object sender, EventArgs e)
-        {
-            UnknownRBut.Enabled = crazy.Checked ? true : false;
-            UnknownRBut.BackColor = crazy.Checked ? UnknownRcol : Color.LightGray;
-        }
-
-        private void secCol_CheckedChanged(object sender, EventArgs e)
-        {
-            // Colbutton2.Enabled = secCol.Checked ? true : false;
-            // Colbutton2.BackColor = secCol.Checked ? Color2Pulse : Color.LightGray;
-        }
-
-        private void xxx_ValueChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void color3but_Click(object sender, EventArgs e)
-        {
-            ColorDialog colorDlg = new ColorDialog();
-            colorDlg.Color = color3but.BackColor;
-            if (colorDlg.ShowDialog() == DialogResult.OK)
-            {
-                color3but.BackColor = colorDlg.Color;
-                if (color3but.BackColor == (shadow.Checked ? Color.White : Color.Black))
+                cmdColor3.BackColor = colorDlg.Color;
+                if (cmdColor3.BackColor == (shadow.Checked ? Color.White : Color.Black))
                 {
-                    color3but.Visible = false;
-                    button4.Visible = false;
-                    button5.Visible = false;
-                    button6.Visible = false;
-                    button7.Visible = false;
-                    button8.Visible = false;
-                    button9.Visible = false;
-                    button10.Visible = false;
+                    cmdColor3.Visible = false;
+                    cmdColor4.Visible = false;
+                    cmdColor5.Visible = false;
+                    cmdColor6.Visible = false;
+                    cmdColor7.Visible = false;
+                    cmdColor8.Visible = false;
+                    cmdColor9.Visible = false;
+                    cmdColor10.Visible = false;
                 }
                 sizable();
             }
         }
-
-        private void button4_Click(object sender, EventArgs e)
+        private void cmdColor4_Click(object sender, EventArgs e)
         {
             ColorDialog colorDlg = new ColorDialog();
-            colorDlg.Color = button4.BackColor;
+            colorDlg.Color = cmdColor4.BackColor;
             if (colorDlg.ShowDialog() == DialogResult.OK)
             {
-                button4.BackColor = colorDlg.Color;
-                if (button4.BackColor == (shadow.Checked ? Color.White : Color.Black))
+                cmdColor4.BackColor = colorDlg.Color;
+                if (cmdColor4.BackColor == (shadow.Checked ? Color.White : Color.Black))
                 {
-                    button4.Visible = false;
-                    button5.Visible = false;
-                    button6.Visible = false;
-                    button7.Visible = false;
-                    button8.Visible = false;
-                    button9.Visible = false;
-                    button10.Visible = false;
+                    cmdColor4.Visible = false;
+                    cmdColor5.Visible = false;
+                    cmdColor6.Visible = false;
+                    cmdColor7.Visible = false;
+                    cmdColor8.Visible = false;
+                    cmdColor9.Visible = false;
+                    cmdColor10.Visible = false;
                 }
                 sizable();
             }
         }
-
-        private void button5_Click(object sender, EventArgs e)
+        private void cmdColor5_Click(object sender, EventArgs e)
         {
             ColorDialog colorDlg = new ColorDialog();
-            colorDlg.Color = button5.BackColor;
+            colorDlg.Color = cmdColor5.BackColor;
             if (colorDlg.ShowDialog() == DialogResult.OK)
             {
-                button5.BackColor = colorDlg.Color;
-                if (button5.BackColor == (shadow.Checked ? Color.White : Color.Black))
+                cmdColor5.BackColor = colorDlg.Color;
+                if (cmdColor5.BackColor == (shadow.Checked ? Color.White : Color.Black))
                 {
-                    button5.Visible = false;
-                    button6.Visible = false;
-                    button7.Visible = false;
-                    button8.Visible = false;
-                    button9.Visible = false;
-                    button10.Visible = false;
+                    cmdColor5.Visible = false;
+                    cmdColor6.Visible = false;
+                    cmdColor7.Visible = false;
+                    cmdColor8.Visible = false;
+                    cmdColor9.Visible = false;
+                    cmdColor10.Visible = false;
                 }
                 sizable();
             }
         }
-
-        private void button6_Click(object sender, EventArgs e)
+        private void cmdColor6_Click(object sender, EventArgs e)
         {
             ColorDialog colorDlg = new ColorDialog();
-            colorDlg.Color = button6.BackColor;
+            colorDlg.Color = cmdColor6.BackColor;
             if (colorDlg.ShowDialog() == DialogResult.OK)
             {
-                button6.BackColor = colorDlg.Color;
-                if (button6.BackColor == (shadow.Checked ? Color.White : Color.Black))
+                cmdColor6.BackColor = colorDlg.Color;
+                if (cmdColor6.BackColor == (shadow.Checked ? Color.White : Color.Black))
                 {
-                    button6.Visible = false;
-                    button7.Visible = false;
-                    button8.Visible = false;
-                    button9.Visible = false;
-                    button10.Visible = false;
+                    cmdColor6.Visible = false;
+                    cmdColor7.Visible = false;
+                    cmdColor8.Visible = false;
+                    cmdColor9.Visible = false;
+                    cmdColor10.Visible = false;
                 }
                 sizable();
             }
         }
-
-        private void button7_Click(object sender, EventArgs e)
+        private void cmdColor7_Click(object sender, EventArgs e)
         {
             ColorDialog colorDlg = new ColorDialog();
-            colorDlg.Color = button7.BackColor;
+            colorDlg.Color = cmdColor7.BackColor;
             if (colorDlg.ShowDialog() == DialogResult.OK)
             {
-                button7.BackColor = colorDlg.Color;
-                if (button7.BackColor == (shadow.Checked ? Color.White : Color.Black))
+                cmdColor7.BackColor = colorDlg.Color;
+                if (cmdColor7.BackColor == (shadow.Checked ? Color.White : Color.Black))
                 {
-
-                    button7.Visible = false;
-                    button8.Visible = false;
-                    button9.Visible = false;
-                    button10.Visible = false;
+                    cmdColor7.Visible = false;
+                    cmdColor8.Visible = false;
+                    cmdColor9.Visible = false;
+                    cmdColor10.Visible = false;
+                }
+            }
+        }
+        private void cmdColor8_Click(object sender, EventArgs e)
+        {
+            ColorDialog colorDlg = new ColorDialog();
+            colorDlg.Color = cmdColor8.BackColor;
+            if (colorDlg.ShowDialog() == DialogResult.OK)
+            {
+                cmdColor8.BackColor = colorDlg.Color;
+                if (cmdColor8.BackColor == (shadow.Checked ? Color.White : Color.Black))
+                {
+                    cmdColor8.Visible = false;
+                    cmdColor9.Visible = false;
+                    cmdColor10.Visible = false;
                 }
 
             }
         }
-
-        private void button8_Click(object sender, EventArgs e)
+        private void cmdColor9_Click(object sender, EventArgs e)
         {
             ColorDialog colorDlg = new ColorDialog();
-            colorDlg.Color = button8.BackColor;
+            colorDlg.Color = cmdColor9.BackColor;
             if (colorDlg.ShowDialog() == DialogResult.OK)
             {
-                button8.BackColor = colorDlg.Color;
-                if (button8.BackColor == (shadow.Checked ? Color.White : Color.Black))
+                cmdColor9.BackColor = colorDlg.Color;
+                if (cmdColor9.BackColor == (shadow.Checked ? Color.White : Color.Black))
                 {
-
-                    button8.Visible = false;
-                    button9.Visible = false;
-                    button10.Visible = false;
-                }
-
-            }
-        }
-
-        private void button9_Click(object sender, EventArgs e)
-        {
-            ColorDialog colorDlg = new ColorDialog();
-            colorDlg.Color = button9.BackColor;
-            if (colorDlg.ShowDialog() == DialogResult.OK)
-            {
-                button9.BackColor = colorDlg.Color;
-                if (button9.BackColor == (shadow.Checked ? Color.White : Color.Black))
-                {
-
-                    button9.Visible = false;
-                    button10.Visible = false;
-                }
-
-            }
-        }
-
-        private void button10_Click(object sender, EventArgs e)
-        {
-            ColorDialog colorDlg = new ColorDialog();
-            colorDlg.Color = button10.BackColor;
-            if (colorDlg.ShowDialog() == DialogResult.OK)
-            {
-                button10.BackColor = colorDlg.Color;
-                if (button10.BackColor == (shadow.Checked ? Color.White : Color.Black))
-                {
-
-                    button10.Visible = false;
+                    cmdColor9.Visible = false;
+                    cmdColor10.Visible = false;
                 }
             }
         }
-
-        private void max2_ValueChanged(object sender, EventArgs e)
+        private void cmdColor10_Click(object sender, EventArgs e)
         {
+            ColorDialog colorDlg = new ColorDialog();
+            colorDlg.Color = cmdColor10.BackColor;
+            if (colorDlg.ShowDialog() == DialogResult.OK)
+            {
+                cmdColor10.BackColor = colorDlg.Color;
+                if (cmdColor10.BackColor == (shadow.Checked ? Color.White : Color.Black))
+                    cmdColor10.Visible = false;
+            }
+        }
+        private void cmdRemoveColor_Click(object sender, EventArgs e)
+        {
+            if (cmdColor10.Visible)
+            {
+                cmdColor10.Visible = false;
+                sizable();
+                return;
+            }
+            if (cmdColor9.Visible)
+            {
+                cmdColor9.Visible = false;
+                sizable();
+                return;
+            }
+            if (cmdColor8.Visible)
+            {
+                cmdColor8.Visible = false;
+                sizable();
+                return;
+            }
+            if (cmdColor7.Visible)
+            {
+                cmdColor7.Visible = false;
+                sizable();
+                return;
+            }
+            if (cmdColor6.Visible)
+            {
+                cmdColor6.Visible = false;
+                sizable();
+                return;
+            }
+            if (cmdColor5.Visible)
+            {
+                cmdColor5.Visible = false;
+                sizable();
+                return;
+            }
+            if (cmdColor4.Visible)
+            {
+                cmdColor4.Visible = false;
+                sizable();
+                return;
+            }
+            if (cmdColor3.Visible)
+            {
+                cmdColor3.Visible = false;
+                sizable();
+                return;
+            }
+            if (cmdColor2.Visible)
+            {
+                cmdColor1.Visible = false;
+                cmdColor2.Visible = false;
+                sizable();
+                return;
+            }
+            if (cmdColor1.Visible)
+            {
+                cmdColor1.Visible = false;
+                sizable();
+                return;
+            }
 
+        }
+        private void cmdAddColor_Click(object sender, EventArgs e)
+        {
+            if (cmdColor1.BackColor == (!shadow.Checked ? Color.Black : Color.White))
+            {
+                cmdColor1.Visible = false;
+                cmdColor2.Visible = false;
+            }
+            if (cmdColor2.BackColor == (!shadow.Checked ? Color.Black : Color.White))
+            {
+                cmdColor2.Visible = false;
+                cmdColor1.Visible = false;
+            }
+
+            if (cmdColor3.BackColor == (!shadow.Checked ? Color.Black : Color.White))
+                cmdColor3.Visible = false;
+            if (cmdColor4.BackColor == (!shadow.Checked ? Color.Black : Color.White))
+                cmdColor4.Visible = false;
+            if (cmdColor5.BackColor == (!shadow.Checked ? Color.Black : Color.White))
+                cmdColor5.Visible = false;
+            if (cmdColor6.BackColor == (!shadow.Checked ? Color.Black : Color.White))
+                cmdColor6.Visible = false;
+            if (cmdColor7.BackColor == (!shadow.Checked ? Color.Black : Color.White))
+                cmdColor7.Visible = false;
+            if (cmdColor8.BackColor == (!shadow.Checked ? Color.Black : Color.White))
+                cmdColor8.Visible = false;
+            if (cmdColor9.BackColor == (!shadow.Checked ? Color.Black : Color.White))
+                cmdColor9.Visible = false;
+            if (cmdColor10.BackColor == (!shadow.Checked ? Color.Black : Color.White))
+                cmdColor10.Visible = false;
+
+
+            if (!cmdColor1.Visible)
+            {
+                cmdColor1.BackColor = shadow.Checked ? Color.Black : Color.White;
+                cmdColor2.BackColor = shadow.Checked ? Color.Black : Color.White;
+                cmdColor1.Visible = true;
+                cmdColor2.Visible = true;
+                sizable();
+                return;
+            }
+            if (!cmdColor2.Visible)
+            {
+                cmdColor2.BackColor = shadow.Checked ? Color.Black : Color.White;
+                cmdColor2.Visible = true;
+                sizable();
+                return;
+            }
+            if (!cmdColor3.Visible)
+            {
+                cmdColor3.BackColor = shadow.Checked ? Color.Black : Color.White;
+                cmdColor3.Visible = true;
+                sizable();
+                return;
+            }
+            if (!cmdColor4.Visible)
+            {
+                cmdColor4.BackColor = shadow.Checked ? Color.Black : Color.White;
+                cmdColor4.Visible = true;
+                sizable();
+                return;
+            }
+            if (!cmdColor5.Visible)
+            {
+                cmdColor5.BackColor = shadow.Checked ? Color.Black : Color.White;
+                cmdColor5.Visible = true;
+                sizable();
+                return;
+            }
+
+            if (!cmdColor6.Visible)
+            {
+                cmdColor6.BackColor = shadow.Checked ? Color.Black : Color.White;
+                cmdColor6.Visible = true;
+                sizable();
+                return;
+            }
+            if (!cmdColor7.Visible)
+            {
+                cmdColor7.BackColor = shadow.Checked ? Color.Black : Color.White;
+                cmdColor7.Visible = true;
+                sizable();
+                return;
+            }
+            if (!cmdColor8.Visible)
+            {
+                cmdColor8.BackColor = shadow.Checked ? Color.Black : Color.White;
+                cmdColor8.Visible = true;
+                sizable();
+                return;
+            }
+            if (!cmdColor9.Visible)
+            {
+                cmdColor9.BackColor = shadow.Checked ? Color.Black : Color.White;
+                cmdColor9.Visible = true;
+                sizable();
+                return;
+            }
+            if (!cmdColor10.Visible)
+            {
+                cmdColor10.BackColor = shadow.Checked ? Color.Black : Color.White;
+                cmdColor10.Visible = true;
+                sizable();
+                return;
+            }
         }
 
         private void ChangeIntensitySingleNum_ValueChanged(object sender, EventArgs e)
@@ -780,41 +769,17 @@ namespace MapEditor.XferGui
                 ChangeIntensitySingleNum.Value = xxx.Value + 1;
         }
 
-        private void max3_ValueChanged(object sender, EventArgs e)
+        private void radioButton1_CheckedChanged(object sender, EventArgs e)
         {
+            StaticOptions.Enabled = true;
+            PulsingOptions.Enabled = false;
 
         }
-
-        private void min2_ValueChanged(object sender, EventArgs e)
+        private void radioButton2_CheckedChanged(object sender, EventArgs e)
         {
-
+            StaticOptions.Enabled = false;
+            PulsingOptions.Enabled = true;
         }
-
-        private void min4_ValueChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label4_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label3_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void PulseSpeedSingleNum_ValueChanged(object sender, EventArgs e)
-        {
-
-        }
-
         private void PulsingBox_CheckedChanged(object sender, EventArgs e)
         {
             if (PulsingBox.Checked)
@@ -823,11 +788,8 @@ namespace MapEditor.XferGui
                 PulsingOptions.Enabled = true;
                 StaticOptions.Enabled = false;
 
-
                 if (ChangeIntensitySingleNum.Value <= 0)
                     ChangeIntensitySingleNum.Value = numericUpDown1.Value;
-
-
 
                 if (PulseSpeedSingleNum.Value <= 0)
                 {
@@ -840,7 +802,6 @@ namespace MapEditor.XferGui
                     xxx.Value = 20;
                     xxx.Minimum = 1;
                 }
-
             }
             else
             {
@@ -853,294 +814,65 @@ namespace MapEditor.XferGui
                 PulseSpeedSingleNum.Value = 0;
             }
         }
-
-        private void min3_ValueChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void AddColor_Click(object sender, EventArgs e)
-        {
-
-
-            if (button2.BackColor == (!shadow.Checked ? Color.Black : Color.White))
-            {
-                button2.Visible = false;
-                Colbutton2.Visible = false;
-            }
-
-            if (Colbutton2.BackColor == (!shadow.Checked ? Color.Black : Color.White))
-            {
-                Colbutton2.Visible = false;
-                button2.Visible = false;
-            }
-
-            if (color3but.BackColor == (!shadow.Checked ? Color.Black : Color.White))
-                color3but.Visible = false;
-
-            if (button4.BackColor == (!shadow.Checked ? Color.Black : Color.White))
-                button4.Visible = false;
-
-            if (button5.BackColor == (!shadow.Checked ? Color.Black : Color.White))
-                button5.Visible = false;
-
-            if (button6.BackColor == (!shadow.Checked ? Color.Black : Color.White))
-                button6.Visible = false;
-
-            if (button7.BackColor == (!shadow.Checked ? Color.Black : Color.White))
-                button7.Visible = false;
-
-            if (button8.BackColor == (!shadow.Checked ? Color.Black : Color.White))
-                button8.Visible = false;
-
-
-            if (button9.BackColor == (!shadow.Checked ? Color.Black : Color.White))
-                button9.Visible = false;
-
-
-            if (button10.BackColor == (!shadow.Checked ? Color.Black : Color.White))
-                button10.Visible = false;
-
-
-
-
-            if (!button2.Visible)
-            {
-                button2.BackColor = shadow.Checked ? Color.Black : Color.White;
-                Colbutton2.BackColor = shadow.Checked ? Color.Black : Color.White;
-                button2.Visible = true;
-                Colbutton2.Visible = true;
-                sizable();
-                return;
-            }
-            if (!Colbutton2.Visible)
-            {
-                Colbutton2.BackColor = shadow.Checked ? Color.Black : Color.White;
-                Colbutton2.Visible = true;
-                sizable();
-                return;
-            }
-            if (!color3but.Visible)
-            {
-                color3but.BackColor = shadow.Checked ? Color.Black : Color.White;
-                color3but.Visible = true;
-                sizable();
-                return;
-            }
-            if (!button4.Visible)
-            {
-                button4.BackColor = shadow.Checked ? Color.Black : Color.White;
-                button4.Visible = true;
-                sizable();
-                return;
-            }
-            if (!button5.Visible)
-            {
-                button5.BackColor = shadow.Checked ? Color.Black : Color.White;
-                button5.Visible = true;
-                sizable();
-                return;
-            }
-
-            if (!button6.Visible)
-            {
-                button6.BackColor = shadow.Checked ? Color.Black : Color.White;
-                button6.Visible = true;
-                sizable();
-                return;
-            }
-            if (!button7.Visible)
-            {
-                button7.BackColor = shadow.Checked ? Color.Black : Color.White;
-                button7.Visible = true;
-                sizable();
-                return;
-            }
-            if (!button8.Visible)
-            {
-                button8.BackColor = shadow.Checked ? Color.Black : Color.White;
-                button8.Visible = true;
-                sizable();
-                return;
-            }
-            if (!button9.Visible)
-            {
-                button9.BackColor = shadow.Checked ? Color.Black : Color.White;
-                button9.Visible = true;
-                sizable();
-                return;
-            }
-            if (!button10.Visible)
-            {
-                button10.BackColor = shadow.Checked ? Color.Black : Color.White;
-                button10.Visible = true;
-                sizable();
-                return;
-            }
-
-        }
-
-        private void button11_Click(object sender, EventArgs e)
-        {
-
-            if (button10.Visible)
-            {
-                button10.Visible = false;
-                sizable();
-                return;
-            }
-            if (button9.Visible)
-            {
-                button9.Visible = false;
-                sizable();
-                return;
-            }
-
-            if (button8.Visible)
-            {
-                button8.Visible = false;
-                sizable();
-                return;
-            }
-            if (button7.Visible)
-            {
-                button7.Visible = false;
-                sizable();
-
-                return;
-            }
-            if (button6.Visible)
-            {
-                button6.Visible = false;
-                sizable();
-                return;
-            }
-            if (button5.Visible)
-            {
-                button5.Visible = false;
-                sizable();
-                return;
-            }
-            if (button4.Visible)
-            {
-                button4.Visible = false;
-                sizable();
-                return;
-
-            }
-
-            if (color3but.Visible)
-            {
-                color3but.Visible = false;
-                sizable();
-                return;
-            }
-
-            if (Colbutton2.Visible)
-            {
-                button2.Visible = false;
-                Colbutton2.Visible = false;
-                sizable();
-                return;
-            }
-            if (button2.Visible)
-            {
-                button2.Visible = false;
-                sizable();
-                return;
-            }
-
-        }
-
-        private void sequenceOptions_Enter(object sender, EventArgs e)
-        {
-
-        }
         private void shadow_CheckedChanged(object sender, EventArgs e)
         {
             if (shadow.Checked)
             {
-                button2.BackColor = button2.BackColor.R == 255 && button2.BackColor.G == 255 && button2.BackColor.B == 255 ? Color.Black : button2.BackColor;
-                Colbutton2.BackColor = Colbutton2.BackColor.R == 255 && Colbutton2.BackColor.G == 255 && Colbutton2.BackColor.B == 255 ? Color.Black : Colbutton2.BackColor;
-                color3but.BackColor = color3but.BackColor == Color.White ? Color.Black : color3but.BackColor;
-                button4.BackColor = button4.BackColor.R == 255 && button4.BackColor.G == 255 && button4.BackColor.B == 255 ? Color.Black : button4.BackColor;
-                button5.BackColor = button5.BackColor == Color.White ? Color.Black : button5.BackColor;
-                button6.BackColor = button6.BackColor == Color.White ? Color.Black : button6.BackColor;
-                button7.BackColor = button7.BackColor == Color.White ? Color.Black : button7.BackColor;
-                button8.BackColor = button8.BackColor == Color.White ? Color.Black : button8.BackColor;
-                button9.BackColor = button9.BackColor == Color.White ? Color.Black : button9.BackColor;
-                button10.BackColor = button10.BackColor == Color.White ? Color.Black : button10.BackColor;
-
-
+                cmdColor1.BackColor = cmdColor1.BackColor.R == 255 && cmdColor1.BackColor.G == 255 && cmdColor1.BackColor.B == 255 ? Color.Black : cmdColor1.BackColor;
+                cmdColor2.BackColor = cmdColor2.BackColor.R == 255 && cmdColor2.BackColor.G == 255 && cmdColor2.BackColor.B == 255 ? Color.Black : cmdColor2.BackColor;
+                cmdColor3.BackColor = cmdColor3.BackColor == Color.White ? Color.Black : cmdColor3.BackColor;
+                cmdColor4.BackColor = cmdColor4.BackColor.R == 255 && cmdColor4.BackColor.G == 255 && cmdColor4.BackColor.B == 255 ? Color.Black : cmdColor4.BackColor;
+                cmdColor5.BackColor = cmdColor5.BackColor == Color.White ? Color.Black : cmdColor5.BackColor;
+                cmdColor6.BackColor = cmdColor6.BackColor == Color.White ? Color.Black : cmdColor6.BackColor;
+                cmdColor7.BackColor = cmdColor7.BackColor == Color.White ? Color.Black : cmdColor7.BackColor;
+                cmdColor8.BackColor = cmdColor8.BackColor == Color.White ? Color.Black : cmdColor8.BackColor;
+                cmdColor9.BackColor = cmdColor9.BackColor == Color.White ? Color.Black : cmdColor9.BackColor;
+                cmdColor10.BackColor = cmdColor10.BackColor == Color.White ? Color.Black : cmdColor10.BackColor;
             }
             else
             {
-
-                button2.BackColor = button2.BackColor.R == 0 && button2.BackColor.G == 0 && button2.BackColor.B == 0 ? Color.White : button2.BackColor;
-                Colbutton2.BackColor = Colbutton2.BackColor.R == 0 && Colbutton2.BackColor.G == 0 && Colbutton2.BackColor.B == 0 ? Color.White : Colbutton2.BackColor;
-                color3but.BackColor = color3but.BackColor.R == 0 && color3but.BackColor.G == 0 && color3but.BackColor.B == 0 ? Color.White : color3but.BackColor;
-                button4.BackColor = button4.BackColor.R == 0 && button4.BackColor.G == 0 && button4.BackColor.B == 0 ? Color.White : button4.BackColor;
-                button5.BackColor = button5.BackColor.R == 0 && button5.BackColor.G == 0 && button5.BackColor.B == 0 ? Color.White : button5.BackColor;
-                button6.BackColor = button6.BackColor.R == 0 && button6.BackColor.G == 0 && button6.BackColor.B == 0 ? Color.White : button6.BackColor;
-                button7.BackColor = button7.BackColor.R == 0 && button7.BackColor.G == 0 && button7.BackColor.B == 0 ? Color.White : button7.BackColor;
-                button8.BackColor = button8.BackColor.R == 0 && button8.BackColor.G == 0 && button8.BackColor.B == 0 ? Color.White : button8.BackColor;
-                button9.BackColor = button9.BackColor.R == 0 && button9.BackColor.G == 0 && button9.BackColor.B == 0 ? Color.White : button9.BackColor;
-                button10.BackColor = button10.BackColor.R == 0 && button10.BackColor.G == 0 && button10.BackColor.B == 0 ? Color.White : button10.BackColor;
-
+                cmdColor1.BackColor = cmdColor1.BackColor.R == 0 && cmdColor1.BackColor.G == 0 && cmdColor1.BackColor.B == 0 ? Color.White : cmdColor1.BackColor;
+                cmdColor2.BackColor = cmdColor2.BackColor.R == 0 && cmdColor2.BackColor.G == 0 && cmdColor2.BackColor.B == 0 ? Color.White : cmdColor2.BackColor;
+                cmdColor3.BackColor = cmdColor3.BackColor.R == 0 && cmdColor3.BackColor.G == 0 && cmdColor3.BackColor.B == 0 ? Color.White : cmdColor3.BackColor;
+                cmdColor4.BackColor = cmdColor4.BackColor.R == 0 && cmdColor4.BackColor.G == 0 && cmdColor4.BackColor.B == 0 ? Color.White : cmdColor4.BackColor;
+                cmdColor5.BackColor = cmdColor5.BackColor.R == 0 && cmdColor5.BackColor.G == 0 && cmdColor5.BackColor.B == 0 ? Color.White : cmdColor5.BackColor;
+                cmdColor6.BackColor = cmdColor6.BackColor.R == 0 && cmdColor6.BackColor.G == 0 && cmdColor6.BackColor.B == 0 ? Color.White : cmdColor6.BackColor;
+                cmdColor7.BackColor = cmdColor7.BackColor.R == 0 && cmdColor7.BackColor.G == 0 && cmdColor7.BackColor.B == 0 ? Color.White : cmdColor7.BackColor;
+                cmdColor8.BackColor = cmdColor8.BackColor.R == 0 && cmdColor8.BackColor.G == 0 && cmdColor8.BackColor.B == 0 ? Color.White : cmdColor8.BackColor;
+                cmdColor9.BackColor = cmdColor9.BackColor.R == 0 && cmdColor9.BackColor.G == 0 && cmdColor9.BackColor.B == 0 ? Color.White : cmdColor9.BackColor;
+                cmdColor10.BackColor = cmdColor10.BackColor.R == 0 && cmdColor10.BackColor.G == 0 && cmdColor10.BackColor.B == 0 ? Color.White : cmdColor10.BackColor;
             }
         }
-
-        private void min6_ValueChanged(object sender, EventArgs e)
+        private void chkCrazyLight_CheckedChanged(object sender, EventArgs e)
         {
-
+            cmdCrazyColor.Enabled = chkCrazyLight.Checked ? true : false;
+            cmdCrazyColor.BackColor = chkCrazyLight.Checked ? UnknownRcol : Color.LightGray;
+        }
+        private void secCol_CheckedChanged(object sender, EventArgs e)
+        {
+            // Colbutton2.Enabled = secCol.Checked ? true : false;
+            // Colbutton2.BackColor = secCol.Checked ? Color2Pulse : Color.LightGray;
         }
 
-        private void button11_Click_1(object sender, EventArgs e)
+        private void cmdColor2_VisibleChanged(object sender, EventArgs e)
         {
-            if (this.Width == 355)
-            {
-                this.Width = 746;
-                button11.Text = "-";
-            }
-            else
-            {
-                this.Width = 355;
-                button11.Text = "+";
-            }
-        }
-
-        private void shadow_Click(object sender, EventArgs e)
-        {
-            //turd2.Enabled = true;
-
-        }
-
-
-
-        private void button12_Click(object sender, EventArgs e)
-        {
-
-            button4.Focus();
-
-            // if (button4.BackColor == Color.Black)
-            MessageBox.Show(button4.BackColor.A.ToString());
-            MessageBox.Show(button4.BackColor.ToKnownColor().ToString());
-        }
-
-        private void Colbutton2_VisibleChanged(object sender, EventArgs e)
-        {
-            if (Colbutton2.Visible)
+            if (cmdColor2.Visible)
             {
                 numericUpDown2.Value = numericUpDown2.Value <= 0 ? 20 : numericUpDown2.Value;
                 numericUpDown2.Minimum = 1;
-                button3.Enabled = false;
+                cmdColor.Enabled = false;
 
             }
             else
             {
                 numericUpDown2.Minimum = 0;
-                button3.Enabled = true;
+                cmdColor.Enabled = true;
             }
+        }
+
+        private void cmdCancel_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }

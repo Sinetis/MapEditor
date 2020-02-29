@@ -41,7 +41,7 @@ namespace MapEditor.XferGui
             this.enchantment2 = new System.Windows.Forms.ComboBox();
             this.enchantment3 = new System.Windows.Forms.ComboBox();
             this.enchantment4 = new System.Windows.Forms.ComboBox();
-            this.label3 = new System.Windows.Forms.Label();
+            this.lblCharges = new System.Windows.Forms.Label();
             this.ammoMin = new System.Windows.Forms.NumericUpDown();
             this.ammoMax = new System.Windows.Forms.NumericUpDown();
             this.picRender = new System.Windows.Forms.PictureBox();
@@ -136,15 +136,15 @@ namespace MapEditor.XferGui
             this.enchantment4.TabIndex = 7;
             this.enchantment4.SelectedIndexChanged += new System.EventHandler(this.enchantment4_SelectedIndexChanged);
             // 
-            // label3
+            // lblCharges
             // 
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(24, 186);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(121, 23);
-            this.label3.TabIndex = 8;
-            this.label3.Text = "Charges/Arrows:";
-            this.label3.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.lblCharges.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCharges.Location = new System.Drawing.Point(24, 186);
+            this.lblCharges.Name = "lblCharges";
+            this.lblCharges.Size = new System.Drawing.Size(121, 23);
+            this.lblCharges.TabIndex = 8;
+            this.lblCharges.Text = "Charges/Arrows:";
+            this.lblCharges.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             // 
             // ammoMin
             // 
@@ -158,6 +158,7 @@ namespace MapEditor.XferGui
             this.ammoMin.Name = "ammoMin";
             this.ammoMin.Size = new System.Drawing.Size(48, 20);
             this.ammoMin.TabIndex = 9;
+            this.ammoMin.ValueChanged += new System.EventHandler(this.ammoMin_ValueChanged);
             // 
             // ammoMax
             // 
@@ -242,7 +243,7 @@ namespace MapEditor.XferGui
             this.Controls.Add(this.picRender);
             this.Controls.Add(this.ammoMax);
             this.Controls.Add(this.ammoMin);
-            this.Controls.Add(this.label3);
+            this.Controls.Add(this.lblCharges);
             this.Controls.Add(this.enchantment4);
             this.Controls.Add(this.enchantment3);
             this.Controls.Add(this.enchantment2);
@@ -269,7 +270,7 @@ namespace MapEditor.XferGui
 		}
 		private System.Windows.Forms.NumericUpDown ammoMax;
 		private System.Windows.Forms.NumericUpDown ammoMin;
-		private System.Windows.Forms.Label label3;
+		private System.Windows.Forms.Label lblCharges;
 		private System.Windows.Forms.ComboBox enchantment4;
 		private System.Windows.Forms.ComboBox enchantment3;
 		private System.Windows.Forms.ComboBox enchantment2;

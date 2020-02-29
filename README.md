@@ -1,115 +1,103 @@
 # MapEditor
-Nox Map Editor 1.10 by KITTY
+## Nox Map Editor 1.2 by KITTY
 
-Added Copy Map features:
- - Copy Area mode: select an area on the map to copy
- - Copy All: copy everything on the map
- - Paste Area: place copied area anywhere on current/new/existing map (no limit)
- - Can specify which elements get pasted
- - (credit to panic and Schizz for the idea)
- 
-Added Map Image tab (replacing Export Image)
- - Render the current map into preview
- - Crop option: auto crops to outer edges of map
- - Change resolution (exports actual size specified)
- - Show/Hide specific Objects/Entities
- - Compression on saved images vastly improved
- - (took some functionality from NoxMapRender, credit to IllidanS4)
- 
-Added Tile Paint Bucket tool (not perfect)
- - Fill in area enclosed by walls or tiles
- - Right click to bucket delete
- 
-Added Wall Paint Bucket tool
- - Makes walls around selected tile group
- - (most funtionality from MapGenerator, credit to AngryKirC)
- 
-Added 'Color Special Walls' setting
+Improved map compression, nearly identical to original sizes!
+ - (many thanks to panic and AngryKiRC for their help)
 
-Added Window property to Wall Change mode
- - Can now make all walls windows
- - Shades both preview modes
- - Forces 'Color Special Walls' while mode is active
- 
-Added 'Recent' menu item: open previous maps
- - Will open new window if visible changes on current map
- 
-Added Quick Find tool to Shop Editor
- - Single click to set text
- - Double click to force text
- 
-Added 'Select All' waypoints button (replaced broken 'Enable All')
- - Can move just like Objects
- 
-Added menu for AngryKirC's 'Map Generator'
- - Added options to change tiles/walls/randomize/abort
- 
-Added mass editing feature to View Objects for: Script Name, Enchants 1-4 (+validation)
+Added Buff Editor Window:
+ - New GUI for adding Enchants to any entity
+ - Change Spell Level, Duration, and Shield HP
+ - CAUTION: Old map editors will fail to read map
 
-Added 'Import + Save' option: CTRL + S to reimport latest script(.obj) and save map
+Object List Window:
+ - Added search filter (Enter to search, Ctrl+Enter to clear)
+ - Added object count
+ - Added Delete Object
+ - Fixed Apply Changes not correctly updating when sorting
+ - Fixed Scripts/Enchants getting wiped after Editing Object
 
-Added preview to Equipment Enchantments:
- - Added Randomize button
-
-Added 'Map Saved' indicator
-
-Added option to 'Auto Increment' map version every save (+0.01)
-
-Added 'Export Native Script' option: saves all Strings/Functions as .txt file
-
-Added 'Help' menu with links
-
-Added Quick Menu button for Settings
-
-Added all Voices to NPC Edit and Maiden/Wounded Edit
-
-Added icons for a few buttons
-
-Groups Window:
- - Map Groups work again!
- - UI now a bit more intuitive
- - Extent validation on Save
- 
 Scripting Window:
- - UI now resizes better, moved Help text to bottom
- - Added Color Syntax toggle
- - Added Nox Script 3.0 indicators
- - Renamed Function now updates correctly in TreeView
- - Added Show Help toggle
- - Added Color Theme toggle
- - Fixed local variables clearing when editing GLOBAL
- - Added 25 missing script function descriptions
- 
-Mini Map tab:
- - Fixed Divide1/Divide2 for different zooms
- - Bumped Mini Map zoom to minimum of 1 and maximum of 7
- 
- Can use Escape key to cancel temporary modes:
- - Picker, Bucket, Line Draw, Rect Draw, Smart Draw, Copy/Paste Area, and Wall Change
- 
+ - Added more details in the Wrong Syntax error messages
+ - Functions treenode now defaults to expanded
+ - Window can now remain open while map editing
+ - Fixed parser not reading Gvars and vars above a single digit
+ - Fixed parser incorrectly parsing brackets
+ - Fixed parser not reading every jump label
+ - Fixed Groups not being recognized by their index
+
+Revised Voice set on NPC/Maiden Edit:
+ - Added "_Guard1", "_Guard2", and an empty option
+ - Got rid of broken ones
+ - Fixed unrecognized Voice error
+
+Trigger Edit:
+ - Added MonsterGenerator flag (Quest)
+ - Updated GUI
+
+Sentry Edit:
+ - Added preview for angle and speed
+ - Fixed SentryGlobe direction not applying to map
+ - Updated GUI
+
+Polygon Edit:
+ - Added Minimap Group to Polygon label
+ - Added all used Polygon colors to Custom Colors
+ - Fixed Polygons not accepting decimals
+ - Fixed Polygons Minimap Group range
+
+Added Wall Property Picker
+
+Added Clone to Inventory Edit
+
+Added Waypoints to Statusbar on hover
+
 Other:
- - Map Info tab now has proper character limits
- - Cleaned up Settings UI
- - Undo Clipboard now holds 50 changes (up from 15)
- - Disabled waypoints and double way path colors more distinguishable
- - Only warns of closing Editor if visible changes are made
- - Moved some menu items around (File, Map, Options, Help)
- - Changed Fast Preview walls from BlackWall to MagicWallSystemUseOnly (less ambiguious)
- - Window size and maximized mode saved
+ - Added option for Save NXZ Only
+ - Added icons for Grid Snap
+ - Added icon for Randomize
+ - Added Waypoint total to List
+ - Added Script Wiki link
 
-File Changes:
- - Latest.log file now only saves in MapEditor.exe directory
- - BlankMap.map no longer needed in MapEditor.exe directory
- - Categories.xml file is generated if it doesn't exist
- - 'noxscript' directory + contents generated if it doesn't exist
- - 'functiondesc' directory + contents generated if it doesn't exist
-
-Bug Fixes:
- - Weapons/Armor now default to standard Arena durability (used to crash map)
- - Fixed 'Show 3D Extents' setting not toggling
- - 'Export Script' handles errors a bit better
- - Fixed Maiden/Wounded voice bug not allowing change
- - Replaced main menu toolbar with MenuStrip, old one was limited and buggy
- - Waypoint/Object text drawing causing huge render delays; replaced TextRenderer with DrawString
- - Fixed object values(xfer) not saving on deletion -> Undo
+More Bug Fixes:
+ - Fixed Bomber Spells
+ - Fixed ColorLight Editor not expanding
+ - Fixed Object box switching tabs when numbers 1-4 pressed
+ - Fixed Recent Items removing from top instead of bottom
+ - Fixed Undo not reversing Oriented Rectangle
+ - Fixed Undo wiping NPC properties
+ - Fixed Existing Team setting not functioning
+ - Fixed Weapons not accepting 0 charges
+ - Fixed Tile Picker not selecting variation
+ - Fixed Tile Brush not applying Manual Variation
+ - Fixed tabs not scaling properly on non-English Windows
+ - Fixed Groups occasionally saving incorrect index
+ - Fixed Grid Snap settings not saving/loading
+ - Fixed "Buffer cannot be null" error when saving
  - Many other small bug fixes and code cleanup
+
+
+## Nox Map Editor X by Protokol
+
+Waypoints:
+ - Added Connection Flag
+ - Select/Enable/Delete multiple Waypoints
+ - Added Copy Waypoints Right-click menu
+ - Fixed editor not drawing all Connections
+
+Added Waypoint List to Map menu
+ - Can search/sort by any column
+
+Added Waypoint Properties dialog
+ - Can view/delete all Connections
+ - Can edit Coordinates
+
+Added Object search filter
+ - Type in Object box, then hit Space bar
+
+Added Randomize button based on Category
+ - Right click to reshuffle
+
+Other:
+ - Disabled Objects are shaded gray
+ - Inventory list shows count of items
+ - Added graphic to About
