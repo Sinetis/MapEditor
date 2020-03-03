@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Runtime;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
@@ -23,23 +24,10 @@ namespace MapEditor
         private string prevname;
         public bool hasLoaded = false;
         private int lastHeight;
-        private string lastLine = "";
+        private string lastLine = ""; // Used for error reporting
         protected List<string> strings;
         protected Map.ScriptFunction sf;
         protected Map.ScriptObject sct;
-        private Label lblVariables;
-        private Label lblFunctionName;
-        private TextBox nameBox;
-        private Button cancelButton;
-        private ListBox lstMethods;
-        private SyntaxRichTextBox scriptBox;
-        private Button okButton;
-        private TextBox symbBox;
-        private CheckBox chkColorSyntax;
-        private TreeView scriptTree;
-        private CheckBox chkShowHelp;
-        private CheckBox chkColorTheme;
-
         public Map.ScriptObject Scripts
         {
             get
@@ -103,7 +91,6 @@ namespace MapEditor
             }
 
         }
-
         public List<string> ScriptStrings
         {
             get { return strings; }
@@ -115,9 +102,22 @@ namespace MapEditor
             get { return funcs; }
             set { funcs = value; }
         }
+
+        private SyntaxRichTextBox scriptBox;
         #endregion
 
         #region Windows Form Designer generated code
+        private Label lblVariables;
+        private Label lblFunctionName;
+        private Button cancelButton;
+        private Button okButton;
+        private ListBox lstMethods;
+        private TextBox nameBox;
+        private TextBox symbBox;
+        private CheckBox chkColorSyntax;
+        private CheckBox chkShowHelp;
+        private CheckBox chkColorTheme;
+        private TreeView scriptTree;
         private ContextMenuStrip treeMenu;
         private ToolStripMenuItem addToolStripMenuItem;
         private ToolStripMenuItem deleteToolStripMenuItem;
@@ -479,111 +479,41 @@ namespace MapEditor
                 Dictionary<int, string> jumps = new Dictionary<int, string>();
                 Dictionary<string, int> labels = new Dictionary<string, int>();
 
-                //while ((start = scr.IndexOf('"')) != -1)
-                for (; (start = scr.IndexOf('"')) != -1; scr = scr.Remove(start, end - start + 1).Insert(start, string.Format("*{0}", Scripts.SctStr.IndexOf(s))))
+                while ((start = scr.IndexOf('"')) != -1)
                 {
                     end = scr.IndexOf('"', start + 1);
                     s = scr.Substring(start + 1, end - start - 1);
                     if (!Scripts.SctStr.Contains(s))
                         Scripts.SctStr.Add(s);
-                    //scr = scr.Remove(start, end - start + 1).Insert(start, string.Format("*{0}", Scripts.SctStr.IndexOf(s)));
+                    scr = scr.Remove(start, end - start + 1).Insert(start, string.Format("*{0}", Scripts.SctStr.IndexOf(s)));
                 }
                 foreach (var str in scr.Split('\n'))
                 {
                     linenum++;
                     flags = 0;
                     string line = str.Trim();
-                    lastLine = line; // Only used for debugging
-                    if (line.StartsWith("Gvar") && line.Contains("=")) // Set global variable
+                    lastLine = line;
+                    // Set global variable
+                    if (line.StartsWith("Gvar") && line.Contains("="))
                     {
-                        int line_len = line.StartsWith("GvarF") ? 5 : 4;  // GvarF is never used in declaration, not sure why this is here
+                        int line_len = line.StartsWith("GvarF") ? 5 : 4;
                         wtr.Write(2);
                         wtr.Write(1);
 
-                        var bracketPos = line.IndexOf('[');
-
-                        var newPos = -1;
-                        if (bracketPos > -1)
-                            newPos = bracketPos - line_len;
-                        else
-                            newPos = GetValidDigitsFrom(line, line_len) - line_len;
-
-                        var result = int.Parse(line.Substring(line_len, newPos));
-
-                        wtr.Write(result);
-                        if (bracketPos > -1 && line.IndexOf('[') < line.IndexOf('='))
-                        {
-                            try
-                            {
-                                ParseWord(wtr, 0, line.Substring(line.IndexOf('[') + 1, line.IndexOf(']') - line.IndexOf('[') - 1));
-                            }
-                            catch
-                            {
-                                MessageBox.Show("Wrong Syntax!\nFailed to parse array variable.\n\nLine: " + line, sf.name);
-                                return;
-                            }
-                            wtr.Write(0x44);
-                        }
-                        switch (line[line.IndexOf("=") - 1])
-                        {
-                            case 'f':
-                                flags = 0x17;
-                                break;
-                            case '+':
-                                flags = (line[line.IndexOf("=") - 2]) == 'f' ? 0x1E : 0x1D;
-                                break;
-                            default:
-                                flags = 0x16;
-                                break;
-                        }
-                        line = line.Split('=')[1].Trim();
+                        var arrResult = ParseVariable(line, line_len, wtr);
+                        flags = arrResult.Key;
+                        line = arrResult.Value;
                     }
-                    else if (line.StartsWith("var") && line.Contains("=")) // Set local variable
+                    // Set local variable
+                    else if (line.StartsWith("var") && line.Contains("="))
                     {
                         int line_len = line.StartsWith("varF") ? 4 : 3;
                         wtr.Write(2);
                         wtr.Write(0);//var0 = Ob
 
-                        var leftside = line.Substring(0, line.IndexOf('='));
-                        var bracketPos = leftside.IndexOf('[');
-
-                        var newPos = -1;
-                        if (bracketPos > -1)
-                            newPos = bracketPos - line_len;
-                        else
-                            newPos = GetValidDigitsFrom(line, line_len) - line_len;
-
-                        var result = int.Parse(line.Substring(line_len, newPos));
-
-                        wtr.Write(result);
-
-                        if (bracketPos > -1)
-                        {
-
-                            try
-                            {
-                                ParseWord(wtr, 0, line.Substring(bracketPos + 1, line.IndexOf(']') - bracketPos - 1));
-                            }
-                            catch
-                            {
-                                MessageBox.Show("Wrong Syntax!\nFailed to parse array variable.\n\nLine: " + line, sf.name);
-                                return;
-                            }
-                            wtr.Write(0x44);
-                        }
-                        switch (line[line.IndexOf("=") - 1])
-                        {
-                            case 'f':
-                                flags = 0x17;
-                                break;
-                            case '+':
-                                flags = (line[line.IndexOf("=") - 2]) == 'f' ? 0x1E : 0x1D;
-                                break;
-                            default:
-                                flags = 0x16;
-                                break;
-                        }
-                        line = line.Split('=')[1].Trim();
+                        var arrResult = ParseVariable(line, line_len, wtr);
+                        flags = arrResult.Key;
+                        line = arrResult.Value;
                     }
                     else if (line.StartsWith("if")) // If - jump statement
                     {
@@ -669,6 +599,55 @@ namespace MapEditor
             }
         }
 
+        private KeyValuePair<int, string> ParseVariable(string line, int lineLen, BinaryWriter binaryWriter)
+        {
+            // Check for array brackets (Gvar82[100] f= 0.35)
+            var leftSide = line.Substring(0, line.IndexOf('='));
+            var rightSide = line.Split('=')[1].Trim();
+            var bracketPos = leftSide.IndexOf('[');
+
+            // Find array number (Gvar82)
+            var newPos = -1;
+            if (bracketPos > -1)
+                newPos = bracketPos - lineLen;
+            else
+                newPos = GetValidDigitsFrom(line, lineLen) - lineLen;
+
+            var arrNum = int.Parse(line.Substring(lineLen, newPos));
+            binaryWriter.Write(arrNum);
+
+            // Declaring array element; find array index
+            if (bracketPos > -1)
+            {
+                try
+                {
+                    ParseWord(binaryWriter, 0, line.Substring(bracketPos + 1, line.IndexOf(']') - bracketPos - 1));
+                }
+                catch
+                {
+                    MessageBox.Show("Wrong Syntax!\nFailed to parse array variable.\n\nLine: " + line, sf.name);
+                    //return new KeyValuePair<int, string>(-1, null);
+                    throw new Exception();
+                }
+                binaryWriter.Write(0x44);
+            }
+            // Parse equal operators ( = , f= , += )
+            int resultFlag;
+            switch (line[line.IndexOf("=") - 1])
+            {
+                case 'f':
+                    resultFlag = 0x17;
+                    break;
+                case '+':
+                    resultFlag = (line[line.IndexOf("=") - 2]) == 'f' ? 0x1E : 0x1D;
+                    break;
+                default:
+                    resultFlag = 0x16;
+                    break;
+            }
+
+            return new KeyValuePair<int, string>(resultFlag, rightSide);
+        }
         private int GetValidDigitsFrom(string input, int startAt)
         {
             // Used to find variable number; i.e. GetValidDigitsFrom("Gvar55 f= GetObjectX(Gvar0)", 4) returns 2
@@ -686,6 +665,7 @@ namespace MapEditor
             float tempF = 0;
             int tempI = 0;
             s = Join(wordi, line);
+
             if (word.Length > 0)
             {
                 switch (word)
@@ -921,7 +901,7 @@ namespace MapEditor
                             else
                                 wtr.Write(0);
                             wtr.Write(1);
-                            wtr.Write(Int32.Parse(word.Substring(4)));
+                            wtr.Write(int.Parse(word.Substring(4)));
                             if (array.Length > 0)
                             {
                                 while (array.Length > 0)
@@ -946,7 +926,7 @@ namespace MapEditor
                             else
                                 wtr.Write(0);
                             wtr.Write(0);
-                            wtr.Write(Int32.Parse(word.Substring(3)));
+                            wtr.Write(int.Parse(word.Substring(3)));
                             if (array.Length > 0)
                             {
                                 while (array.Length > 0)
@@ -978,16 +958,16 @@ namespace MapEditor
                         else if (word[0] == '*' && word[1] != ' ')  // String pointer (i.e. *20 = 21st String in array)
                         {
                             wtr.Write(6);
-                            wtr.Write(Int32.Parse(word.Remove(0, 1)));
+                            wtr.Write(int.Parse(word.Remove(0, 1)));
                             s = Join(wordi + 1, line);
                         }
-                        else if (word[0] == 'f' && Single.TryParse(word.Remove(0, 1), out tempF))
+                        else if (word[0] == 'f' && float.TryParse(word.Remove(0, 1), out tempF))
                         {
                             wtr.Write(5);
                             wtr.Write(tempF);
                             s = Join(wordi + 1, line);
                         }
-                        else if (Int32.TryParse(word, out tempI))
+                        else if (int.TryParse(word, out tempI))
                         {
                             wtr.Write(4);
                             wtr.Write(tempI);
@@ -1123,7 +1103,7 @@ namespace MapEditor
                 }
                 if (scriptTree.SelectedNode == treeNode2)
                 {
-                    treeNode2.Nodes.Add(String.Format("{0}: {1}", Scripts.Funcs.Count, "New Function"));
+                    treeNode2.Nodes.Add(string.Format("{0}: {1}", Scripts.Funcs.Count, "New Function"));
                     Map.ScriptFunction sf = new Map.ScriptFunction();
                     sf.name = "New Function";
                     sf.code = new byte[0];
@@ -1152,7 +1132,7 @@ namespace MapEditor
                         int i = 0;
                         foreach (Map.ScriptFunction sf in Scripts.Funcs)
                         {
-                            treeNode2.Nodes.Add(String.Format("{0}: {1}", i, sf.name));
+                            treeNode2.Nodes.Add(string.Format("{0}: {1}", i, sf.name));
                             i++;
                         }
                     }
@@ -1634,12 +1614,28 @@ namespace MapEditor
                 opcode = rdr.ReadInt32();
                 switch (opcode)
                 {
+                    case 0:
+                    case 1:
+                    case 2:
+                    case 3:
+                        _ = rdr.ReadInt32();
+                        _ = rdr.ReadInt32();
+                        break;
+                    case 5:
+                        _ = rdr.ReadSingle();
+                        break;
                     case 0x13:
                     case 0x14:
                     case 0x15:
                         opcode = rdr.ReadInt32();
                         if (!jumps.Contains(opcode))
                             jumps.Add(opcode);
+                        break;
+                    case 4:
+                    case 6:
+                    case 0x45:
+                    case 0x46:
+                        _ = rdr.ReadInt32();
                         break;
                 }
             }
