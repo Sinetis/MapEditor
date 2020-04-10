@@ -383,7 +383,7 @@ namespace MapEditor.newgui
             this.PickerProp.Name = "PickerProp";
             this.PickerProp.Size = new System.Drawing.Size(30, 30);
             this.PickerProp.TabIndex = 38;
-            this.toolTip1.SetToolTip(this.PickerProp, "Wall Picker (Ctrl+A)");
+            this.toolTip1.SetToolTip(this.PickerProp, "Wall Property Picker (Ctrl+A)");
             this.PickerProp.UseVisualStyleBackColor = true;
             this.PickerProp.CheckedChanged += new System.EventHandler(this.PickerProp_CheckedChanged);
             // 

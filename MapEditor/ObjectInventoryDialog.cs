@@ -64,7 +64,9 @@ namespace MapEditor
 			foreach (Map.Object o in obj.InventoryList)
                 objectsList.Items.Add(o);
 
-            if (objectsList.Items.Count > 0)
+            if (objectsList.Items.Count <= i)
+                objectsList.SelectedIndex = objectsList.Items.Count - 1;
+            else if (objectsList.Items.Count > 0)
                 objectsList.SelectedIndex = i;
 		}
 

@@ -1146,7 +1146,7 @@ namespace MapEditor
             if (e.KeyCode >= Keys.A && e.KeyCode <= Keys.Z || e.KeyCode >= Keys.D0 && e.KeyCode <= Keys.D9 || e.KeyCode >= Keys.NumPad0 && e.KeyCode <= Keys.NumPad9)
             {
                 MainWindow.Instance.suggestBox.Visible = false;
-                wheeled = true;
+                //wheeled = true;
             }
             else if (e.KeyCode == Keys.Space)
             {

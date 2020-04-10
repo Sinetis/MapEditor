@@ -558,7 +558,12 @@ namespace NoxShared.ObjDataXfer
 			{
 				bw.Write(ShopkeeperInfo.BuyValueMultiplier);
 				bw.Write(ShopkeeperInfo.SellValueMultiplier);
-				bw.Write(ShopkeeperInfo.ShopkeeperGreetingText);
+				// bug fix for old maps
+				string greeting = (ShopkeeperInfo.ShopkeeperGreetingText == null) ? "" : ShopkeeperInfo.ShopkeeperGreetingText;
+				bw.Write(greeting);
+				// bug fix for old maps
+				if (ShopkeeperInfo.ShopItems == null)
+					ShopkeeperInfo.ShopItems = new ShopItemInfo[] { };
 				byte itemsCount = (byte) ShopkeeperInfo.ShopItems.Length;
 				ShopItemInfo item;
 				bw.Write(itemsCount);

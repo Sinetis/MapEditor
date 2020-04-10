@@ -479,6 +479,7 @@ namespace MapEditor
                 Dictionary<int, string> jumps = new Dictionary<int, string>();
                 Dictionary<string, int> labels = new Dictionary<string, int>();
 
+                // Find, store, and replace all strings with '*index'
                 while ((start = scr.IndexOf('"')) != -1)
                 {
                     end = scr.IndexOf('"', start + 1);
@@ -515,7 +516,8 @@ namespace MapEditor
                         flags = arrResult.Key;
                         line = arrResult.Value;
                     }
-                    else if (line.StartsWith("if")) // If - jump statement
+                    // If - jump statement
+                    else if (line.StartsWith("if"))
                     {
                         flags = 0x14;
                         if (line.StartsWith("if not"))
@@ -937,10 +939,9 @@ namespace MapEditor
                         }
                         else if (word.Contains("("))    // Parse method and args
                         {
-                            
                             name = s.Remove(s.IndexOf('('));
                             int end = FindClosing(s.Substring(s.IndexOf('(') + 1));
-                            if (end > 0)
+                            if (end > 0) // BUG: Needs to check for nested functions with multiple arguments, that or read numArgs
                                 args = s.Substring(s.IndexOf('(') + 1, end - 1).Split(',');
                             else
                                 args = new string[0];
