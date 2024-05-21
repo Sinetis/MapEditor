@@ -911,23 +911,22 @@ namespace MapEditor
 
                     if (ThingDb.Things[(string)thingName].Xfer == "DoorXfer")
                     {
-                        sbyte facing = (sbyte)delta;
-                        if (e.Delta >= 90) facing += 8;
-                        if (e.Delta <= 90) facing -= 8;
+                        var facing = (int)delta;
+                        facing += e.Delta > 0 ? 8 : -8;
 
                         if (facing > 24) facing = 0;
                         if (facing < 0) facing = 24;
+
                         delta = facing;
                     }
                     else if (ThingDb.Things[(string)thingName].Xfer == "MonsterXfer" || ThingDb.Things[(string)thingName].Xfer == "NPCXfer")
                     {
                         int facing = Array.IndexOf(directions, (int)delta);
-
-                        if (e.Delta >= 90) facing += 1;
-                        if (e.Delta <= 90) facing -= 1;
+                        facing += e.Delta > 0 ? 1 : -1;
 
                         if (facing > 7) facing = 0;
                         if (facing < 0) facing = 7;
+
                         delta = (byte)directions[facing];
                     }
                     else if (ThingDb.Things[(string)thingName].Xfer == "SentryXfer")
@@ -935,10 +934,10 @@ namespace MapEditor
                         int rotatDegrees = (int)(delta * 180 / Math.PI);
                         rotatDegrees += e.Delta / 30;
                         if (rotatDegrees > 360) rotatDegrees -= 360;
-                        if (e.Delta >= 90)
-                            rotatDegrees = 5 * (int)(decimal.Ceiling((decimal)(rotatDegrees - 0.1) / 5));
 
-                        if (e.Delta <= 90)
+                        if (e.Delta > 0)
+                            rotatDegrees = 5 * (int)(decimal.Ceiling((decimal)(rotatDegrees - 0.1) / 5));
+                        else
                             rotatDegrees = -5 * (int)(decimal.Ceiling((decimal)(rotatDegrees + 0.1) / -5));
 
                         // deg2rad
@@ -959,9 +958,8 @@ namespace MapEditor
                             if (ThingDb.Things[obj.Name].Xfer == "DoorXfer")
                             {
                                 DoorXfer door = obj.GetExtraData<DoorXfer>();
-                                sbyte facing = (sbyte)door.Direction;
-                                if (e.Delta >= 90) facing += 8;
-                                if (e.Delta <= 90) facing -= 8;
+                                var facing = (int)door.Direction;
+                                facing += e.Delta > 0 ? 8 : -8;
 
                                 if (facing > 24) facing = 0;
                                 if (facing < 0) facing = 24;
@@ -977,10 +975,10 @@ namespace MapEditor
                                 // rotate(lel)
                                 rotatDegrees += e.Delta / 30;
                                 if (rotatDegrees > 360) rotatDegrees -= 360;
-                                if (e.Delta >= 90)
-                                    rotatDegrees = 5 * (int)(decimal.Ceiling((decimal)(rotatDegrees - 0.1) / 5));
 
-                                if (e.Delta <= 90)
+                                if (e.Delta > 0)
+                                    rotatDegrees = 5 * (int)(decimal.Ceiling((decimal)(rotatDegrees - 0.1) / 5));
+                                else
                                     rotatDegrees = -5 * (int)(decimal.Ceiling((decimal)(rotatDegrees + 0.1) / -5));
 
                                 // deg2rad
@@ -995,9 +993,7 @@ namespace MapEditor
                             {
                                 MonsterXfer monster = obj.GetExtraData<MonsterXfer>();
                                 int facing = Array.IndexOf(directions, monster.DirectionId);
-
-                                if (e.Delta >= 90) facing += 1;
-                                if (e.Delta <= 90) facing -= 1;
+                                facing += e.Delta > 0 ? 1 : -1;
 
                                 if (facing > 7) facing = 0;
                                 if (facing < 0) facing = 7;
@@ -1008,9 +1004,7 @@ namespace MapEditor
                             {
                                 NPCXfer npc = obj.GetExtraData<NPCXfer>();
                                 int facing = Array.IndexOf(directions, npc.DirectionId);
-
-                                if (e.Delta >= 90) facing += 1;
-                                if (e.Delta <= 90) facing -= 1;
+                                facing += e.Delta > 0 ? 1 : -1;
 
                                 if (facing > 7) facing = 0;
                                 if (facing < 0) facing = 7;
@@ -1040,10 +1034,12 @@ namespace MapEditor
                 Button wallSelectButton = WallMakeNewCtrl.WallSelectButtons[index];
                 wallSelectButton.PerformClick();
                 wallSelectButton.Focus();
-                mapPanel.Invalidate();
             }
+
+            mapPanel.Invalidate();
         }
         #endregion
+
         #region Object/Waypoint Events
         private void cboObjMouseWheel(object sender, MouseEventArgs e)
         {
@@ -3515,7 +3511,7 @@ namespace MapEditor
         private StatusBar statusBar;
         public StatusBarPanel statusLocation;
         private StatusBarPanel statusMode;
-        public Panel scrollPanel; //WARNING: the form designer is not happy with this
+        public PanelWithoutWheel scrollPanel; //WARNING: the form designer is not happy with this
         public FlickerFreePanel mapPanel;
         private MenuItem contextMenuCopy;
         private MenuItem contextMenuPaste;
@@ -3664,7 +3660,7 @@ namespace MapEditor
             this.cmdUndo = new System.Windows.Forms.Button();
             this.lblMapStatus = new System.Windows.Forms.Label();
             this.lstDebug = new System.Windows.Forms.ListBox();
-            this.scrollPanel = new System.Windows.Forms.Panel();
+            this.scrollPanel = new PanelWithoutWheel();
             this.mapPanel = new MapEditor.MapView.FlickerFreePanel();
             this.contextMenu = new System.Windows.Forms.ContextMenu();
             this.contextMenuCopy = new System.Windows.Forms.MenuItem();
@@ -4695,6 +4691,13 @@ namespace MapEditor
         public static Point ToPoint(this PointF source)
         {
             return new Point((int)source.X, (int)source.Y);
+        }
+    }
+
+    public class PanelWithoutWheel : Panel
+    {
+        protected override void OnMouseWheel(MouseEventArgs e)
+        {
         }
     }
 }
